@@ -205,7 +205,7 @@ PAGES = [
                        "lui-même, au lieu d'écrire un parseur de plus.",
         'sous_titre': 'visualiseur G-code',
         'resume': "Visualiseur de parcours LinuxCNC en PySide6/OpenGL, appuyé sur rs274. "
-                  "Dépôt privé.",
+                  "Code public, LGPL-2.1.",
     },
     {
         'contenu': 'pupitre-graphtec.html',
@@ -216,7 +216,7 @@ PAGES = [
                        "et le protocole propriétaire TC relevé au flux USB.",
         'sous_titre': 'pupitre Graphtec',
         'resume': "Pilotage du traceur de découpe Graphtec CE6000-60 sous Linux, sans "
-                  "driver constructeur. Dépôt privé.",
+                  "driver constructeur. Code public, GPL-3.0.",
     },
     {
         'contenu': 'projets.html',
