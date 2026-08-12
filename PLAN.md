@@ -308,11 +308,23 @@ pas encore. Relevé au `dig` le 12/08/2026 : l'apex et `www`/`laser`/`liens` poi
 GitHub Pages, **`printnc` n'existe pas, pas de wildcard**.
 
 **Reste, dans cet ordre :**
-1. **DNS, geste de Christophe** — chez le registraire, un seul enregistrement, à l'identique
-   de `laser` et `liens` :
-   `printnc  CNAME  atelierduverdier.github.io.`
-   (Avant les CNAME, il ne sert à rien : GitHub répond 404 pour un domaine non réclamé.
-   C'est l'état sûr.)
+1. **DNS, geste de Christophe.** Registraire **ET** hébergeur de la zone : **OVH**
+   (RDAP AFNIC + `NS ns109/dns109.ovh.net` — la zone n'est déléguée nulle part ailleurs).
+   Domaine créé le 17/06/2026, expire le 17/06/2029.
+
+   Manager OVH → *Noms de domaine* → `atelierduverdier.fr` → onglet **Zone DNS** →
+   *Ajouter une entrée* → **CNAME** :
+
+   | champ | valeur |
+   |---|---|
+   | Sous-domaine | `printnc` |
+   | Cible | `atelierduverdier.github.io.` (avec le point final) |
+
+   C'est exactement ce que sont déjà `laser`, `liens` et `www` — vérifié au `dig`. L'apex,
+   lui, garde ses quatre `A` vers GitHub : un CNAME est interdit sur un apex.
+
+   Avant la permutation des CNAME, cet enregistrement ne fait rien de visible : GitHub
+   répond 404 pour un domaine qu'aucun dépôt ne réclame. C'est l'état sûr.
 2. **Dès qu'il résout** (`dig +short printnc.atelierduverdier.fr` rend les IP GitHub), la
    permutation, deux gestes de deux minutes :
    a. dans `printnc-build` : `CNAME` passe de `atelierduverdier.fr` à
