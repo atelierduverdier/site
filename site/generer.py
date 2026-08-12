@@ -172,7 +172,7 @@ PAGES = [
 LIENS_PIED = [
     ('https://github.com/atelierduverdier', 'GitHub'),
     ('https://laser.atelierduverdier.fr', 'Atelier Laser'),
-    ('https://atelierduverdier.fr', 'Journal PrintNC'),
+    ('https://printnc.atelierduverdier.fr', 'Journal PrintNC'),
     ('https://liens.atelierduverdier.fr', 'Mes liens'),
 ]
 
