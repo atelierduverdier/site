@@ -38,6 +38,21 @@ def courir(cmd, **kw):
 
 
 def main() -> None:
+    # 0. Les planches reprises des projets sont-elles à jour ? Ce sont des
+    #    artefacts tirés d'autres artefacts — modèle → PDF → PNG → WebP —
+    #    et rien dans la chaîne ne garantit l'ordre des dates. Le 12/08/2026,
+    #    une planche corrigée à 20 h 27 s'est affichée en ligne dans sa
+    #    version de 20 h 02 : le dessin existait, il était simplement
+    #    d'avant, et ça ne se voyait qu'en ouvrant le PDF à côté.
+    print("--- fraîcheur des planches reprises ---")
+    r = subprocess.run([sys.executable,
+                        str(RACINE / 'site' / 'outils' / 'reprendre_plans.py'),
+                        '--verifier'], cwd=RACINE)
+    if r.returncode != 0:
+        sys.exit("publier : une planche du site est plus vieille que sa "
+                 "source — rien n'est poussé.\n"
+                 "  python3 site/outils/reprendre_plans.py")
+
     # 1. Régénérer. Le générateur porte les garde-fous ; on ne les répète pas.
     r = subprocess.run([sys.executable, str(RACINE / 'site' / 'generer.py')],
                        cwd=RACINE)
