@@ -81,6 +81,24 @@ def injecter_laser(corps: str, nom: str) -> str:
     return corps
 
 
+def compteur_prefixe() -> str:
+    """Le bout de script qui préfixe les chemins remontés au compteur.
+
+    Posé AVANT count.js : le script lit `window.goatcounter` au chargement.
+    `path` accepte une fonction, qui reçoit le chemin courant et rend celui
+    à enregistrer.
+    """
+    if not PREFIXE_COMPTEUR:
+        return ''
+    return (
+        '<script>\n'
+        '  window.goatcounter = {\n'
+        f"    path: function (p) {{ return '{PREFIXE_COMPTEUR}' + p }}\n"
+        '  };\n'
+        '</script>'
+    )
+
+
 def logo_en_ligne() -> str:
     """Le logo, prêt à être collé dans une page.
 
@@ -106,6 +124,13 @@ ANNEE = '2026'
 # conflit. L'ordre a été DNS (OVH) → libération par le journal → cette
 # ligne. Voir PLAN.md, chantier 2.
 DOMAINE = 'atelierduverdier.fr'
+
+# Préfixe des chemins remontés à GoatCounter. Le compte est commun à tout le
+# domaine et n'enregistre PAS le nom d'hôte (vérifié dans count.js) : sans
+# préfixe, le « / » du portail et celui du journal PrintNC se confondraient.
+# C'est le nouveau venu qui se préfixe — le journal garde son historique.
+# Vide ('') = pas de préfixe, pour un site qui serait seul sur son compte.
+PREFIXE_COMPTEUR = '/portail'
 
 # --- Les pages -----------------------------------------------------------
 # `sortie` est relatif à public/ ; la profondeur en déduit {{RACINE}}.
@@ -351,6 +376,7 @@ def main() -> None:
             }, 'entete.html')
             + '\n' + corps + '\n'
             + remplir(pied, {
+                'COMPTEUR_PREFIXE': compteur_prefixe(),
                 'LOGO': logo,
                 'RACINE': prefixe,
                 'SOUS_TITRE': page['sous_titre'],

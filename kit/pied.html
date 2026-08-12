@@ -46,7 +46,18 @@
 
 <!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
      tous les sous-domaines remontent au même endroit. Pas de cookie, pas
-     de tiers publicitaire, rien à demander au visiteur. -->
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+{{COMPTEUR_PREFIXE}}
 <script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 
