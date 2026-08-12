@@ -1,0 +1,10 @@
+; Un arc mal formé, pour la capture du bandeau d'erreur du visualiseur.
+; Le mot K est interdit dans un arc du plan XY (G17) : c'est l'exemple même
+; que cite le projet pour expliquer pourquoi il AJOUTE une raison au message
+; de rs274, exact mais trop court.
+G21 G17
+G0 X0 Y0
+G1 X40 Y0 F600
+G2 X60 Y20 K10
+G1 X60 Y40
+M2

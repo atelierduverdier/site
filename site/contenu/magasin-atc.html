@@ -1,0 +1,558 @@
+<!-- Magasin ATC ER20 — la note de calcul de la bille.
+
+     AUCUN NOMBRE N'EST ÉCRIT DANS CETTE PAGE. Chaque marque « atc point
+     quelque-chose » est lue au moment de la génération dans
+     `note_calcul.valeurs()` du projet magasin-atc — la fonction même qui
+     engendre la note de calcul en PDF. Le tableau des saillies est engendré
+     entier : changer BILLE_SAILLIE dans le modèle déplace la ligne en gras
+     tout seul, sans toucher à ce fichier.
+
+     Une clé absente du modèle ARRÊTE la génération plutôt que de laisser
+     passer un trou — ou pire, un nombre périmé. Voir site/valeurs_atc.py.
+     (Pas d'exemple littéral de marque dans ce commentaire : le générateur
+     le prendrait pour une vraie, et refuserait de produire la page.)
+
+     Les schémas sont des SVG EN LIGNE, pas des images : ils utilisent les
+     variables du thème et suivent donc le clair/sombre, et leurs étiquettes
+     chiffrées sont des marques comme le reste. Les planches TechDraw, elles,
+     ont leurs traits en dur et vivent sur plaque claire. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">Broche <b>ER20</b></span>
+          <span class="badge">{{atc.postes|0}} postes</span>
+          <span class="badge">{{atc.billes_total|0}} billes acier <b>Ø{{atc.bille|0}}</b></span>
+        </div>
+        <h1>Trois billes contre un écrou</h1>
+        <p class="lede">
+          Comment un changeur d'outil automatique tient sur une seule cote libre —
+          et pourquoi elle vaut {{atc.saillie|2}} mm.
+        </p>
+      </div>
+      <div class="hero-art">
+        <!-- Vue de dessus, à l'échelle vraie : les trois rayons en jeu y sont
+             volontairement indiscernables. C'est tout le propos. -->
+        <svg style="font-size:9.9px" viewBox="0 0 340 340" role="img" aria-label="Vue de dessus : l'écrou hexagonal dans la chambre, retenu par trois billes">
+          <g class="figure">
+            <circle cx="170" cy="170" r="87.5" fill="none" stroke="var(--fg-3)"
+                    stroke-width="1.2" stroke-dasharray="4 3"/>
+            <polygon points="256.6,170 213.3,95 126.7,95 83.4,170 126.7,245 213.3,245"
+                     fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.8"/>
+            <circle cx="170" cy="76" r="12.5" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.2"/>
+            <circle cx="88.6" cy="217" r="12.5" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.2"/>
+            <circle cx="251.4" cy="217" r="12.5" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.2"/>
+            <text x="170" y="174" text-anchor="middle" fill="var(--fg-2)">écrou</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Le principe</div>
+    <h2>Une butée franche, et rien d'autre</h2>
+    <p class="sec-lede">
+      Chaque poste tient un écrou ER20 — avec sa pince et son outil — suspendu dans une
+      chambre Ø{{atc.chambre|0}}, retenu par trois billes acier Ø{{atc.bille|0}} qui font
+      saillie de {{atc.saillie|2}} mm.
+    </p>
+
+    <p>
+      L'écrou descend six-pans en avant. Ses <b>plats</b> passent entre les billes, ses
+      <b>angles</b> non : il tourne librement d'un angle fini, puis <b>bute net</b>. La
+      broche lancée à 1 500 tr/min s'arrête sec sur cette butée, et c'est cet arrêt qui
+      fournit le couple de vissage ou de dévissage. Il n'y a pas d'autre moteur, pas de
+      doigt, pas de vérin : toute la mécanique du changement d'outil tient dans ce
+      contact.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">{{atc.saillie|2}} mm</span><span class="l">saillie des billes<br>la seule cote vraiment libre</span></div>
+      <div class="chiffre"><span class="v">{{atc.mordant|2}} mm</span><span class="l">mordant sur les angles<br>ce qui retient</span></div>
+      <div class="chiffre"><span class="v">{{atc.angle_centre|1}}°</span><span class="l">rotation libre<br>avant la butée</span></div>
+      <div class="chiffre"><span class="v">{{atc.porte|2}} mm</span><span class="l">hauteur du contact<br>la cote la plus critique</span></div>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">D'où viennent ces nombres</span>
+      <p>
+        De <code>docs/note-de-calcul-ER20.pdf</code>, huit pages <b>engendrées depuis le
+        modèle</b> : aucun chiffre n'y est recopié, un paramètre qui change dans le code
+        change dans le document. L'écrou, lui, a été mesuré au pied à coulisse — {{atc.ecrou_h|0}} mm
+        hors tout, dont <b>{{atc.hex|0}} mm seulement de six-pans</b> et {{atc.entreplat|0}} sur plats.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Le calcul</div>
+    <h2>Pourquoi la saillie vaut {{atc.saillie|2}} mm</h2>
+    <p class="sec-lede">
+      C'est le seul chiffre du mécanisme qui soit vraiment libre. Il n'est ni mesuré ni
+      copié : il se déduit de deux impossibilités, et on le place dans ce qui reste.
+    </p>
+
+    <h3>Les trois rayons qui décident de tout</h3>
+    <p>
+      Vue de dessus et à l'échelle, les trois rayons en jeu sont indiscernables — ils
+      tiennent dans {{atc.s_max|1}} mm. Il faut les déplier pour voir quoi que ce soit. Notons
+      <var>r<sub>b</sub></var> le rayon du cercle tangent intérieurement aux trois billes.
+    </p>
+
+    <figure class="figure">
+      <svg style="font-size:10.1px" viewBox="0 0 540 250" role="img" aria-label="Les rayons dépliés : plats à {{atc.plat_r|2}}, tangente aux billes à {{atc.rb_centre|2}}, angles à {{atc.r_angles|2}}, chambre à {{atc.r_chambre|2}}">
+        <!-- axe -->
+        <line x1="60" y1="140" x2="500" y2="140" class="cote"/>
+        <polygon points="500,140 492,136.5 492,143.5" fill="var(--fg-2)"/>
+        <text x="500" y="158" text-anchor="end" class="petit">rayon (mm)</text>
+
+        <!-- graduations : x = 60 + (r - 14.6) * 130 -->
+        <g class="trait-fin">
+          <line x1="112" y1="134" x2="112" y2="146"/>
+          <line x1="281" y1="134" x2="281" y2="146"/>
+          <line x1="413.6" y1="134" x2="413.6" y2="146"/>
+          <line x1="437" y1="134" x2="437" y2="146"/>
+        </g>
+        <text x="112" y="160" text-anchor="middle" class="petit">{{atc.plat_r|2}}</text>
+        <text x="281" y="160" text-anchor="middle" class="petit">{{atc.rb_centre|2}}</text>
+        <text x="413.6" y="160" text-anchor="middle" class="petit">{{atc.r_angles|2}}</text>
+        <text x="437" y="176" text-anchor="middle" class="petit">{{atc.r_chambre|2}}</text>
+
+        <!-- repères verticaux -->
+        <line x1="112" y1="140" x2="112" y2="72" stroke="var(--fg-3)" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <text x="112" y="62" text-anchor="middle" class="petit">rayon des plats</text>
+        <text x="112" y="50" text-anchor="middle" class="petit">E/2</text>
+
+        <line x1="281" y1="140" x2="281" y2="88" class="accent"/>
+        <text x="281" y="78" text-anchor="middle" class="orange">tangente aux billes</text>
+        <text x="281" y="64" text-anchor="middle" class="orange">r_b = {{atc.rb_centre|2}}</text>
+
+        <line x1="413.6" y1="140" x2="413.6" y2="72" stroke="var(--fg-3)" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <text x="413.6" y="62" text-anchor="middle" class="petit">rayon des angles</text>
+        <text x="413.6" y="50" text-anchor="middle" class="petit">E_a/2</text>
+
+        <line x1="437" y1="140" x2="437" y2="108" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="2 3"/>
+        <text x="470" y="104" text-anchor="middle" class="petit">chambre</text>
+
+        <!-- les deux parts -->
+        <g class="cote">
+          <line x1="112" y1="196" x2="281" y2="196"/>
+          <line x1="112" y1="191" x2="112" y2="201"/>
+          <line x1="281" y1="191" x2="281" y2="201"/>
+          <line x1="281" y1="196" x2="413.6" y2="196"/>
+          <line x1="413.6" y1="191" x2="413.6" y2="201"/>
+        </g>
+        <text x="196" y="214" text-anchor="middle" class="petit">jeu sur les plats</text>
+        <text x="196" y="228" text-anchor="middle" class="fort">{{atc.jeu_plats|2}}</text>
+        <text x="347" y="214" text-anchor="middle" class="petit">mordant sur les angles</text>
+        <text x="347" y="228" text-anchor="middle" class="fort">{{atc.mordant|2}}</text>
+
+        <!-- la saillie -->
+        <g class="cote">
+          <line x1="281" y1="120" x2="437" y2="120"/>
+          <line x1="281" y1="115" x2="281" y2="125"/>
+          <line x1="437" y1="115" x2="437" y2="125"/>
+        </g>
+        <text x="359" y="112" text-anchor="middle" class="orange">s = {{atc.saillie|2}}</text>
+      </svg>
+      <figcaption>
+        Les mêmes rayons, dépliés. Tout se joue sur la position du cercle tangent aux
+        billes entre le rayon des plats et celui des angles.
+      </figcaption>
+    </figure>
+
+    <h3>Deux impossibilités encadrent la solution</h3>
+
+    <p>
+      <b>Première impossibilité.</b> Si <var>r<sub>b</sub></var> dépasse le rayon des
+      angles, les angles passent entre les billes et <b>plus rien ne bloque</b> :
+    </p>
+    <div class="formule">
+      D<sub>c</sub>/2 − <var>s</var> &lt; E<sub>a</sub>/2
+      &nbsp;&nbsp;⟹&nbsp;&nbsp;
+      <var>s</var> &gt; (D<sub>c</sub> − E<sub>a</sub>)/2 = <span class="res">{{atc.s_min|2}} mm</span>
+    </div>
+
+    <p>
+      <b>Seconde impossibilité.</b> Si <var>r<sub>b</sub></var> descend sous le rayon des
+      plats, les plats ne passent plus et <b>l'écrou n'entre même pas</b> :
+    </p>
+    <div class="formule">
+      D<sub>c</sub>/2 − <var>s</var> &gt; E/2
+      &nbsp;&nbsp;⟹&nbsp;&nbsp;
+      <var>s</var> &lt; (D<sub>c</sub> − E)/2 = <span class="res">{{atc.s_max|2}} mm</span>
+    </div>
+
+    <p>
+      Reste une fenêtre de <b>{{atc.s_fenetre|2}} mm</b>, et toute la question est où s'y placer. Deux
+      grandeurs s'y partagent la place, et elles s'opposent : le <b>mordant</b> sur les
+      angles, <var>s</var> − {{atc.s_min|2}}, qui est ce qui retient ; et le <b>jeu</b> sur les
+      plats, {{atc.s_max|2}} − <var>s</var>, qui est ce qui laisse l'écrou entrer et tourner. Ce
+      qu'on donne à l'un, on le retire à l'autre.
+    </p>
+
+    <figure class="figure">
+      <svg style="font-size:10.1px" viewBox="0 0 540 300" role="img" aria-label="La fenêtre de {{atc.s_fenetre|2}} mm : le mordant croît et le jeu décroît, ils se croisent à {{atc.s_equilibre|2}} mm ; {{atc.saillie|2}} est retenu">
+        <!-- zones interdites : x = 70 + s*160 -->
+        <rect x="30" y="70" width="68.8" height="160" class="zone-non"/>
+        <rect x="470" y="70" width="40" height="160" class="zone-non"/>
+
+        <!-- axe -->
+        <line x1="30" y1="230" x2="512" y2="230" class="cote"/>
+        <g class="trait-fin">
+          <line x1="98.8" y1="224" x2="98.8" y2="236"/>
+          <line x1="262" y1="224" x2="262" y2="236"/>
+          <line x1="284.4" y1="224" x2="284.4" y2="236"/>
+          <line x1="470" y1="224" x2="470" y2="236"/>
+        </g>
+        <text x="98.8" y="250" text-anchor="middle" class="petit">{{atc.s_min|2}}</text>
+        <text x="262" y="250" text-anchor="middle" class="orange">{{atc.saillie|2}}</text>
+        <text x="284.4" y="264" text-anchor="middle" class="petit">{{atc.s_equilibre|2}}</text>
+        <text x="470" y="250" text-anchor="middle" class="petit">{{atc.s_max|2}}</text>
+        <text x="512" y="250" text-anchor="end" class="petit">saillie s (mm)</text>
+
+        <!-- les deux droites qui se croisent -->
+        <line x1="98.8" y1="230" x2="470" y2="70" stroke="var(--tip-b)" stroke-width="2.2" fill="none"/>
+        <line x1="98.8" y1="70" x2="470" y2="230" stroke="var(--note-b)" stroke-width="2.2" fill="none"/>
+        <circle cx="284.4" cy="150" r="4" fill="var(--fg-2)"/>
+
+        <text x="478" y="66" class="petit" fill="var(--tip-b)">mordant</text>
+        <text x="478" y="80" class="petit" fill="var(--tip-b)">ce qui retient</text>
+        <text x="62" y="66" class="petit" fill="var(--note-b)">jeu</text>
+        <text x="62" y="80" class="petit" fill="var(--note-b)">ce qui fait entrer</text>
+
+        <!-- le choix retenu -->
+        <line x1="262" y1="42" x2="262" y2="230" class="accent"/>
+        <text x="262" y="34" text-anchor="middle" class="orange">retenu : {{atc.saillie|2}}</text>
+        <circle cx="262" cy="160.4" r="4" fill="var(--tip-b)"/>
+        <circle cx="262" cy="139.6" r="4" fill="var(--note-b)"/>
+
+        <text x="106" y="96" class="petit" fill="var(--warn-b)">les angles</text>
+        <text x="106" y="110" class="petit" fill="var(--warn-b)">passent</text>
+        <text x="464" y="96" text-anchor="end" class="petit" fill="var(--warn-b)">les plats ne</text>
+        <text x="464" y="110" text-anchor="end" class="petit" fill="var(--warn-b)">passent plus</text>
+
+        <text x="284.4" y="286" text-anchor="middle" class="petit">partage exact : {{atc.s_equilibre|2}} mm</text>
+      </svg>
+      <figcaption>
+        Les deux grandeurs se croisent à <b>{{atc.s_equilibre|2}} mm</b> — le partage exact. Le modèle
+        retient pourtant <b>{{atc.saillie|2}}</b>, délibérément un peu plus de jeu que de mordant.
+      </figcaption>
+    </figure>
+
+    <div class="formule">
+      <var>s</var> − {{atc.s_min|2}} = {{atc.s_max|2}} − <var>s</var>
+      &nbsp;&nbsp;⟹&nbsp;&nbsp;
+      <var>s</var> = <span class="res">{{atc.s_equilibre|2}} mm</span>
+      <span class="ou">le partage exact — qui n'est pas celui qu'on a retenu</span>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Pourquoi {{atc.saillie|2}} et pas {{atc.s_equilibre|2}}</span>
+      <p>
+        La raison est d'atelier, pas de calcul. Sur une pièce imprimée, la panne qu'on
+        rencontre en premier est l'écrou qui <b>n'entre pas</b> ou ne tourne pas — la
+        chambre ne lui laisse déjà que {{atc.jeu_chambre|2}} mm au rayon. Le mordant, lui, se vérifie sur
+        le gabarit d'essai avant d'imprimer quoi que ce soit ; un écrou qui n'entre pas,
+        c'est une impression jetée.
+      </p>
+    </div>
+
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th class="num">saillie s</th><th class="num">mordant</th><th class="num">jeu plats</th><th></th></tr>
+        </thead>
+        <tbody>
+          {{atc:table_saillie}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Vérification</div>
+    <h2>Les plats passent, les angles non</h2>
+
+    <div class="figure-row">
+      <figure class="figure">
+        <svg style="font-size:6.9px" viewBox="0 0 300 250" role="img" aria-label="Hexagone : {{atc.entreplat|1}} mm sur plats, {{atc.sur_angles|2}} mm sur angles">
+          <polygon points="235,125 190,47 100,47 55,125 100,203 190,203"
+                   fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.8"/>
+          <circle cx="145" cy="125" r="78" fill="none" stroke="var(--fg-3)"
+                  stroke-width="1" stroke-dasharray="4 3"/>
+          <g class="cote">
+            <line x1="262" y1="47" x2="262" y2="203"/>
+            <line x1="257" y1="47" x2="267" y2="47"/>
+            <line x1="257" y1="203" x2="267" y2="203"/>
+            <line x1="55" y1="222" x2="235" y2="222"/>
+            <line x1="55" y1="217" x2="55" y2="227"/>
+            <line x1="235" y1="217" x2="235" y2="227"/>
+          </g>
+          <text x="276" y="129" text-anchor="middle" class="petit" transform="rotate(-90 276 129)">sur plats E = {{atc.entreplat|1}}</text>
+          <text x="145" y="240" text-anchor="middle" class="petit">sur angles E_a = {{atc.sur_angles|2}}</text>
+        </svg>
+        <figcaption>Un hexagone régulier de {{atc.entreplat|0}} sur plats mesure {{atc.sur_angles|2}} sur angles.</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <svg style="font-size:6.9px" viewBox="0 0 300 250" role="img" aria-label="Comparaison : plats {{atc.entreplat|2}} passent, passage {{atc.passage|2}}, angles {{atc.sur_angles|2}} ne passent pas">
+          <g class="cote">
+            <line x1="76" y1="70" x2="224" y2="70"/>
+            <line x1="76" y1="64" x2="76" y2="76"/>
+            <line x1="224" y1="64" x2="224" y2="76"/>
+          </g>
+          <text x="150" y="56" text-anchor="middle" class="petit">plats de l'écrou · {{atc.entreplat|2}}</text>
+
+          <line x1="70" y1="125" x2="230" y2="125" class="accent"/>
+          <line x1="70" y1="117" x2="70" y2="133" class="accent"/>
+          <line x1="230" y1="117" x2="230" y2="133" class="accent"/>
+          <text x="150" y="111" text-anchor="middle" class="orange">passage entre billes · {{atc.passage|2}}</text>
+
+          <g class="cote">
+            <line x1="65" y1="180" x2="235" y2="180"/>
+            <line x1="65" y1="174" x2="65" y2="186"/>
+            <line x1="235" y1="174" x2="235" y2="186"/>
+          </g>
+          <text x="150" y="166" text-anchor="middle" class="petit">angles de l'écrou · {{atc.sur_angles|2}}</text>
+          <text x="150" y="212" text-anchor="middle" class="fort">{{atc.entreplat|2}} &lt; {{atc.passage|2}} &lt; {{atc.sur_angles|2}}</text>
+          <text x="150" y="230" text-anchor="middle" class="petit">l'encadrement strict est vérifié</text>
+        </svg>
+        <figcaption>La condition de fonctionnement, en une ligne.</figcaption>
+      </figure>
+    </div>
+
+    <div class="formule">
+      P = D<sub>c</sub> − 2<var>s</var> = {{atc.chambre|0}} − 2 × {{atc.saillie|2}} = <span class="res">{{atc.passage|2}} mm</span>
+      <span class="ou">puis l'interférence au rayon : i = (E<sub>a</sub> − P)/2 = {{atc.mordant|2}} mm</span>
+    </div>
+
+    <h3>De combien l'écrou tourne-t-il avant de buter ?</h3>
+    <p>
+      L'écrou tourne jusqu'à ce qu'un angle vienne toucher une bille. L'angle libre se lit
+      sur la position où la distance de l'axe au plat atteint <var>r<sub>b</sub></var> :
+    </p>
+
+    <div class="formule">
+      θ = 2·arccos( (E/2) / <var>r<sub>b</sub></var> ) = <span class="res">{{atc.angle_centre|1}}°</span>
+      <span class="ou">bille centrée dans son logement, r_b = {{atc.rb_centre|3}} mm</span>
+    </div>
+
+    <figure class="figure">
+      <svg style="font-size:7.9px" viewBox="0 0 420 380" role="img" aria-label="L'écrou dans ses deux positions extrêmes, séparées de {{atc.angle_centre|1}} degrés">
+        <circle cx="210" cy="200" r="105" fill="none" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="3 3"/>
+        <!-- Position 1, tournée de -23,04°. Sommets d'un hexagone RÉGULIER de
+             rayon 103,9 px (= 17,32 mm à 6 px/mm) : centre + R·cos/sin des six
+             angles. Recalculés le 12/08/2026 — la première version avait deux
+             sommets sur six à 75,9 px, et l'écrou n'était plus hexagonal. -->
+        <polygon points="305.6,240.7 293.0,137.5 197.4,96.9 114.4,159.3 127.0,262.5 222.6,303.1"
+                 fill="none" stroke="var(--fg-3)" stroke-width="1.6" stroke-dasharray="6 3"/>
+        <!-- position 2, tournée de +23,04° -->
+        <polygon points="305.6,159.3 222.6,96.9 127.0,137.5 114.4,240.7 197.4,303.1 293.0,262.5"
+                 fill="var(--bg-3)" fill-opacity="0.75" stroke="var(--fg)" stroke-width="1.8"/>
+        <!-- la bille, fixe -->
+        <circle cx="210" cy="87.2" r="15" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.2"/>
+        <text x="210" y="60" text-anchor="middle" class="petit">bille (fixe)</text>
+        <!-- l'angle parcouru, suivi sur un sommet : de 36,96° à 83,04° -->
+        <path d="M 319.4 117.6 A 137 137 0 0 0 226.6 64.0" fill="none" class="accent"/>
+        <text x="316" y="52" text-anchor="middle" class="orange">θ = {{atc.angle_centre|1}}°</text>
+        <text x="210" y="345" text-anchor="middle" class="petit">les deux positions où l'écrou bute</text>
+        <text x="210" y="362" text-anchor="middle" class="petit">entre les deux, il tourne librement</text>
+      </svg>
+      <figcaption>
+        Ce n'est pas un nombre unique : le logement a du jeu, et sous l'effort l'écrou
+        repousse la bille vers l'extérieur — <b>{{atc.angle_centre|1}}°</b> bille centrée,
+        <b>{{atc.angle_pousse|1}}°</b> bille repoussée.
+      </figcaption>
+    </figure>
+
+    <div class="callout warn">
+      <span class="ci">La sensibilité qui interdit les substituts</span>
+      <p>
+        Cette lecture d'angle bouge de <b>{{atc.sensibilite|1}} degré par dixième de millimètre</b> de
+        diamètre de bille. Un substitut de diamètre inconnu — un rond quelconque, une
+        queue de foret — rend la mesure inexploitable sur le gabarit d'essai.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">La contrainte la plus serrée</div>
+    <h2>Où la bille porte sur l'écrou</h2>
+    <p class="sec-lede">
+      La bille doit toucher l'écrou sur sa partie à six faces, et nulle part ailleurs.
+      Trop haut elle tombe sur la partie ronde ; trop bas, sur le chanfrein de pied.
+      Ni l'une ni l'autre ne retient quoi que ce soit.
+    </p>
+
+    <p>
+      Premier point contre-intuitif : <b>la bille ne touche jamais le plat en son
+      milieu</b>. Son point intérieur est à {{atc.rb_centre|2}} de l'axe, le plat à {{atc.plat_r|1}} en son milieu
+      mais à {{atc.r_angles|2}} à ses extrémités. La bille passe donc au large du milieu et vient
+      rencontrer le plat près de son extrémité, à {{atc.d_arete|2}} mm de l'arête. L'arête elle-même
+      reste à {{atc.d_sommet|3}} mm du centre de la bille alors qu'il en faudrait {{atc.r_bille_seule|3}} pour toucher :
+      <b>elle ne touche pas</b>.
+    </p>
+
+    <p>
+      Second point, celui qui fixe la hauteur : ce plat est une surface <b>verticale</b>.
+      Une sphère qui touche un plan vertical le touche à la hauteur de son <b>centre</b>,
+      en un seul point. Ce n'est donc pas toute la silhouette de la bille qui porte, mais
+      son équateur.
+    </p>
+
+    <figure class="figure">
+      <svg style="font-size:12px" viewBox="0 0 640 340" role="img" aria-label="Coupe verticale : le contact tombe à {{atc.porte|2}} mm, avec {{atc.marge_bas|2}} mm de marge dessous et {{atc.marge_haut|2}} dessus">
+        <!-- repères horizontaux : y0 = 290, k = 26 px/mm -->
+        <g class="trait-fin">
+          <line x1="80" y1="82" x2="392" y2="82" stroke-dasharray="5 3" stroke="var(--fg-2)" stroke-width="1.3"/>
+          <line x1="80" y1="145.4" x2="392" y2="145.4" stroke-dasharray="5 3" stroke="var(--orange)" stroke-width="1.5"/>
+          <line x1="100" y1="251" x2="392" y2="251" stroke-dasharray="4 3"/>
+          <line x1="100" y1="290" x2="392" y2="290" stroke-dasharray="4 3"/>
+        </g>
+        <text x="402" y="78" class="petit">haut des plats · h₆ = {{atc.hex|0}} mm</text>
+        <text x="402" y="141" class="orange">contact · {{atc.porte|2}} mm</text>
+        <text x="402" y="247" class="petit">chanfrein de pied · c = {{atc.chanfrein|2}} mm</text>
+        <text x="402" y="294" class="petit">face d'appui de l'écrou</text>
+
+        <!-- l'arête de l'angle, vue de côté -->
+        <rect x="100" y="82" width="30" height="208" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.6"/>
+        <rect x="100" y="251" width="30" height="39" fill="var(--fg-3)" stroke="var(--fg)" stroke-width="1.6"/>
+
+        <!-- zone utile, à gauche -->
+        <g class="cote">
+          <line x1="72" y1="82" x2="72" y2="251"/>
+          <line x1="67" y1="82" x2="77" y2="82"/>
+          <line x1="67" y1="251" x2="77" y2="251"/>
+        </g>
+        <text x="60" y="158" text-anchor="end" class="petit">arête à plein</text>
+        <text x="60" y="172" text-anchor="end" class="petit">rayon · {{atc.h_arete|2}} mm</text>
+
+        <!-- la bille : centre à 5,56 mm, tangente au plat -->
+        <circle cx="195" cy="145.4" r="65" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.4"/>
+        <text x="195" y="150" text-anchor="middle" fill="#e6e9ee" class="gros">bille</text>
+        <circle cx="130" cy="145.4" r="3.5" fill="var(--orange)"/>
+
+        <!-- les deux marges, à droite de la bille -->
+        <g class="cote">
+          <line x1="300" y1="145.4" x2="300" y2="251"/>
+          <line x1="295" y1="251" x2="305" y2="251"/>
+          <line x1="300" y1="82" x2="300" y2="145.4"/>
+          <line x1="295" y1="82" x2="305" y2="82"/>
+          <line x1="295" y1="145.4" x2="305" y2="145.4"/>
+        </g>
+        <text x="312" y="204" class="petit">{{atc.marge_bas|2}} mm</text>
+        <text x="312" y="118" class="petit">{{atc.marge_haut|2}} mm</text>
+      </svg>
+      <figcaption>
+        Le contact se fait au <b>centre</b> de la bille, à {{atc.porte|2}} mm au-dessus de la face
+        d'appui. Il reste {{atc.marge_bas|2}} mm de marge dessous et {{atc.marge_haut|2}} dessus.
+      </figcaption>
+    </figure>
+
+    <div class="formule">
+      z<sub>e</sub> = h<sub>p</sub> + h<sub>c</sub>·(E<sub>a</sub> − D<sub>p</sub>)/(D<sub>c</sub> − D<sub>p</sub>) − c
+      = {{atc.h_passage|0}} + {{atc.h_cone|1}} × ({{atc.sur_angles|2}} − {{atc.passage_d|0}})/({{atc.chambre|0}} − {{atc.passage_d|0}}) − {{atc.chanfrein|2}} = <span class="res">{{atc.z_ecrou_siege|2}} mm</span>
+      <span class="ou">hauteur d'appui de l'écrou sur le cône du siège</span>
+    </div>
+    <div class="formule">
+      z<sub>b</sub> = z<sub>fond</sub> + d<sub>b</sub>/2 = {{atc.poche_fond|1}} + {{atc.bille|1}}/2 = <span class="res">{{atc.z_bille_siege|2}} mm</span>
+      <span class="ou">hauteur du centre de la bille</span>
+    </div>
+    <div class="formule">
+      z<sub>b</sub> − z<sub>e</sub> = <span class="res">{{atc.porte|2}} mm</span>
+      &nbsp;&nbsp;et&nbsp;&nbsp; {{atc.chanfrein|2}} ≤ {{atc.porte|2}} ≤ {{atc.hex|0}} ✓
+      <span class="ou">le contact tombe bien dans la zone où l'arête est à plein rayon</span>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">Ne jamais viser les 11 mm</span>
+      <p>
+        Le six-pans fait {{atc.hex|0}} mm, 11 en comptant le chanfrein du haut. Mais <b>au-delà des
+        {{atc.hex|0}} mm, ce chanfrein rogne les angles et l'interférence tombe à zéro : plus rien ne
+        bloque</b>. C'est la contrainte la plus serrée de tout le projet, et elle est
+        restée invisible tant que la hauteur du six-pans — puis son chanfrein de pied —
+        n'avaient pas été mesurés.
+      </p>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">{{atc.chanfrein|1}} mm qui ont fait bouger toute la chaîne</span>
+      <p>
+        L'arête de l'angle est chanfreinée en pied sur {{atc.chanfrein|2}} mm. Elle n'est donc à plein
+        rayon que de {{atc.chanfrein|1}} à {{atc.hex|1}} mm : <b>{{atc.h_arete|2}} mm d'arête utile, et non {{atc.hex|0}}</b>. Sans ce terme,
+        le modèle se trompait de {{atc.chanfrein|2}} mm sur toute la chaîne verticale — écart retrouvé
+        par <b>deux mesures indépendantes</b> sur pièce imprimée.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Les planches</div>
+    <h2>Le reste du magasin</h2>
+    <p class="sec-lede">
+      Les plans sortent de TechDraw, et leurs cotes sont lues directement sur le modèle :
+      74 cotes vérifiées à chaque régénération. Cliquer pour agrandir.
+    </p>
+
+    <figure class="plan">
+      <img src="{{RACINE}}projets/plans/07-ensemble-monte.svg"
+           alt="Planche TechDraw : l'ensemble monté du magasin ATC six postes" data-agrandir>
+      <figcaption>
+        <b>L'ensemble monté.</b> {{atc.postes|0}} postes, chacun avec son siège à billes coulissant
+        contre un ressort préchargé. La course du siège — {{atc.course|0}} mm — doit rester supérieure
+        à la longueur de filetage engagée entre l'écrou et le nez de broche ({{atc.filetage|0}} mm,
+        mesurés), sinon le siège arrive en butée avant que l'écrou ait fini de se
+        dévisser.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="{{RACINE}}projets/plans/01-siege-billes.svg"
+           alt="Planche TechDraw : le siège à billes, avec ses trois logements Ø{{atc.loge_d|1}}" data-agrandir>
+      <figcaption>
+        <b>Le siège à billes.</b> Trois logements Ø{{atc.loge_d|1}} à 120° pour des billes Ø{{atc.bille|0}}.
+        Les parois de ces logements font {{atc.paroi_bille|2}} mm — d'où les
+        4 périmètres minimum à l'impression.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="{{RACINE}}projets/plans/08-gabarit-essai.svg"
+           alt="Planche TechDraw : le gabarit d'essai qui reproduit l'engagement bille/écrou" data-agrandir>
+      <figcaption>
+        <b>Le gabarit d'essai.</b> Même chambre Ø{{atc.chambre|0}}, même saillie de {{atc.saillie|2}} : il reproduit
+        l'engagement bille/écrou à l'identique. On y dépose trois billes, on engage un
+        écrou, on le tourne — et on lit l'angle avant butée. C'est ce qui se vérifie
+        <b>avant</b> d'imprimer six sièges à 28 g et 40 minutes pièce.
+      </figcaption>
+    </figure>
+
+    <div class="callout note">
+      <span class="ci">Ce qui n'est pas publié ici</span>
+      <p>
+        Le magasin est modélisé d'après la demande de brevet <b>US 2024/0278368 A1</b>
+        (Greilick Industries LLC, publiée le 22/08/2024, statut « pending » — une demande
+        en instance, pas un brevet délivré). Cette page explique des calculs et montre des
+        plans ; elle ne diffuse ni modèle 3D, ni STL. Les macros du changeur d'outil
+        LinuxCNC, elles, portent la logique des macros
+        <a href="https://github.com/greilick-industries/rcatc-scripts-grblhal">RapidChange ATC</a>
+        de Greilick, sous GPL-3.0, et sont
+        <a href="https://github.com/atelierduverdier/printnc-config">dans la config PrintNC</a>.
+      </p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,327 @@
+# Plan — site général « Atelier du Verdier »
+
+Cadrage du 11/08/2026. **Les six décisions structurantes sont prises** (§6) ; les chantiers
+du §5 peuvent démarrer dans l'ordre. Le contenu rédactionnel reste entièrement à écrire.
+
+---
+
+## 1. Ce qui existe déjà (inventaire vérifié, pas de mémoire)
+
+### Sites en ligne — il y en a **trois**, pas deux
+
+| Domaine | Sert quoi | Dépôt | Comment c'est fait |
+|---|---|---|---|
+| `atelierduverdier.fr` | Journal de construction PrintNC (277 vidéos) | `printnc-build` (public) | `generer_site.py` → **un seul `index.html` de 588 Ko** depuis `data/videos.csv` |
+| `laser.atelierduverdier.fr` | LaserAtelier : présentation + manuel + PDF | `LaserAtelier/docs/` (public) | HTML écrit à la main, 11 sections, `manuel.html` de 352 Ko |
+| `liens.atelierduverdier.fr` | Page « Mes liens » | `liens` (public) | Page unique |
+
+Tout est hébergé sur GitHub Pages. GoatCounter est déjà branché sur le journal PrintNC
+(y compris un événement personnalisé `/vote-utile`).
+
+### Logiciels
+
+| Logiciel | Dépôt | Visibilité | État |
+|---|---|---|---|
+| LaserAtelier (workbench FreeCAD) | `LaserAtelier` | **public** | v2.99.15, cap sur une v3 stable |
+| Config LinuxCNC PrintNC + changeur d'outil | `printnc-config` | **public** | changeur poussé le 09/08/2026 |
+| Visualiseur G-code LinuxCNC | `visualiseur-gcode` | **privé** | v1 le 10/08/2026 |
+| Pupitre Graphtec CE6000-60 | `graphtec-ce6000` | **privé** | fini le 11/08/2026 |
+
+Satellites publics qui existent aussi : `gsr-gui` (enregistreur d'écran, hors atelier),
+`huanyang-vfd-reader` (lecture VFD, atelier-adjacent).
+Non publiés : AMAP-Crouay, `atelier-telegram-bot`, les projets FreeCAD (magasin ATC,
+dust shoe, meuble à balais, tonnelle).
+
+### Identité
+
+Le chapeau melon existe (`chapeau.svg`, signature déjà présente dans chaque icône de mode
+LaserAtelier). Mais **les deux sites ont déjà divergé** :
+
+- laser : orange `#ff8a00` sur ardoise `#2f3540` — c'est la charte du chapeau ;
+- journal PrintNC : fond `#13110e`, palette par phase (bleu `#378ADD`, orange `#EF9F27`,
+  vert `#1D9E75`, rouge `#C44A31`).
+
+Deux chartes après deux sites. Au quatrième, ce sera ingérable.
+
+---
+
+## 2. Le vrai problème structurel
+
+**La racine du domaine est déjà occupée par le journal PrintNC.**
+
+Un site général veut cette racine — c'est l'adresse qu'on donne à l'oral, celle qui est sur
+la carte de visite. Or `atelierduverdier.fr` sert aujourd'hui un journal de construction, et
+les liens partagés ailleurs (Instagram, forum PrintNC) pointent dessus **avec des ancres**
+(`atelierduverdier.fr/#video-…`). GitHub Pages ne sait pas faire de redirection 301 côté
+serveur, et une ancre n'est de toute façon jamais envoyée au serveur.
+
+C'est le seul point de ce plan qui peut casser quelque chose de visible. Il est traité au
+chantier 2.
+
+Second problème, moins urgent mais déjà là : le journal est **une seule page de 588 Ko** pour
+277 vidéos, plus 632 miniatures (dépôt de 42 Mo). Le générateur monopage a atteint sa limite.
+
+---
+
+## 3. Statique ou dynamique
+
+### ✅ Décidé : **statique, généré par un script Python maison.**
+
+Le critère n'est pas « statique c'est plus simple », c'est : *qui écrit les données ?*
+Ici, **seul toi**. Pas de compte utilisateur, pas de commentaire, pas de panier, pas de
+formulaire. Un site dynamique se justifie quand un visiteur écrit dans la base. Aucun visiteur
+n'écrira ici.
+
+Ce qui plaide concrètement pour le statique dans **ton** cas précis :
+
+1. **C'est déjà ce que tu fais.** `generer_site.py` lit un CSV et crache du HTML ; le manuel
+   LaserAtelier est généré en PDF par WeasyPrint ; l'AMAP a aussi son `generer_site.py`. Le
+   flux « données → script Python → HTML » t'est familier, il est versionné, il se rejoue.
+2. **Zéro maintenance de sécurité.** Un site dynamique, c'est un VPS, un runtime à tenir à
+   jour, des sauvegardes, une surface d'attaque — pour des pages qui ne changent que quand
+   *tu* changes un fichier.
+3. **Zéro coût.** GitHub Pages est gratuit et déjà en place sur les trois sites.
+4. **Versionné avec le code.** Le manuel LaserAtelier vit dans `docs/` du même dépôt que le
+   workbench : c'est exactement ce qui garantit que la doc suive la `VERSION`. Un CMS séparé
+   casserait ce lien.
+5. **Ça marche hors ligne** dans l'atelier, et ça s'archive.
+
+### Ce qu'on croit avoir besoin de dynamique, et qui n'en a pas besoin
+
+| Envie | Solution statique |
+|---|---|
+| Recherche dans la doc | index JSON + recherche en JS côté client |
+| Filtrer les vidéos par phase/mois | déjà fait aujourd'hui, en JS |
+| Compteur de vues, stats | GoatCounter — **déjà branché** |
+| Flux RSS | fichier généré |
+| Dernière version d'un logiciel | lue à la génération depuis `VERSION` / l'API GitHub, figée dans la page |
+
+### Ce qui ferait rouvrir la question
+
+Un seul de ces trois suffirait : **commentaires**, **formulaire de contact avec pièce jointe**,
+ou **vente** (plans, pièces usinées). Aucun n'est prévu au 11/08/2026 — c'est ce qui rend la
+décision facile. Si l'un des trois revient plus tard, la réponse restera probablement « site
+statique + service tiers » (formulaire hébergé, boutique externe) plutôt qu'un serveur à toi :
+le statique n'est pas une impasse.
+
+---
+
+## 4. Architecture proposée
+
+### Le modèle : **fédération, pas fusion**
+
+Un dépôt `site` nouveau qui porte **la racine + les fiches logiciels + la charte commune**.
+Chaque projet garde sa doc chez lui, sur son sous-domaine.
+
+```
+atelierduverdier.fr            ← NOUVEAU dépôt « site »
+├── /                          accueil : le chapeau, qui je suis, les 4 logiciels, l'atelier
+├── /logiciels/                les fiches : une par logiciel (capture, à quoi ça sert,
+│                              état, lien dépôt, lien doc)
+├── /atelier/                  la machine, le laser, le traceur — le matériel
+├── /projets/                  les projets d'atelier (magasin ATC, dust shoe, meubles…)
+└── /kit/                      LA CHARTE : verdier.css, en-tête, pied de page, chapeau.svg
+
+printnc.atelierduverdier.fr    ← le journal déménage ici (dépôt printnc-build)
+laser.atelierduverdier.fr      ← inchangé (LaserAtelier/docs)
+gcode.atelierduverdier.fr      ← plus tard : doc du visualiseur
+traceur.atelierduverdier.fr    ← plus tard : doc du pupitre Graphtec
+liens.atelierduverdier.fr      ← inchangé
+```
+
+**Pourquoi fédérer plutôt que tout fusionner dans un dépôt.** Fusionner donnerait une
+cohérence parfaite, mais couperait `docs/` de `LaserAtelier` — or c'est précisément cette
+cohabitation qui fait que le manuel suit la `VERSION` du workbench, avec le rituel de bump
+déjà en place. On ne casse pas ça pour une question de mise en page.
+
+### La charte : un kit copié par script, jamais à la main
+
+C'est le point à ne pas rater. Le dépôt `site` contient `kit/verdier.css` +
+`kit/entete.html` + `kit/pied.html` + `chapeau.svg`, et un script
+`diffuser_kit.py` les **recopie** dans chaque site satellite (avec une bannière
+`<!-- généré depuis atelierduverdier/site, ne pas éditer ici -->`).
+
+Le raisonnement est le même que pour la ligne `VERSION` de LaserAtelier restée 44 versions en
+retard, ou pour les chiffres d'effort qu'on recalcule au lieu de les retaper : **une valeur
+recopiée à la main dans cinq fichiers finit toujours par diverger.** Ici c'est déjà arrivé,
+en deux sites.
+
+Charte de référence : **orange `#ff8a00` sur ardoise `#2f3540`, chapeau noir** — celle du
+laser, parce que c'est celle du chapeau. Le journal PrintNC garde ses quatre couleurs de
+phase *comme accents de contenu*, mais reprend le fond, la typo, l'en-tête et le pied.
+
+---
+
+## 5. Chantiers, dans l'ordre
+
+Chaque chantier est livrable seul et laisse le site en état de marche.
+
+### Chantier 0 — Fixer la charte ✅ **fait le 11/08/2026**
+`kit/verdier.css`, `kit/verdier.js`, les gabarits `entete.html` / `pied.html` et le
+`chapeau.svg`, extraits de l'existant du site laser sans retoucher une seule valeur de
+jeton. Page d'essai dans `essai/`, assemblée **par les gabarits** (`construire_essai.py`)
+pour les valider en même temps que la charte. Contrat du kit dans `kit/LISEZMOI.md`.
+Rien en ligne, aucun site existant touché.
+
+Trouvé en chemin, corrigé dans les gabarits : le site laser écrit `data-theme="light"`
+en dur, ce qui neutralise `prefers-color-scheme` — un visiteur en thème sombre reçoit la
+page blanche. Vérifié au navigateur, pas déduit.
+
+Reste ouvert : **pas de navigation sur téléphone** (`.navlinks` en `display:none` sous
+860 px, sans menu de remplacement). Hérité du site laser, à traiter au chantier 1.
+
+### Chantier 1 — La page d'accueil ✅ **fait le 12/08/2026**
+`site/generer.py` assemble les pages depuis `site/contenu/` et le kit, et écrit tout dans
+`site/public/` (entièrement reconstruit à chaque passage). Deux pages :
+
+- **l'accueil** — héros, les 4 fiches logiciels avec leur état, l'atelier, les projets ;
+- **`projets/magasin-atc.html`** — la note de calcul de la bille, 7 schémas SVG dessinés
+  pour le site + 3 planches TechDraw reprises du projet ATC.
+
+Dette du chantier 0 réglée : **navigation sur téléphone**, panneau déroulant sous 860 px
+(`.nav-btn`, refermé au clic, au lien ou par Échap).
+
+Trouvé et corrigé en mesurant : un SVG est étiré à la largeur de sa colonne, donc un même
+texte déclaré à 10,5 px se rendait **entre 10,5 et 18,2 px** selon la figure. Les tailles
+sont désormais en `em`, chaque figure portant sa base — rendu uniforme à 12 px vérifié.
+
+**La page ATC est branchée sur le modèle** (`site/valeurs_atc.py`) : elle ne contient plus
+un seul nombre écrit à la main. Chaque marque est lue dans `note_calcul.valeurs()` du projet
+magasin-atc — la fonction même qui engendre la note de calcul en PDF — et le tableau des
+saillies est engendré entier. Une clé absente **arrête** la génération.
+
+`magasin_er20` importe FreeCAD, dont l'interpréteur n'existe que si FreeCAD tourne (point de
+montage changeant). Deux modules factices suffisent : `valeurs()` ne touche que des constantes
+et de la trigonométrie. Le site se régénère donc sans FreeCAD, et **115 grandeurs** sont lues.
+
+**Logo** (12/08/2026) — `kit/faire_logo.py` compose le chapeau et le mot-symbole « Atelier
+du Verdier » et engendre deux variantes : une autonome pour l'extérieur, une en ligne que le
+générateur colle dans les pages pour qu'elle suive le bouton de thème. Texte converti en
+courbes (Fira Sans, licence OFL). Il remplace le chapeau seul dans la barre du haut, le pied
+et le héros de l'accueil.
+
+**Pages des deux logiciels privés** (12/08/2026) — fiches vitrines sans lien dépôt (choix D3),
+faits et chiffres repris des README des projets :
+
+- `logiciels/visualiseur-gcode.html`, six schémas SVG ;
+- `logiciels/pupitre-graphtec.html`, cinq schémas SVG.
+
+**Captures du pupitre** (12/08/2026) — `site/outils/capturer_pupitre.py` lance l'application
+**hors écran** (`QT_QPA_PLATFORM=offscreen`), lui fait ouvrir un SVG, et grabbe ses trois
+onglets. Il **refuse de démarrer si le traceur est branché** : aucune image ne vaut le risque
+de faire bouger une plume sur du papier.
+
+**Ordre de la page du pupitre repris** à la demande de Christophe : le mode d'emploi et les
+captures d'abord, l'archéologie du protocole ensuite et **repliée** dans des
+`details.pliable`. Une page qui s'ouvre sur du protocole propriétaire décourage avant d'avoir
+dit à quoi sert le programme. Le détail n'est pas retiré, il est derrière un panneau.
+
+**Captures du visualiseur** (12/08/2026) — `site/outils/capturer_visualiseur.py` appelle
+l'outil du projet lui-même (`outils/capturer.py`), qui compose l'habillage Qt et le tampon
+OpenGL : un `grab()` ordinaire ne traverse pas la vue 3D. Quatre images — le fichier
+paramétré d'origine, la gravure colorée par profondeur, le bloc de bois à mi-parcours, et le
+bandeau d'erreur sur `site/exemples/arc_fautif.ngc`, une fixture écrite exprès.
+
+`rs274` est nécessaire : il tourne par le lanceur `~/.local/bin/rs274` qui passe par
+distrobox. `capturer.py` écrit son PNG **puis meurt en core dump** au démontage OpenGL hors
+écran — sans effet sur l'image ; le pilote juge donc sur l'existence et la fraîcheur du
+fichier, pas sur le code de retour.
+
+Une modification faite **dans le projet visualiseur** : `outils/capturer.py` orientait la
+caméra sans cocher le bouton de vue, si bien qu'une capture `--vue iso` montrait « Dessus »
+en surbrillance — un état que l'application n'atteint jamais. Neuf lignes ajoutées.
+
+**Page du visualiseur réordonnée** comme celle du pupitre : captures et usage d'abord,
+architecture et pièges repliés. Repliée elle fait 6 527 px, tout ouvert 10 065.
+
+**Page LaserAtelier** (12/08/2026) — `logiciels/laseratelier.html`. C'est le seul logiciel qui
+avait **déjà** son site complet, d'où un périmètre choisi : cette page raconte ce que la doc ne
+raconte pas — pourquoi l'atelier existe, la contrainte matérielle qui commande toute la
+génération du G-code (à l'arrêt la puissance tombe à zéro), et la discipline de mesure sur bois.
+Pour le comment-faire, elle renvoie à `laser.atelierduverdier.fr`. Trois schémas SVG, trois
+captures reprises du dépôt LaserAtelier et réduites par `site/outils/reprendre_captures_laser.py`.
+
+La **version est lue dans `laser_core.py`** à chaque génération (`{{laser.version}}`), sur
+l'accueil comme sur la page — elle y était écrite en dur, exactement le piège de la ligne
+VERSION. Le chiffre « ≈ N heures » du site laser n'est **volontairement pas repris** : il est
+recalculé par `outils/chiffrer_effort.py` et vit déjà dans trois fichiers.
+
+Le chantier 4 est **fait** : les quatre logiciels ont leur page.
+
+**Captures en WebP** (12/08/2026) — `generer.py` convertit les PNG de `contenu/captures/` au
+moment de publier ; les PNG restent les maîtres. **Le mode est mesuré, pas supposé** : sur une
+interface à aplats le WebP sans perte bat le lossy de moitié (77 Ko contre 153 à q92), sur une
+capture à dégradés c'est l'inverse (350 contre 96). On encode donc les deux et on garde le plus
+petit — les 13 captures ont toutes choisi le sans perte.
+
+**1 852 Ko → 652 Ko, 65 % de moins.** Le site passe de 3,3 Mo à **1,44 Mo**.
+
+**Captures LaserAtelier refaites** (12/08/2026) — celles du site venaient de
+`docs/screenshots/*.png`, quatre captures plein écran **du 16 juillet** que le script du dépôt ne
+régénère pas. Entre-temps les panneaux ont beaucoup grossi. La source est maintenant
+`docs/manuel_img/`, recadrée pour un document, et six panneaux sont montrés en grille à leur
+largeur juste de 430 px — les étirer les rendrait flous.
+
+Côté dépôt LaserAtelier (commit `737d415`, poussé) : `tests/captures.py` ne connaissait que 20
+panneaux sur 22 — Calligraphie et Texte contour avaient été faits à la main et sortaient à 453 px
+au lieu de 430. Les 22 sont régénérés, le PDF du manuel aussi (98 pages). **Config vivante
+vérifiée intacte** avant et après, md5 et mtime identiques.
+
+Reste à faire ici : le paragraphe « qui je suis » sur l'accueil (encadré en place).
+**Rien n'est en ligne** — pas de dépôt, pas de DNS.
+
+### Chantier 2 — La bascule de la racine ⚠️ (½ journée, le seul risque)
+1. `printnc-build` **reste son propre dépôt** (choix D4) : on remplace juste son `CNAME` par
+   `printnc.atelierduverdier.fr`. Le générateur et le CSV ne bougent pas.
+2. DNS : nouvel enregistrement pour `printnc`.
+3. **Filet pour les vieux liens** : la nouvelle page d'accueil embarque quelques lignes de JS
+   qui, si l'URL arrive avec une ancre du journal (`#video-…`, `#mois-…`), redirigent vers
+   `printnc.atelierduverdier.fr/#même-ancre`. C'est la seule façon de rattraper une ancre, et
+   ça doit être **testé sur trois vrais liens** partagés (Instagram, forum) avant bascule.
+4. Vérifier GoatCounter : le changement de domaine coupe la continuité des stats du journal.
+
+### Chantier 3 — Diffuser la charte (½ journée)
+`diffuser_kit.py`, puis passage du site laser et du journal sous la charte commune.
+
+### Chantier 4 — Les deux logiciels privés (½ journée)
+**Fiche vitrine, sans lien dépôt** (choix D3) : captures + ce que ça fait + état, pour
+`visualiseur-gcode` et `graphtec-ce6000`. Réversible : le jour où l'un passe en public, on
+ajoute le lien, rien d'autre à refaire.
+
+Si ce jour arrive, la relecture préalable n'est pas une formalité — secrets, chemins
+personnels, `config.env`, adresses. Une fois poussé, c'est public pour toujours.
+
+### Chantier 5 — Découper le journal PrintNC (1 journée, plus tard)
+Faire cracher à `generer_site.py` une page par mois au lieu d'un `index.html` de 588 Ko.
+Indépendant du reste, à faire quand ça gênera vraiment.
+
+### Chantier 6 — La rubrique `/projets/` (plus tard)
+Magasin ATC, dust shoe, meuble à balais, tonnelle, AMAP. Prévue dans l'architecture dès
+maintenant pour ne pas avoir à la greffer, remplie **après** la mise en ligne du portail
+(choix D6) : c'est du contenu à écrire, ça ne doit pas retarder le reste.
+
+---
+
+## 6. Décisions prises — 11/08/2026
+
+| # | Question | Décision |
+|---|---|---|
+| **D1** | Statique ou dynamique ? | ✅ **Statique, script Python maison** (ni Hugo ni Zola) |
+| **D2** | Le portail prend-il la racine ? | ✅ **Oui.** Le journal PrintNC déménage sur `printnc.`, avec le filet à ancres |
+| **D3** | `visualiseur-gcode` et `graphtec-ce6000` | ✅ **Fiche vitrine sans lien dépôt.** Ils restent privés |
+| **D4** | Sous-domaines ou sous-dossiers ? | ✅ **Sous-domaines** : chaque doc reste dans le dépôt de son logiciel |
+| **D5** | Générateur | ✅ **Script maison**, dans la lignée de `generer_site.py` |
+| **D6** | Projets non logiciels | ✅ **Oui, rubrique `/projets/`, mais après la mise en ligne** |
+
+Ces six décisions n'engagent rien d'irréversible : la seule opération qui touche du visible
+est le chantier 2, et elle est protégée par le filet à ancres et par le passage préalable sur
+`nouveau.atelierduverdier.fr`.
+
+---
+
+## 7. Ce que ce plan ne dit pas
+
+- Rien sur le contenu rédactionnel (le « qui je suis », le ton). C'est le plus long à écrire
+  et ça ne se planifie pas dans un tableau.
+- Rien sur le référencement. À voir une fois qu'il y a quelque chose à référencer.
+- Rien sur les langues. Tout reste en français.

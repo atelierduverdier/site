@@ -1,0 +1,228 @@
+<!-- Corps de la page d'essai. Assemblé avec kit/entete.html et kit/pied.html
+     par construire_essai.py. Contenu volontairement RÉEL (les 4 logiciels,
+     les vrais états) : une charte se juge sur du vrai texte, pas sur du
+     faux latin. Ce n'est pas encore le site — c'est le banc d'essai. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">Banc d'essai — <b>chantier 0</b></span>
+          <span class="badge">rien en ligne</span>
+        </div>
+        <h1>L'atelier, et ce qu'on y écrit</h1>
+        <p class="lede">
+          Une fraiseuse PrintNC, une tête laser, un traceur de découpe — et les
+          logiciels qu'il a fallu écrire pour les faire tourner ensemble.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#logiciels">Voir les logiciels</a>
+          <a class="btn btn-ghost" href="#composants">Les composants du kit</a>
+          <a class="btn btn-kofi" href="#composants">☕ Bouton Ko-fi</a>
+        </div>
+        <div class="effort">
+          <b>≈ … heures pour en arriver là.</b>
+          <span class="qui">Le nombre reste vide ici EXPRÈS : il est recalculé par
+          <code>outils/chiffrer_effort.py</code>, jamais retapé à la main. Une page
+          d'essai n'a rien à inventer.</span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <img src="../kit/chapeau.svg" alt="Le chapeau de l'Atelier du Verdier"
+             style="max-width:220px" data-agrandir>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">À quoi sert cette page</div>
+    <h2>Ce que tu regardes</h2>
+    <p class="sec-lede">
+      Tous les composants de la charte commune, assemblés sur une seule page pour
+      être jugés à l'écran. Bascule le thème avec le bouton ◐ en haut à droite, et
+      regarde ce qui tient et ce qui ne tient pas.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Ce qu'il faut regarder en priorité</span>
+      <p>Le chapeau dans les deux thèmes — il est <b>noir avec un liseré blanc</b>, et
+      c'est ce liseré qui doit le détacher sur fond sombre, sans le repeindre.
+      Puis les cartes ci-dessous : c'est la forme qu'auront les fiches logiciels.</p>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Corrigé au passage</span>
+      <p>Le site laser écrit <code>data-theme="light"</code> en dur dans sa balise
+      <code>&lt;html&gt;</code>. Vérifié le 11/08/2026 : un visiteur dont le système
+      est en sombre reçoit quand même la page blanche — son thème sombre existe
+      pourtant, mais seul le bouton ◐ y donne accès. Les gabarits du kit ne
+      posent plus cet attribut.</p>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">Pas encore fait</span>
+      <p>Le script de diffusion (<code>diffuser_kit.py</code>) n'existe pas : c'est le
+      chantier 3. Tant qu'il n'est pas écrit, aucun site existant n'est touché.</p>
+    </div>
+  </div>
+</section>
+
+<section id="logiciels">
+  <div class="wrap">
+    <div class="sec-tag">Composant · cartes</div>
+    <h2>Les logiciels</h2>
+    <p class="sec-lede">La forme prévue pour les fiches du portail. Le point de couleur
+    dit l'état du dépôt.</p>
+
+    <div class="cartes">
+      <div class="carte">
+        <div class="head">
+          <span class="ci">🔥</span>
+          <h3>LaserAtelier</h3>
+          <span class="etat public">public</span>
+        </div>
+        <p>Atelier FreeCAD qui transforme de la géométrie 2D/3D en G-code laser :
+        marquage, gravure remplie, photo tramée, découpe multi-passes, suivi de
+        surfaces courbes.</p>
+        <div class="liens">
+          <a href="https://laser.atelierduverdier.fr">Documentation</a>
+          <a href="https://github.com/atelierduverdier/LaserAtelier">Dépôt</a>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">📐</span>
+          <h3>Visualiseur G-code</h3>
+          <span class="etat prive">privé</span>
+        </div>
+        <p>Traceur de parcours LinuxCNC en PySide6/OpenGL, appuyé sur <code>rs274</code> :
+        affiche les fichiers paramétrés que les autres visualiseurs refusent.</p>
+        <div class="liens"><span class="muted">Fiche vitrine — pas de lien dépôt</span></div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">✂️</span>
+          <h3>Pupitre Graphtec</h3>
+          <span class="etat prive">privé</span>
+        </div>
+        <p>Pilotage du traceur de découpe CE6000-60 sous Linux, sans driver :
+        sonde, tracé de contrôle, convertisseur SVG vers HP-GL.</p>
+        <div class="liens"><span class="muted">Fiche vitrine — pas de lien dépôt</span></div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">⚙️</span>
+          <h3>Config PrintNC</h3>
+          <span class="etat public">public</span>
+        </div>
+        <p>La configuration LinuxCNC de la machine : cinématique, HAL, et le
+        changeur d'outil du magasin ER20.</p>
+        <div class="liens">
+          <a href="https://github.com/atelierduverdier/printnc-config">Dépôt</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="composants">
+  <div class="wrap">
+    <div class="sec-tag">Composant · étapes</div>
+    <h2>Les chantiers</h2>
+    <p class="sec-lede">Le composant « étapes numérotées », qui servira aussi aux
+    prises en main.</p>
+
+    <div class="pipe">
+      <div class="step"><div class="n">0</div><h4>Charte</h4><p>Le kit, sur une page d'essai. C'est ici.</p></div>
+      <div class="step"><div class="n">1</div><h4>Accueil</h4><p>Le portail, publié sur une adresse de test.</p></div>
+      <div class="step"><div class="n">2</div><h4>Racine</h4><p>La bascule, avec le filet à ancres.</p></div>
+      <div class="step"><div class="n">3</div><h4>Diffusion</h4><p>Le kit envoyé dans les sites existants.</p></div>
+      <div class="step"><div class="n">4</div><h4>Vitrines</h4><p>Les deux logiciels privés.</p></div>
+      <div class="step"><div class="n">5</div><h4>Journal</h4><p>Découper les 588 Ko en pages.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Composant · tableau</div>
+    <h2>Où vit quoi</h2>
+
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th>Adresse</th><th>Contenu</th><th>Dépôt</th><th class="num">État</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>atelierduverdier.fr</code></td><td>Le portail</td><td>site</td><td class="num">à créer</td></tr>
+          <tr><td><code>printnc.atelierduverdier.fr</code></td><td>Journal de construction</td><td>printnc-build</td><td class="num">à déplacer</td></tr>
+          <tr><td><code>laser.atelierduverdier.fr</code></td><td>Doc LaserAtelier</td><td>LaserAtelier/docs</td><td class="num gain">en place</td></tr>
+          <tr><td><code>liens.atelierduverdier.fr</code></td><td>Page de liens</td><td>liens</td><td class="num gain">en place</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Ce que le kit contient</h3>
+        <ul class="clean">
+          <li>Les jetons de couleur, clairs et sombres</li>
+          <li>En-tête, marque au chapeau, navigation, bouton de thème</li>
+          <li>Héros, badges, boutons</li>
+          <li>Cartes, panneaux, encarts, étapes, tableaux, FAQ</li>
+          <li>Pied de page, visionneuse d'images</li>
+          <li>Styles d'impression</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Ce qu'il ne contient pas</h3>
+        <ul class="clean">
+          <li>Les cartes de mode et les schémas du site laser</li>
+          <li>Les quatre couleurs de phase du journal PrintNC</li>
+          <li>Tout ce qui n'existe que sur un seul site</li>
+        </ul>
+        <p class="muted">Chaque site garde une feuille locale, chargée après celle du
+        kit. Le kit sert à arrêter la divergence, pas à tout uniformiser.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Composant · FAQ</div>
+    <h2>Questions</h2>
+
+    <details class="faq">
+      <summary><span class="chev">›</span><span class="q">Pourquoi un cookie pour le thème et pas localStorage ?</span></summary>
+      <div class="a"><p>Parce que le site est fédéré par sous-domaines.
+      <code>localStorage</code> est cloisonné par origine : un réglage fait sur
+      <code>atelierduverdier.fr</code> ne suivrait pas sur <code>laser.</code>. Le
+      cookie est posé sur le domaine parent et traverse. Mémoriser un choix
+      d'affichage exprimé par le visiteur ne demande pas de bandeau de
+      consentement.</p></div>
+    </details>
+
+    <details class="faq">
+      <summary><span class="chev">›</span><span class="q">Est-ce que ça touche au site laser ?</span></summary>
+      <div class="a"><p>Pas encore. Le kit est un dossier de fichiers, rien ne le
+      recopie nulle part tant que <code>diffuser_kit.py</code> n'existe pas. Quand il
+      existera, la visionneuse du kit reprendra les deux sélecteurs historiques du
+      site laser pour ne rien lui retirer au passage.</p></div>
+    </details>
+
+    <details class="faq">
+      <summary><span class="chev">›</span><span class="q">Et les <kbd>Échap</kbd>, les clics, tout ça ?</span></summary>
+      <div class="a"><p>Clique sur le chapeau du héros : la visionneuse s'ouvre.
+      <kbd>Échap</kbd> ou un clic n'importe où la ferme. C'est le même code que sur
+      le site laser, rendu défensif pour ne pas planter sur une page qui n'a pas
+      d'images à agrandir.</p></div>
+    </details>
+  </div>
+</section>

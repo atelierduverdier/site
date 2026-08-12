@@ -1,0 +1,16 @@
+# Produit de la génération — ENTIÈREMENT reconstruit par site/generer.py.
+# La source est site/contenu/ et kit/ ; rien ici ne s'édite ni ne se committe.
+site/public/
+
+# Page d'essai assemblée par essai/construire_essai.py
+essai/index.html
+
+# Aperçus du logo, régénérés par kit/faire_logo.py --apercu
+kit/apercu-*.png
+
+# Python
+__pycache__/
+*.pyc
+
+# Éditeurs
+*~

@@ -1,0 +1,534 @@
+; =====================================================================
+; COPIE POUR LA CAPTURE DU SITE — ne pas usiner avec.
+; =====================================================================
+; Le percage du lit du magasin ATC, avec #<essai> force a 0 : la machine
+; coupe pour de bon, et le visualiseur peut donc montrer le bloc se
+; creuser. L'original, dans magasin-atc/gcode/, porte un interrupteur qui
+; appartient a l'atelier -- en essai a blanc il ne creuse rien, et la
+; capture montrerait une planche intacte.
+;
+; Une COPIE et non un fichier temporaire : le visualiseur affiche le
+; chemin du fichier charge en haut a droite, et « /tmp/tmp4i41m45/... »
+; dans une capture publiee fait neglige.
+;
+; Regenerer : reprendre l'original et forcer #<essai> a 0.
+; =====================================================================
+
+; =====================================================================
+; PERCAGE DU LIT — magasin ATC ER20 a 6 postes
+; PrintNC Flexi-HAL - Atelier du Verdier
+; =====================================================================
+; ENGENDRE par magasin-atc/code/percage_lit.py — NE PAS EDITER LES
+; COORDONNEES A LA MAIN. Elles sortent de table_percage() du modele,
+; exactement comme celles que la macro de changement d'outil utilisera.
+; Pour les changer : changer le MODELE, et regenerer.
+;
+; CE PROGRAMME COUPE DANS LE LIT DE LA MACHINE. Avant de lancer :
+;
+;   1. REGARDER CE QU'IL Y A SOUS LE LIT, a l'aplomb des 20 percages.
+;      Cables, vis a billes, traverses : la fraise descend 2 mm SOUS
+;      la surface. Le vide mesure est de 50 mm, mais il n'est pas vide
+;      partout.
+;   2. Poser le zero piece EN X, Y ET Z sur le coin choisi du magasin :
+;      Z0 = SURFACE DU LIT, X0/Y0 = origine du bloc (voir ci-dessous).
+;   3. Lancer d'abord en ESSAI A BLANC (#<essai> = 1) : la machine
+;      refait tous les mouvements 10 mm au-dessus du lit, sans
+;      toucher. C'est la que se voient une origine fausse ou un
+;      percage qui sort de la table.
+;   4. Pour un apercu trace, ouvrir percage_lit_atc_apercu.ngc :
+;      meme parcours, sans les parametres que les visualiseurs
+;      ordinaires ne savent pas lire.
+;   5. Verifier que la course Z suffit : la fraise doit descendre a
+;      Z-16 sous le zero piece.
+;
+; REPERE : X0/Y0 = le bout GAUCHE du bloc, sur l'axe des postes.
+;          Le bloc va de X0 a X450, et de Y-35.6 a Y+35.6.
+;          Le poste 1 tombe a X37.5 : c'est ce chiffre, une fois
+;          ramene en coordonnees machine, qui va dans _atc_poste1_x
+;          de atc_config.ngc.
+;
+; OUTILLAGE : UNE fraise Ø6.0, aucun changement d'outil.
+; TROUS : 12 x Ø6.5, 2 x Ø8.0, 6 x Ø30.0 — 20 au total
+; =====================================================================
+
+; --- REGLAGES ---
+#<essai>       = 0        ; 1 = A BLANC, aucune descente. 0 = on coupe.
+#<ep_lit>      = 14.0     ; epaisseur du lit, MESUREE
+#<debouche>    = 2.0      ; descente sous le lit, pour deboucher franc
+#<z_sur>       = 10.0     ; transit au-dessus du lit
+#<z_approche>  = 1.0      ; ou l'on passe en avance travail
+#<feed_xy>     = 2000
+#<feed_z>      = 500
+#<rpm>         = 18000
+
+; Les deux bornes du travail en Z. Aucune cote de coupe n'est ecrite en
+; dur ailleurs : c'est ce qui rend l'essai a blanc VRAIMENT a blanc.
+#<z_haut> = 0                              ; ou la coupe commence
+#<z_bas>  = [0 - #<ep_lit> - #<debouche>]  ; le fond
+
+O100 IF [#<essai> EQ 1]
+    #<z_haut>     = #<z_sur>
+    #<z_bas>      = #<z_sur>
+    #<z_approche> = #<z_sur>
+    (MSG, PERCAGE LIT - ESSAI A BLANC, tout se passe a 10 mm au-dessus du lit. Mettre essai a 0 pour couper.)
+O100 ENDIF
+
+G21 G90 G17 G94       ; mm, absolu, plan XY, avance par minute
+G64 P0.01             ; melange serre : les cercles doivent rester ronds
+G40 G49
+G0 Z#<z_sur>
+
+O110 IF [#<essai> EQ 0]
+    M3 S#<rpm>
+    G4 P2.0           ; laisse la broche prendre son regime
+O110 ENDIF
+
+; =====================================================================
+; DEGAGEMENTS D'OUTIL — 6 trous Ø30.0
+; =====================================================================
+(MSG, degagement outil poste 1)
+G0 X37.5 Y0
+G0 Z#<z_approche>
+; palier 1/4
+G1 X37.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.2500] F#<feed_z>
+G1 X40.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X43.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X46.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X49.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 2/4
+G1 X37.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.5000] F#<feed_z>
+G1 X40.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X43.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X46.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X49.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 3/4
+G1 X37.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.7500] F#<feed_z>
+G1 X40.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X43.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X46.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X49.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 4/4
+G1 X37.5 Y0 F#<feed_xy>
+G1 Z#<z_bas> F#<feed_z>
+G1 X40.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X43.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X46.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X49.5 Y0 F#<feed_xy>
+G3 I-12 J0
+G0 Z#<z_sur>
+
+(MSG, degagement outil poste 2)
+G0 X112.5 Y0
+G0 Z#<z_approche>
+; palier 1/4
+G1 X112.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.2500] F#<feed_z>
+G1 X115.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X118.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X121.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X124.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 2/4
+G1 X112.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.5000] F#<feed_z>
+G1 X115.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X118.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X121.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X124.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 3/4
+G1 X112.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.7500] F#<feed_z>
+G1 X115.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X118.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X121.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X124.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 4/4
+G1 X112.5 Y0 F#<feed_xy>
+G1 Z#<z_bas> F#<feed_z>
+G1 X115.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X118.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X121.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X124.5 Y0 F#<feed_xy>
+G3 I-12 J0
+G0 Z#<z_sur>
+
+(MSG, degagement outil poste 3)
+G0 X187.5 Y0
+G0 Z#<z_approche>
+; palier 1/4
+G1 X187.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.2500] F#<feed_z>
+G1 X190.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X193.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X196.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X199.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 2/4
+G1 X187.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.5000] F#<feed_z>
+G1 X190.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X193.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X196.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X199.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 3/4
+G1 X187.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.7500] F#<feed_z>
+G1 X190.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X193.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X196.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X199.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 4/4
+G1 X187.5 Y0 F#<feed_xy>
+G1 Z#<z_bas> F#<feed_z>
+G1 X190.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X193.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X196.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X199.5 Y0 F#<feed_xy>
+G3 I-12 J0
+G0 Z#<z_sur>
+
+(MSG, degagement outil poste 4)
+G0 X262.5 Y0
+G0 Z#<z_approche>
+; palier 1/4
+G1 X262.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.2500] F#<feed_z>
+G1 X265.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X268.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X271.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X274.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 2/4
+G1 X262.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.5000] F#<feed_z>
+G1 X265.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X268.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X271.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X274.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 3/4
+G1 X262.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.7500] F#<feed_z>
+G1 X265.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X268.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X271.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X274.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 4/4
+G1 X262.5 Y0 F#<feed_xy>
+G1 Z#<z_bas> F#<feed_z>
+G1 X265.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X268.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X271.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X274.5 Y0 F#<feed_xy>
+G3 I-12 J0
+G0 Z#<z_sur>
+
+(MSG, degagement outil poste 5)
+G0 X337.5 Y0
+G0 Z#<z_approche>
+; palier 1/4
+G1 X337.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.2500] F#<feed_z>
+G1 X340.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X343.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X346.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X349.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 2/4
+G1 X337.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.5000] F#<feed_z>
+G1 X340.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X343.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X346.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X349.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 3/4
+G1 X337.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.7500] F#<feed_z>
+G1 X340.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X343.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X346.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X349.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 4/4
+G1 X337.5 Y0 F#<feed_xy>
+G1 Z#<z_bas> F#<feed_z>
+G1 X340.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X343.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X346.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X349.5 Y0 F#<feed_xy>
+G3 I-12 J0
+G0 Z#<z_sur>
+
+(MSG, degagement outil poste 6)
+G0 X412.5 Y0
+G0 Z#<z_approche>
+; palier 1/4
+G1 X412.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.2500] F#<feed_z>
+G1 X415.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X418.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X421.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X424.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 2/4
+G1 X412.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.5000] F#<feed_z>
+G1 X415.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X418.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X421.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X424.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 3/4
+G1 X412.5 Y0 F#<feed_xy>
+G1 Z[#<z_haut> + [#<z_bas> - #<z_haut>] * 0.7500] F#<feed_z>
+G1 X415.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X418.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X421.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X424.5 Y0 F#<feed_xy>
+G3 I-12 J0
+; palier 4/4
+G1 X412.5 Y0 F#<feed_xy>
+G1 Z#<z_bas> F#<feed_z>
+G1 X415.5 Y0 F#<feed_xy>
+G3 I-3 J0
+G1 X418.5 Y0 F#<feed_xy>
+G3 I-6 J0
+G1 X421.5 Y0 F#<feed_xy>
+G3 I-9 J0
+G1 X424.5 Y0 F#<feed_xy>
+G3 I-12 J0
+G0 Z#<z_sur>
+
+; =====================================================================
+; GOUPILLES — 2 trous Ø8.0
+; =====================================================================
+(MSG, goupille 1)
+G0 X12 Y0
+G0 Z#<z_approche>
+G1 X13 Y0 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-1 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-1 J0
+G1 X12 Y0
+G0 Z#<z_sur>
+
+(MSG, goupille 2)
+G0 X438 Y0
+G0 Z#<z_approche>
+G1 X439 Y0 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-1 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-1 J0
+G1 X438 Y0
+G0 Z#<z_sur>
+
+; =====================================================================
+; VIS DE BRIDAGE — 12 trous Ø6.5
+; =====================================================================
+(MSG, vis de bridage 1+)
+G0 X61.5 Y26
+G0 Z#<z_approche>
+G1 X61.75 Y26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X61.5 Y26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 1-)
+G0 X61.5 Y-26
+G0 Z#<z_approche>
+G1 X61.75 Y-26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X61.5 Y-26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 2+)
+G0 X136.5 Y26
+G0 Z#<z_approche>
+G1 X136.75 Y26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X136.5 Y26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 2-)
+G0 X136.5 Y-26
+G0 Z#<z_approche>
+G1 X136.75 Y-26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X136.5 Y-26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 3+)
+G0 X211.5 Y26
+G0 Z#<z_approche>
+G1 X211.75 Y26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X211.5 Y26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 3-)
+G0 X211.5 Y-26
+G0 Z#<z_approche>
+G1 X211.75 Y-26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X211.5 Y-26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 4+)
+G0 X286.5 Y26
+G0 Z#<z_approche>
+G1 X286.75 Y26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X286.5 Y26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 4-)
+G0 X286.5 Y-26
+G0 Z#<z_approche>
+G1 X286.75 Y-26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X286.5 Y-26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 5+)
+G0 X361.5 Y26
+G0 Z#<z_approche>
+G1 X361.75 Y26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X361.5 Y26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 5-)
+G0 X361.5 Y-26
+G0 Z#<z_approche>
+G1 X361.75 Y-26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X361.5 Y-26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 6+)
+G0 X436.5 Y26
+G0 Z#<z_approche>
+G1 X436.75 Y26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X436.5 Y26
+G0 Z#<z_sur>
+
+(MSG, vis de bridage 6-)
+G0 X436.5 Y-26
+G0 Z#<z_approche>
+G1 X436.75 Y-26 F#<feed_xy>
+G1 Z#<z_haut> F#<feed_z>
+G3 I-0.25 J0 Z#<z_bas> P16 F#<feed_xy>
+G3 I-0.25 J0
+G1 X436.5 Y-26
+G0 Z#<z_sur>
+
+; =====================================================================
+M5
+G0 Z#<z_sur>
+G0 X0 Y0
+(MSG, Percage du lit termine — 20 trous)
+M2

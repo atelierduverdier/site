@@ -1,0 +1,248 @@
+<!-- Page d'accueil du portail. Corps seul : l'en-tête et le pied viennent
+     du kit, collés par generer.py.
+
+     Les faits techniques sont exacts et vérifiés. Le récit personnel — qui
+     tu es, pourquoi l'atelier — est laissé en encadré à remplir : ça ne
+     s'invente pas à ta place. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">Fraiseuse <b>PrintNC</b></span>
+          <span class="badge">Laser <b>diode 10 W optiques</b></span>
+          <span class="badge">Traceur <b>Graphtec CE6000-60</b></span>
+        </div>
+        <h1>L'atelier, et ce qu'on y écrit</h1>
+        <p class="lede">
+          Une fraiseuse sous LinuxCNC, une tête laser qui suit les surfaces courbes,
+          un traceur de découpe — et les logiciels qu'il a fallu écrire pour les
+          faire tourner ensemble.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#logiciels">Les logiciels</a>
+          <a class="btn btn-ghost" href="#atelier">L'atelier</a>
+          <a class="btn btn-ghost" href="#projets">Les projets</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        {{LOGO}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="logiciels">
+  <div class="wrap">
+    <div class="sec-tag">Logiciels</div>
+    <h2>Quatre outils, écrits pour cet atelier</h2>
+    <p class="sec-lede">
+      Aucun n'a été écrit pour être un logiciel. Chacun règle un problème que la
+      machine posait, et qu'aucun outil existant ne réglait à ma place.
+    </p>
+
+    <div class="cartes">
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">🔥</span>
+          <h3>LaserAtelier</h3>
+          <span class="etat public">public</span>
+        </div>
+        <p>
+          Un atelier FreeCAD qui transforme de la géométrie 2D et 3D en G-code laser :
+          marquage, gravure remplie, photo tramée, découpe multi-passes, grilles de
+          test et planches de calibration. Il suit les <b>surfaces courbes</b> en
+          pilotant la défocalisation, ce qui est la raison d'être du projet.
+        </p>
+        <p class="muted">
+          Version {{laser.version}} · FreeCAD 1.1 · LinuxCNC, GRBL, grblHAL · LGPL-2.1-or-later
+        </p>
+        <div class="liens">
+          <a href="{{RACINE}}logiciels/laseratelier.html">Comment il marche</a>
+          <a href="https://laser.atelierduverdier.fr">Documentation</a>
+          <a href="https://laser.atelierduverdier.fr/Manuel-LaserAtelier.pdf">Manuel (PDF)</a>
+          <a href="https://github.com/atelierduverdier/LaserAtelier">Dépôt</a>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">📐</span>
+          <h3>Visualiseur G-code</h3>
+          <span class="etat prive">privé</span>
+        </div>
+        <p>
+          Un traceur de parcours LinuxCNC en PySide6/OpenGL, appuyé sur
+          <code>rs274</code> — l'interpréteur de LinuxCNC lui-même. Il affiche donc
+          les fichiers <b>paramétrés</b> (<code>#&lt;nom&gt;</code>, expressions,
+          O-words) que les visualiseurs génériques refusent d'ouvrir.
+        </p>
+        <p class="muted">Première version en août 2026.</p>
+        <div class="liens">
+          <a href="{{RACINE}}logiciels/visualiseur-gcode.html">Comment il marche</a>
+          <span class="muted">dépôt privé</span>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">✂️</span>
+          <h3>Pupitre Graphtec</h3>
+          <span class="etat prive">privé</span>
+        </div>
+        <p>
+          Pilotage du traceur de découpe <b>Graphtec CE6000-60</b> sous Linux, sans
+          driver constructeur : sonde de l'état machine, tracé de contrôle,
+          nuancier de force, et conversion SVG vers HP-GL.
+        </p>
+        <p class="muted">Terminé en août 2026.</p>
+        <div class="liens">
+          <a href="{{RACINE}}logiciels/pupitre-graphtec.html">Comment il marche</a>
+          <span class="muted">dépôt privé</span>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">⚙️</span>
+          <h3>Config PrintNC</h3>
+          <span class="etat public">public</span>
+        </div>
+        <p>
+          La configuration LinuxCNC de la machine, documentée : cinématique, HAL,
+          pilotage du laser en <code>spindle.1</code>, sorties auxiliaires, et les
+          sous-programmes du changeur d'outil automatique.
+        </p>
+        <p class="muted">Flexi-HAL + Remora · GPL-3.0</p>
+        <div class="liens">
+          <a href="https://github.com/atelierduverdier/printnc-config">Dépôt</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="callout note">
+      <span class="ci">À écrire</span>
+      <p>Un paragraphe sur <b>toi</b> manque ici — qui tient cet atelier, depuis quand,
+      et pourquoi le logiciel a fini par prendre autant de place que le bois. C'est la
+      seule chose de cette page que je ne peux pas écrire à ta place.</p>
+    </div>
+  </div>
+</section>
+
+<section id="atelier">
+  <div class="wrap">
+    <div class="sec-tag">L'atelier</div>
+    <h2>Les machines</h2>
+    <p class="sec-lede">Trois machines, un même fil : tout finit en G-code ou en HP-GL.</p>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>La fraiseuse</h3>
+        <p>
+          Une <b>PrintNC</b> sous LinuxCNC, carte Flexi-HAL et Remora, quatre drivers
+          CL57T, l'axe Y en <b>tandem</b>. Broche 2,2 kW pilotée par variateur Huanyang
+          en RS485.
+        </p>
+        <p class="muted">
+          Son accélération est basse : le genou utile se situe entre 600 et
+          800 mm/min, ce qui change tout au moment d'estimer un temps d'usinage.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>La tête laser</h3>
+        <p>
+          Un module diode <b>LT-80W-AA-PRO</b>, capot carré retiré pour qu'il puisse
+          suivre des surfaces courbes. Il occupe <code>spindle.1</code> et sa puissance
+          est mise à l'échelle par la vitesse réelle : <b>à l'arrêt, la puissance
+          tombe à zéro</b>.
+        </p>
+        <p class="muted">
+          Ce détail-là commande toute la génération du G-code : un point ne peut pas
+          être une temporisation, il doit être un micro-déplacement.
+        </p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Le traceur de découpe</h3>
+        <p>
+          Un <b>Graphtec CE6000-60</b>, piloté en HP-GL directement sur son descripteur
+          USB. La commande doit être réglée sur <b>HP-GL et jamais sur AUTO</b> : en
+          AUTO, la machine imprime le fichier au lieu de le découper.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Le changeur d'outil</h3>
+        <p>
+          Un magasin ATC à billes pour pinces ER20, en cours de montage : six postes,
+          trois billes acier par poste, et un mécanisme dont tout tient dans une
+          fenêtre de <b>1,02 mm</b>.
+        </p>
+        <div class="liens">
+          <a href="{{RACINE}}projets/magasin-atc.html">La note de calcul de la bille →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projets">
+  <div class="wrap">
+    <div class="sec-tag">Projets</div>
+    <h2>Ce qui sort de l'atelier</h2>
+    <p class="sec-lede">
+      Les pièces et les montages, avec les calculs et les erreurs qui vont avec.
+    </p>
+
+    <div class="cartes">
+      <div class="carte">
+        <div class="head">
+          <span class="ci">🔩</span>
+          <h3>Magasin ATC ER20</h3>
+          <span class="etat chantier">en cours</span>
+        </div>
+        <p>
+          Changeur d'outil automatique à billes pour broche ER20. La note de calcul
+          détaille pourquoi la saillie des billes vaut 1,20 mm et pas autre chose —
+          et pourquoi la contrainte la plus serrée du projet est restée invisible
+          jusqu'à ce qu'on mesure un chanfrein de 1,5 mm.
+        </p>
+        <div class="liens">
+          <a href="{{RACINE}}projets/magasin-atc.html">Lire la note de calcul</a>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">📓</span>
+          <h3>Journal de construction</h3>
+          <span class="etat public">en ligne</span>
+        </div>
+        <p>
+          Le montage de la PrintNC en vidéo, mois par mois : mécanique, électronique,
+          LinuxCNC, puis laser.
+        </p>
+        <div class="liens">
+          <a href="https://atelierduverdier.fr">Voir le journal</a>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">🗂️</span>
+          <h3>Et le reste</h3>
+          <span class="etat chantier">à venir</span>
+        </div>
+        <p>
+          Dust shoe, meuble à balais, tonnelle à glycine, porte-manteau : les projets
+          FreeCAD paramétriques, chacun régénérable par son script.
+        </p>
+        <div class="liens"><span class="muted">Pages à écrire</span></div>
+      </div>
+    </div>
+  </div>
+</section>
