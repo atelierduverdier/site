@@ -361,8 +361,49 @@ porte un chemin explicite et n'est pas concerné.
 Si un jour Christophe veut vraiment lire ces chiffres, la question à reposer n'est pas le
 préfixe mais l'outil.
 
-### Chantier 3 — Diffuser la charte (½ journée)
-`diffuser_kit.py`, puis passage du site laser et du journal sous la charte commune.
+### Chantier 3 — Diffuser la charte
+**`diffuser_kit.py` : fait le 12/08/2026. Site laser : fait. Journal PrintNC : à faire.**
+
+Le script pose `verdier.css`, `verdier.js`, `verdier-chapeau.svg` et `verdier-logo.svg` chez
+chaque satellite, avec un bandeau d'origine et une empreinte par fichier. Trois garde-fous,
+tous **éprouvés** : une copie retouchée sur place arrête la diffusion (`--forcer` l'écrase) ;
+un fichier existant jamais posé par le kit n'est pas écrasé ; deux passages ne réécrivent rien.
+
+Les noms posés sont préfixés `verdier-*`, et ça vient d'une vraie casse : la première version
+a écrasé `docs/assets/logo.svg` du site laser — 40 Ko, utilisés dans son héros — par simple
+collision de nom. Restauré depuis git, puis les **deux** causes corrigées : le nom, et
+l'absence de refus.
+
+**Le script ne touche aucun HTML.** Brancher une page sur la charte se fait une fois, à la
+main, avec les yeux dessus ; ensuite les fichiers restent synchronisés tout seuls.
+
+#### Site laser — branché, et vérifié plutôt que supposé
+
+Les 14 Ko de `<style>` en ligne cèdent la place à `assets/verdier.css` (la charte) et
+`assets/laser-local.css` (3 Ko, les 33 blocs propres au site : cartes de mode, schémas,
+dépliants, plaque du héros). Sur 53 sélecteurs relevés, **52 ont des styles calculés
+identiques** avant/après, et la page fait exactement la même hauteur : 25 221 px. Le 53ᵉ est
+`.pipe`, dont la grille `auto-fit` ajoute une piste de 0 px dans la valeur calculée — mesuré
+sans effet : mêmes six colonnes, mêmes positions, même largeur.
+
+Deux défauts corrigés au passage, tous deux mesurés en ligne :
+
+- `data-theme="light"` en dur neutralisait `prefers-color-scheme`. Navigateur en thème
+  sombre : fond `rgb(255,255,255)` avant, `rgb(20,23,27)` après.
+- aucune navigation sous 860 px. Le bouton de menu de la charte est en place, éprouvé à
+  390 px.
+
+Le thème passe de `localStorage` à un **cookie de domaine** : le réglage suit le visiteur
+d'un sous-domaine à l'autre. Contrepartie, une fois : un choix déjà enregistré est oublié.
+
+`manuel.html` n'est **pas** touché — il part en PDF par WeasyPrint et garde son style en ligne.
+
+#### Journal PrintNC — reste à faire
+
+Sa charte est engendrée par `generer_site.py` (bloc `<style>` aux lignes 410-621). Le passage
+demandera de découper ce bloc comme pour le laser, en gardant ses **quatre couleurs de phase**
+comme accents de contenu. La charte y est déjà posée (`kit_site/kit/`), rien n'est encore
+branché.
 
 ### Chantier 4 — Les deux logiciels privés (½ journée)
 **Fiche vitrine, sans lien dépôt** (choix D3) : captures + ce que ça fait + état, pour
