@@ -341,12 +341,25 @@ construction » pointaient encore `atelierduverdier.fr`, devenu le portail lui-m
 qui tourne en rond. Redressés vers `printnc.`. Le journal, lui, n'avait aucun lien absolu vers
 lui-même : rien à y changer.
 
-**Reste, et c'est une décision de Christophe :** GoatCounter. Les deux sites déclarent le même
-compte `atelierduverdier.goatcounter.com`, qui n'enregistre que le CHEMIN — le `/` du portail
-et l'historique `/` du journal se mélangent donc dans une seule courbe depuis aujourd'hui.
-Deux sorties, aucune irréversible : un préfixe de chemin sur le journal
-(`data-goatcounter-settings` avec `path`), ou un second code de site. Tant que ce n'est pas
-tranché, les statistiques du journal restent lisibles mais mêlées à celles du portail.
+**GoatCounter — réglé le 12/08/2026, sans rien demander de plus.** Christophe a dit ne pas
+regarder ces statistiques et ne pas les trouver intuitives ; il n'y avait donc pas de décision
+à lui rendre, seulement le choix le moins cher et le moins irréversible.
+
+Le problème était réel : `count.js` envoie `p` (chemin), `r`, `t`, `e`, `s`, `b`, `q` — **le
+nom d'hôte n'en fait pas partie**, vérifié dans le script lui-même. Le `/` du portail et celui
+du journal tombaient donc dans le même seau depuis la bascule du matin.
+
+**C'est le nouveau venu qui se préfixe** (`/portail…`), jamais le journal : lui a des mois
+d'historique sur `/`, et le couper en deux séries perdrait la continuité qu'on cherche à
+préserver. Vérifié en navigateur sur les pages produites : `/` devient `/portail/`,
+`/logiciels/laseratelier.html` devient `/portail/logiciels/…`. Journal inchangé, md5 identique.
+
+Le préfixe est un **réglage du générateur** (`PREFIXE_COMPTEUR`), pas une ligne écrite dans le
+kit : un futur satellite seul sur son compte mettra `''`. L'événement `/vote-utile` du journal
+porte un chemin explicite et n'est pas concerné.
+
+Si un jour Christophe veut vraiment lire ces chiffres, la question à reposer n'est pas le
+préfixe mais l'outil.
 
 ### Chantier 3 — Diffuser la charte (½ journée)
 `diffuser_kit.py`, puis passage du site laser et du journal sous la charte commune.
