@@ -267,8 +267,12 @@ panneaux sur 22 — Calligraphie et Texte contour avaient été faits à la main
 au lieu de 430. Les 22 sont régénérés, le PDF du manuel aussi (98 pages). **Config vivante
 vérifiée intacte** avant et après, md5 et mtime identiques.
 
-Reste à faire ici : le paragraphe « qui je suis » sur l'accueil (encadré en place).
-**Rien n'est en ligne** — pas de dépôt, pas de DNS.
+Le paragraphe « qui je suis » a été écrit le 12/08/2026 (nom, oiseau, Normandie, le bois
+et le code jugés sur une pièce), puis **retiré le jour même à la demande de Christophe**.
+Le texte reste dans l'historique git (commit `dbf450a`) pour le jour où il le remettra.
+
+Le dossier est un **dépôt git local** depuis le 12/08/2026. **Rien n'est en ligne** —
+pas de dépôt GitHub, pas de DNS.
 
 ### Chantier 2 — La bascule de la racine ⚠️ — filet ÉCRIT et ÉPROUVÉ le 12/08/2026
 
