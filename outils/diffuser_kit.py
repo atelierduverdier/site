@@ -55,12 +55,27 @@ FICHIERS = {
     'logo.svg': 'verdier-logo.svg',
 }
 
+# TOUS LES SATELLITES NE PRENNENT PAS LA MÊME CHOSE.
+#
+# Un site qui part de rien prend la charte entière. Un site qui a DÉJÀ sa
+# mise en page ne prend que les jetons : mesuré le 12/08/2026, le kit
+# complet posé sous le journal PrintNC lui ajoutait 258 px, parce que
+# `.hero h1` du kit est plus spécifique que le `.hero-titre` du journal.
+# Dix-sept sélecteurs se croisent, et la spécificité en crée d'autres qui
+# ne se voient pas au nom : on ne pose donc que ce qui est demandé.
+JETONS_SEULS = {
+    'verdier-jetons.css': 'verdier-jetons.css',
+    'verdier.js': 'verdier.js',
+    'chapeau.svg': 'verdier-chapeau.svg',
+    'logo.svg': 'verdier-logo.svg',
+}
+
 # nom lisible -> dossier où poser la charte, chez le satellite.
 SATELLITES = {
-    'site laser': (Path.home() / '.local' / 'share' / 'FreeCAD' / 'v1-1'
-                   / 'Mod' / 'LaserAtelier' / 'docs' / 'assets'),
-    'journal PrintNC': (Path.home() / 'Projets' / 'site' / 'Site_PrintNC'
-                        / 'kit_site' / 'kit'),
+    'site laser': ((Path.home() / '.local' / 'share' / 'FreeCAD' / 'v1-1'
+                    / 'Mod' / 'LaserAtelier' / 'docs' / 'assets'), FICHIERS),
+    'journal PrintNC': ((Path.home() / 'Projets' / 'site' / 'Site_PrintNC'
+                         / 'kit_site' / 'kit'), JETONS_SEULS),
 }
 
 BANDEAU = {
@@ -98,7 +113,8 @@ def empreinte(donnees: bytes) -> str:
     return hashlib.md5(donnees).hexdigest()
 
 
-def diffuser(nom: str, dossier: Path, blanc: bool, forcer: bool) -> int:
+def diffuser(nom: str, dossier: Path, fichiers: dict, blanc: bool,
+             forcer: bool) -> int:
     if not dossier.parent.exists():
         print(f"  {nom} : dossier parent absent ({dossier.parent}) — ignoré")
         return 0
@@ -109,7 +125,7 @@ def diffuser(nom: str, dossier: Path, blanc: bool, forcer: bool) -> int:
         connues = json.loads(journal.read_text(encoding='utf-8'))
 
     retouches, aposer, etrangers = [], [], []
-    for f, pose in FICHIERS.items():
+    for f, pose in fichiers.items():
         source = KIT / f
         if not source.exists():
             sys.exit(f"diffuser_kit : {source} manquant.")
@@ -173,8 +189,8 @@ def main() -> None:
         print("(--blanc : rien n'est écrit)")
 
     total = 0
-    for nom, dossier in SATELLITES.items():
-        r = diffuser(nom, dossier, blanc, forcer)
+    for nom, (dossier, fichiers) in SATELLITES.items():
+        r = diffuser(nom, dossier, fichiers, blanc, forcer)
         if r < 0:
             sys.exit(1)
         total += r

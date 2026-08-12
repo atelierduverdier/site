@@ -398,12 +398,36 @@ d'un sous-domaine à l'autre. Contrepartie, une fois : un choix déjà enregistr
 
 `manuel.html` n'est **pas** touché — il part en PDF par WeasyPrint et garde son style en ligne.
 
-#### Journal PrintNC — reste à faire
+#### Journal PrintNC — fait le 12/08/2026, variante « ardoise »
 
-Sa charte est engendrée par `generer_site.py` (bloc `<style>` aux lignes 410-621). Le passage
-demandera de découper ce bloc comme pour le laser, en gardant ses **quatre couleurs de phase**
-comme accents de contenu. La charte y est déjà posée (`kit_site/kit/`), rien n'est encore
-branché.
+Deux variantes ont été préparées et montrées avant de trancher : garder l'identité chaude, ou
+adopter l'ardoise commune. **La mesure a éliminé la première** — sur 22 sélecteurs, une seule
+marge changeait : le journal définit ses 209 règles lui-même, la charte n'avait rien à lui
+servir. Le choix réel était donc binaire, et Christophe a pris l'ardoise.
+
+**Le journal ne charge que les JETONS, pas la charte entière**, et c'est une mesure qui l'a
+imposé. Avec `verdier.css` complet : titre du héros à **43,2 px au lieu de 30**, paragraphes
+avec 12,6 px de marge — la cause est la spécificité, `.hero h1` du kit bat `.hero-titre` du
+journal. Dix-sept sélecteurs se croisent, et la spécificité en crée d'autres qui ne se voient
+pas au nom. Avec `kit/verdier-jetons.css` : titre 30 px, marges 0, **page 1620 px des deux
+côtés**. Identique.
+
+`kit/extraire_jetons.py` tire ce fichier de `verdier.css` — jamais écrit à la main, pour que
+les deux ne divergent pas. `diffuser_kit.py` sait désormais poser **des jeux différents selon
+le satellite** : la charte entière au site laser, les jetons seuls au journal.
+
+Thème unifié : `data-theme` + cookie de domaine, la logique venant de `verdier.js`. Le réglage
+traverse donc les sous-domaines. `body.jour` et son `localStorage` disparaissent ; il ne reste
+localement que l'icône soleil/lune. Les **quatre couleurs de phase sont intactes**.
+
+**Un piège de mesure, à ne pas refaire.** Les premiers relevés annonçaient +141, +258 puis
++83 px de croissance. Tous faux : mon témoin était un bac à sable contenant `generer_site.py`
+et `data/` **mais pas les images**. L'image du héros ne s'affichant pas, le texte prenait
+toute la largeur au lieu de partager avec elle — la page paraissait plus courte. Comparé au
+vrai dossier, images comprises : 1620 px contre 1620. Un témoin doit être le vrai site, pas
+une reconstitution.
+
+Le chantier 3 est **fait**.
 
 ### Chantier 4 — Les deux logiciels privés (½ journée)
 **Fiche vitrine, sans lien dépôt** (choix D3) : captures + ce que ça fait + état, pour
