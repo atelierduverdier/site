@@ -33,8 +33,9 @@ Tout est hébergé sur GitHub Pages. GoatCounter est déjà branché sur le jour
 
 Satellites publics qui existent aussi : `gsr-gui` (enregistreur d'écran, hors atelier),
 `huanyang-vfd-reader` (lecture VFD, atelier-adjacent).
-Non publiés : AMAP-Crouay, `atelier-telegram-bot`, les projets FreeCAD (magasin ATC,
-dust shoe, meuble à balais, tonnelle).
+Non publiés : `atelier-telegram-bot`, les projets FreeCAD (magasin ATC,
+dust shoe, meuble à balais, tonnelle), et quelques travaux hors atelier qui
+ne regardent pas ce site.
 
 ### Identité
 
@@ -79,7 +80,7 @@ n'écrira ici.
 Ce qui plaide concrètement pour le statique dans **ton** cas précis :
 
 1. **C'est déjà ce que tu fais.** `generer_site.py` lit un CSV et crache du HTML ; le manuel
-   LaserAtelier est généré en PDF par WeasyPrint ; l'AMAP a aussi son `generer_site.py`. Le
+   LaserAtelier est généré en PDF par WeasyPrint ; d'autres projets suivent le même pli. Le
    flux « données → script Python → HTML » t'est familier, il est versionné, il se rejoue.
 2. **Zéro maintenance de sécurité.** Un site dynamique, c'est un VPS, un runtime à tenir à
    jour, des sauvegardes, une surface d'attaque — pour des pages qui ne changent que quand
@@ -503,7 +504,6 @@ En ligne : <https://atelierduverdier.fr/projets/>. Un **sommaire** qui dit surto
 | Tonnelle à glycine | modèle complet | oui |
 | Meuble à balais | modèle complet | oui |
 | Dust shoe | **jamais imprimé ni monté** | non — rien à montrer qui existe |
-| AMAP de Crouay | hors atelier | non — logiciel d'association |
 
 **Aucune cote n'est recopiée.** `site/valeurs_fcstd.py` les lit dans le **tableur du document
 FreeCAD**, en ouvrant le `.FCStd` comme un zip : ni FreeCAD lancé, ni AppImage. C'était
