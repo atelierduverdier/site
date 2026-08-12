@@ -437,9 +437,37 @@ ajoute le lien, rien d'autre à refaire.
 Si ce jour arrive, la relecture préalable n'est pas une formalité — secrets, chemins
 personnels, `config.env`, adresses. Une fois poussé, c'est public pour toujours.
 
-### Chantier 5 — Découper le journal PrintNC (1 journée, plus tard)
-Faire cracher à `generer_site.py` une page par mois au lieu d'un `index.html` de 588 Ko.
-Indépendant du reste, à faire quand ça gênera vraiment.
+### Chantier 5 — Découper le journal PrintNC : **mesuré le 12/08/2026, PAS FAIT, et à raison**
+
+Le plan disait « à faire quand ça gênera vraiment ». Mesuré : **ça ne gêne pas**.
+
+| grandeur | relevé sur le site en ligne |
+|---|---|
+| poids transféré | **103 Ko** compressés (598 Ko en clair — gzip fait le travail) |
+| DOM interactif | **231 ms** |
+| chargement complet | **236 ms** |
+| images réellement tirées | **2** sur 299 (296 en chargement paresseux) |
+| bascule d'un onglet | **1 ms** |
+
+Le « 588 Ko » du cadrage était le poids sur disque, jamais celui sur le fil.
+
+**Et le découpage casserait trois choses qui marchent aujourd'hui :**
+
+1. **Toutes les ancres partagées.** Les `#v-…` valent parce que les 265 vidéos sont dans un
+   seul document. Réparties par mois, chaque lien Instagram ou forum demanderait un second
+   filet — celui du chantier 2 mène à la racine du journal, pas à la bonne page mensuelle.
+2. **La recherche.** Elle filtre les `.item` du document courant : découpée, elle ne verrait
+   plus que le mois affiché. Rendre la recherche globale demanderait un index séparé.
+3. **Le filtre par phase**, pour la même raison.
+
+**Le seuil, calculé sur le coût unitaire mesuré** — 0,39 Ko compressés, 26 nœuds et 0,87 ms
+par vidéo, à un rythme relevé de 39,7 vidéos par mois :
+
+- 300 Ko compressés vers **772 vidéos**, soit ~13 mois (≈ 08/2027) ;
+- 1 s d'interactivité vers **1 147 vidéos**, soit ~22 mois (≈ 06/2028).
+
+**Le déclencheur à surveiller n'est donc pas une date, c'est un compteur : ~770 vidéos.**
+D'ici là, découper coûterait trois régressions certaines pour un gain nul.
 
 ### Chantier 6 — La rubrique `/projets/` (plus tard)
 Magasin ATC, dust shoe, meuble à balais, tonnelle, AMAP. Prévue dans l'architecture dès
