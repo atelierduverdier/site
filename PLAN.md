@@ -307,41 +307,46 @@ plan (CNAME puis DNS) aurait laissé le journal HORS LIGNE entre les deux : dès
 pas encore. Relevé au `dig` le 12/08/2026 : l'apex et `www`/`laser`/`liens` pointent bien vers
 GitHub Pages, **`printnc` n'existe pas, pas de wildcard**.
 
-**Reste, dans cet ordre :**
-1. **DNS, geste de Christophe.** Registraire **ET** hébergeur de la zone : **OVH**
-   (RDAP AFNIC + `NS ns109/dns109.ovh.net` — la zone n'est déléguée nulle part ailleurs).
-   Domaine créé le 17/06/2026, expire le 17/06/2029.
+### ✅ **BASCULÉ le 12/08/2026.** `atelierduverdier.fr` sert le portail.
 
-   Manager OVH → *Noms de domaine* → `atelierduverdier.fr` → onglet **Zone DNS** →
-   *Ajouter une entrée* → **CNAME** :
+Ordre suivi, et il compte : **DNS chez OVH d'abord** (Christophe), puis le journal libère la
+racine, puis le portail la réclame. L'ordre inverse aurait laissé le journal hors ligne entre
+les deux.
 
-   | champ | valeur |
-   |---|---|
-   | Sous-domaine | `printnc` |
-   | Cible | `atelierduverdier.github.io.` (avec le point final) |
+| domaine | sert | vérifié |
+|---|---|---|
+| `atelierduverdier.fr` | le portail | 200, certificat valide |
+| `www.` | le portail | 200 |
+| `printnc.` | le journal | 200, **md5 identique à avant la bascule** |
+| `laser.` · `liens.` | inchangés | 200 |
 
-   C'est exactement ce que sont déjà `laser`, `liens` et `www` — vérifié au `dig`. L'apex,
-   lui, garde ses quatre `A` vers GitHub : un CNAME est interdit sur un apex.
+**Le filet à ancres, éprouvé trois fois plutôt qu'une :**
 
-   Avant la permutation des CNAME, cet enregistrement ne fait rien de visible : GitHub
-   répond 404 pour un domaine qu'aucun dépôt ne réclame. C'est l'état sûr.
-2. **Dès qu'il résout** (`dig +short printnc.atelierduverdier.fr` rend les IP GitHub), la
-   permutation, deux gestes de deux minutes :
-   a. dans `printnc-build` : `CNAME` passe de `atelierduverdier.fr` à
-      `printnc.atelierduverdier.fr` — le journal quitte la racine et répond aussitôt sur
-      son nouveau domaine ;
-   b. dans `atelierduverdier/site` : fichier `CNAME` = `atelierduverdier.fr` dans
-      `site/public/` (à faire écrire par `generer.py` pour survivre à la reconstruction)
-      + domaine posé côté Pages. La racine sert le portail, le filet rattrape les ancres.
-3. **Contrôles d'arrivée** : les trois liens réels rejoués de bout en bout (racine → filet
-   → journal → la vidéo se centre), `laser.` et `liens.` intacts.
-4. **GoatCounter, décision de Christophe** : le compte n'enregistre que le CHEMIN — le `/`
-   du portail et l'historique `/` du journal se mélangeraient. Préfixe de chemin sur le
-   journal (`data-goatcounter-settings` avec `path`) ou second code de site ; aucune des
-   deux n'est irréversible.
-5. Les liens partagés d'origine (Instagram, forum) restent introuvables publiquement —
-   testés à défaut sur les ancres réelles du site en ligne. Si Christophe retrouve les
-   liens exacts, les rejouer prend une minute.
+1. *Sur les 317 ancres réelles du journal*, avec le code JS **extrait de la page servie** et
+   rejoué sous node : **294 rattrapées**. Les 23 restantes (`#theme-toggle`, `#lightbox`,
+   `#search-input`…) ne sont **jamais des cibles de lien** — que des `id` de widgets, vérifié
+   contre la liste des `href="#…"` du journal. Zéro fuite : les quatre ancres propres au
+   portail restent sur place.
+2. *En vrai navigateur* (Firefox headless, JS actif), sur trois vraies ancres relevées en
+   ligne : **3/3 aboutissent sur l'élément visé, à l'écran** — position mesurée, pas déduite.
+3. *Comparé au direct* : mêmes ancres sans passer par le filet, mêmes positions (top=113).
+
+**Un faux défaut, à ne pas rechercher** : un premier passage donnait 2/3, l'ancre `#v-18088…`
+trouvée mais à 1697 px hors écran. C'était **le temps d'attente du test**, pas le filet — la
+redirection ajoute un chargement de page. À 9 s de repos : 3/3, trois passages de suite, à la
+position exacte du cas direct.
+
+**Défaut réel trouvé après bascule, corrigé** : le pied du portail et la fiche « Journal de
+construction » pointaient encore `atelierduverdier.fr`, devenu le portail lui-même — un lien
+qui tourne en rond. Redressés vers `printnc.`. Le journal, lui, n'avait aucun lien absolu vers
+lui-même : rien à y changer.
+
+**Reste, et c'est une décision de Christophe :** GoatCounter. Les deux sites déclarent le même
+compte `atelierduverdier.goatcounter.com`, qui n'enregistre que le CHEMIN — le `/` du portail
+et l'historique `/` du journal se mélangent donc dans une seule courbe depuis aujourd'hui.
+Deux sorties, aucune irréversible : un préfixe de chemin sur le journal
+(`data-goatcounter-settings` avec `path`), ou un second code de site. Tant que ce n'est pas
+tranché, les statistiques du journal restent lisibles mais mêlées à celles du portail.
 
 ### Chantier 3 — Diffuser la charte (½ journée)
 `diffuser_kit.py`, puis passage du site laser et du journal sous la charte commune.
