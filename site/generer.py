@@ -13,6 +13,7 @@
 # =========================================================================
 
 import re
+import hashlib
 import shutil
 import sys
 from pathlib import Path
@@ -337,14 +338,32 @@ def remplir(gabarit: str, valeurs: dict, nom: str) -> str:
     return gabarit
 
 
-def copier_ressources() -> None:
+def copier_ressources() -> dict:
     for nom in FICHIERS_KIT:
         shutil.copy2(KIT / nom, PUBLIC / nom)
 
-    convertir_captures()
+    return convertir_captures()
 
 
-def convertir_captures() -> None:
+def empreinter(corps: str, empreintes: dict) -> str:
+    """Remplace `captures/x.webp` par `captures/x.<empreinte>.webp`.
+
+    **Un nom de fichier qui ne change pas est un mensonge que le cache
+    répète.** Le 12/08/2026, une planche corrigée a continué de s'afficher
+    dans sa version d'avant : le serveur envoyait la bonne image, mais le
+    navigateur gardait l'ancienne — rien dans l'adresse ne lui disait que le
+    contenu avait bougé. Une empreinte du contenu dans le nom rend la faute
+    impossible : contenu différent, adresse différente, cache contourné.
+
+    C'est la même règle que partout ici — ne pas recopier une valeur —
+    appliquée à un nom de fichier.
+    """
+    for ancien, neuf in empreintes.items():
+        corps = corps.replace(f'captures/{ancien}', f'captures/{neuf}')
+    return corps
+
+
+def convertir_captures() -> dict:
     """Publie les captures en WebP. Les PNG de `contenu/` restent les maîtres.
 
     LE CHOIX DU MODE EST MESURÉ, PAS SUPPOSÉ. Sur une interface à aplats —
@@ -357,9 +376,12 @@ def convertir_captures() -> None:
     q92 et non q80 : ces captures sont pleines de texte de 11 px, et c'est
     lui qui se salit en premier quand on descend en qualité.
     """
+    # Declare AVANT la premiere sortie : `empreintes` est le contrat de
+    # cette fonction, chaque chemin doit pouvoir le rendre.
+    empreintes = {}
     captures = CONTENU / 'captures'
     if not captures.is_dir():
-        return
+        return empreintes
     try:
         from PIL import Image
     except ImportError:
@@ -382,17 +404,26 @@ def convertir_captures() -> None:
             image.save(dest, 'WEBP', lossless=True, method=6)
             sans_perte += 1
 
+        # L'empreinte porte sur le WEBP, pas sur le PNG : c'est le fichier
+        # servi, et c'est lui que le navigateur garde. Huit caractères
+        # suffisent — on nomme des images, on ne signe rien.
+        marque = hashlib.sha256(dest.read_bytes()).hexdigest()[:8]
+        final = cible / f'{src.stem}.{marque}.webp'
+        dest.replace(final)
+        empreintes[f'{src.stem}.webp'] = final.name
+
         avant += src.stat().st_size
-        apres += dest.stat().st_size
+        apres += final.stat().st_size
 
     n = len(list(captures.glob('*.png')))
     if n:
         print(f"  {n} capture(s) en WebP — {avant // 1024} Ko → {apres // 1024} Ko "
-              f"({100 - 100 * apres // avant} % de moins, {sans_perte} sans perte)")
+              f"({100 - 100 * apres // avant} % de moins, {sans_perte} sans perte, "
+              f"nommées par empreinte)")
 
     if not PLANS_ATC.is_dir():
         print(f"  ! planches ATC introuvables ({PLANS_ATC}) — pages sans planches")
-        return
+        return empreintes
 
     cible = PUBLIC / 'projets' / 'plans'
     cible.mkdir(parents=True, exist_ok=True)
@@ -404,6 +435,8 @@ def convertir_captures() -> None:
             print(f"  ! planche absente : {nom}")
 
 
+    return empreintes
+
 def main() -> None:
     if PUBLIC.exists():
         shutil.rmtree(PUBLIC)
@@ -413,7 +446,7 @@ def main() -> None:
     pied = (KIT / 'pied.html').read_text(encoding='utf-8')
     logo = logo_en_ligne()
 
-    copier_ressources()
+    empreintes = copier_ressources()
 
     if DOMAINE:
         (PUBLIC / 'CNAME').write_text(DOMAINE + '\n', encoding='utf-8')
@@ -433,6 +466,7 @@ def main() -> None:
         corps = injecter_fcstd(corps, page['contenu'])
         corps = corps.replace('{{LOGO}}', logo)
         corps = corps.replace('{{RACINE}}', prefixe)
+        corps = empreinter(corps, empreintes)
 
         html = (
             remplir(entete, {
