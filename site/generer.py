@@ -20,6 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import chemins
 import valeurs_atc
+import valeurs_fcstd
 
 RACINE = Path(__file__).resolve().parent.parent
 KIT = RACINE / 'kit'
@@ -58,6 +59,42 @@ def version_laser() -> str:
         if m:
             return m.group(1)
     sys.exit(f"generer : aucune ligne VERSION dans {LASER_CORE.name}.")
+
+
+def injecter_fcstd(corps: str, nom: str) -> str:
+    """Remplace les {{fcstd:doc:cle}} par une cote lue DANS le document.
+
+    `{{fcstd:tonnelle:Largeur hors-tout (X)}}`  -> par libellé
+    `{{fcstd:meuble:@Hauteur}}`                 -> par alias (le @ le dit)
+    `{{fcstd:tonnelle:Poteau (carré)|1}}`       -> avec 1 décimale
+
+    Les cotes de ces deux projets vivent dans le tableur de leur .FCStd,
+    pas dans leur Python : celui-ci ne porte que des valeurs de départ.
+    valeurs_fcstd s'arrête si le libellé manque ou si la cellule contient
+    une formule — jamais de chiffre deviné.
+    """
+    if '{{fcstd:' not in corps:
+        return corps
+
+    docs = {
+        'tonnelle': chemins.TONNELLE_FCSTD,
+        'meuble': chemins.MEUBLE_FCSTD,
+    }
+
+    def remplacer(m):
+        doc, cle, dec = m.group(1), m.group(2), m.group(3)
+        if doc not in docs:
+            sys.exit(f"{nom} : document « {doc} » inconnu de injecter_fcstd.")
+        d = int(dec) if dec else 0
+        if cle.startswith('@'):
+            return valeurs_fcstd.par_alias(docs[doc], cle[1:], d)
+        return valeurs_fcstd.nombre(docs[doc], cle, d)
+
+    corps = re.sub(r'\{\{fcstd:(\w+):([^|}]+?)(?:\|(\d+))?\}\}', remplacer, corps)
+    reste = re.findall(r'\{\{fcstd:[^}]*\}\}', corps)
+    if reste:
+        sys.exit(f"{nom} : marque fcstd non résolue : {reste[0]}")
+    return corps
 
 
 def injecter_laser(corps: str, nom: str) -> str:
@@ -182,6 +219,38 @@ PAGES = [
                   "driver constructeur. Dépôt privé.",
     },
     {
+        'contenu': 'projets.html',
+        'sortie': 'projets/index.html',
+        'titre': "Projets d'atelier — Atelier du Verdier",
+        'description': "Les projets de l'atelier : magasin ATC ER20, tonnelle à glycine, "
+                       "meuble à balais, dust shoe. Tous paramétriques, pilotés par un "
+                       "tableur, plans régénérables.",
+        'sous_titre': 'projets',
+        'resume': "Les projets d'atelier, chacun piloté par un tableur : on change une "
+                  "valeur, les plans suivent.",
+    },
+    {
+        'contenu': 'tonnelle-glycine.html',
+        'sortie': 'projets/tonnelle-glycine.html',
+        'titre': "Tonnelle à glycine — modèle paramétrique",
+        'description': "Tonnelle en bois à tenons et mortaises, entièrement pilotée par "
+                       "un tableur de 99 cotes : on change une valeur, les plans "
+                       "d'exécution suivent.",
+        'sous_titre': 'tonnelle',
+        'resume': "Tonnelle à glycine paramétrique, assemblages à tenons et mortaises.",
+    },
+    {
+        'contenu': 'meuble-balais.html',
+        'sortie': 'projets/meuble-balais.html',
+        'titre': "Meuble à balais — armoire de jardin paramétrique",
+        'description': "Armoire de jardin à toit monopente et porte latérale, pilotée "
+                       "par un tableur de 120 paramètres, avec sa feuille de débit "
+                       "engendrée.",
+        'sous_titre': 'meuble à balais',
+        'resume': "Armoire de jardin paramétrique, feuille de débit engendrée avec le "
+                  "modèle.",
+    },
+    {
         'contenu': 'magasin-atc.html',
         'sortie': 'projets/magasin-atc.html',
         'titre': "Magasin ATC ER20 — la note de calcul de la bille",
@@ -208,7 +277,7 @@ def nav(prefixe: str) -> str:
         (prefixe + 'index.html', 'Accueil'),
         (prefixe + 'index.html#logiciels', 'Logiciels'),
         (prefixe + 'index.html#atelier', "L'atelier"),
-        (prefixe + 'index.html#projets', 'Projets'),
+        (prefixe + 'projets/', 'Projets'),
     ]
     return '\n      '.join(f'<a href="{u}">{t}</a>' for u, t in entrees)
 
@@ -361,6 +430,7 @@ def main() -> None:
         corps = (CONTENU / page['contenu']).read_text(encoding='utf-8')
         corps = injecter_valeurs_atc(corps, page['contenu'])
         corps = injecter_laser(corps, page['contenu'])
+        corps = injecter_fcstd(corps, page['contenu'])
         corps = corps.replace('{{LOGO}}', logo)
         corps = corps.replace('{{RACINE}}', prefixe)
 
