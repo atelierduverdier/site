@@ -1,7 +1,11 @@
 # Plan — site général « Atelier du Verdier »
 
-Cadrage du 11/08/2026. **Les six décisions structurantes sont prises** (§6) ; les chantiers
-du §5 peuvent démarrer dans l'ordre. Le contenu rédactionnel reste entièrement à écrire.
+Cadrage du 11/08/2026. **Les six décisions structurantes sont prises** (§6).
+
+**État au 12/08/2026 — les six chantiers sont clos.** Le site est en ligne sur
+<https://atelierduverdier.fr>, huit pages, quatre sites sous une charte commune diffusée par
+script. Le chantier 5 a été **mesuré puis écarté**, ce qui est aussi une façon de le clore.
+Reste, hors chantiers : le paragraphe « qui je suis », retiré à la demande.
 
 ---
 
@@ -469,10 +473,42 @@ par vidéo, à un rythme relevé de 39,7 vidéos par mois :
 **Le déclencheur à surveiller n'est donc pas une date, c'est un compteur : ~770 vidéos.**
 D'ici là, découper coûterait trois régressions certaines pour un gain nul.
 
-### Chantier 6 — La rubrique `/projets/` (plus tard)
-Magasin ATC, dust shoe, meuble à balais, tonnelle, AMAP. Prévue dans l'architecture dès
-maintenant pour ne pas avoir à la greffer, remplie **après** la mise en ligne du portail
-(choix D6) : c'est du contenu à écrire, ça ne doit pas retarder le reste.
+### Chantier 6 — La rubrique `/projets/` ✅ **faite le 12/08/2026**
+
+En ligne : <https://atelierduverdier.fr/projets/>. Un **sommaire** qui dit surtout dans quel
+état est chaque projet — un modèle jamais imprimé ne se présente pas comme une réalisation.
+
+| projet | état | page |
+|---|---|---|
+| Magasin ATC ER20 | impression lancée | oui, la note de calcul |
+| Tonnelle à glycine | modèle complet | oui |
+| Meuble à balais | modèle complet | oui |
+| Dust shoe | **jamais imprimé ni monté** | non — rien à montrer qui existe |
+| AMAP de Crouay | hors atelier | non — logiciel d'association |
+
+**Aucune cote n'est recopiée.** `site/valeurs_fcstd.py` les lit dans le **tableur du document
+FreeCAD**, en ouvrant le `.FCStd` comme un zip : ni FreeCAD lancé, ni AppImage. C'était
+nécessaire, pas élégant — le Python de ces projets ne porte que des valeurs de départ, et il le
+dit : « une fois le document construit, la vérité est dans le tableur ».
+
+**Ce que ça a révélé au passage : le README du meuble est périmé.** Il annonce
+700 × 700 × 1800 mm quand son modèle dit **1900 × 900 × 900**. Le site publie la valeur du
+modèle. Le README reste à corriger côté projet.
+
+**Deux pièges de lecture, corrigés avant publication :**
+
+- Le meuble a **trois tableurs dans un même document** (`Parametres`, `Debit`, `Cotes`) aux
+  mêmes adresses de cellule. Une première version les mélangeait, et l'alias `Hauteur`
+  ressortait en face du libellé « Largeur du toit ». Le lecteur cloisonne désormais par
+  feuille.
+- La feuille `Cotes` du meuble n'est que du **calculé** (`=round(Parametres.Hauteur…)`). On
+  lit donc par **alias**, qui désigne toujours une entrée littérale du modèle.
+
+Une cote absente, ou calculée par formule, **arrête la génération** — avec la liste des
+libellés proches, pour retrouver le bon.
+
+Le passage libre de la tonnelle n'est pas écrit : la page cite les **quatre cotes** et la
+soustraction, pour qu'il ne puisse pas vieillir.
 
 ---
 
