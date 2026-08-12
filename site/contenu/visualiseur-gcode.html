@@ -33,6 +33,7 @@
         </p>
         <div class="cta">
           <a class="btn btn-primary" href="#voir">Ce qu'on voit</a>
+          <a class="btn btn-ghost" href="#freecad">Dans FreeCAD</a>
           <a class="btn btn-ghost" href="#capot">Sous le capot</a>
         </div>
       </div>
@@ -97,7 +98,9 @@
         profondeur, puissance laser, avance, outil, et <b>programme</b>, qui montre d'un
         coup d'œil quelle part du travail revient à quelle fraise. La barre d'état donne
         l'étendue, la longueur travail/rapides et la durée estimée : ici
-        <b>3 h 56 min 57 s</b>.
+        <b>3 h 56 min 57 s</b>, suivie de sa ventilation <b>travail / rapides</b> —
+        c'est la répartition, et non le total, qui départage deux stratégies
+        d'usinage.
       </figcaption>
     </figure>
 
@@ -216,6 +219,80 @@
     <p class="muted">
       Le jumeau développé à la main n'a plus de raison d'être : c'est peut-être le
       meilleur résultat du projet.
+    </p>
+  </div>
+</section>
+
+<section id="freecad">
+  <div class="wrap">
+    <div class="sec-tag">Dans l'atelier CAM</div>
+    <h2>Un bouton dans FreeCAD, et pourquoi ce n'est pas un doublon</h2>
+
+    <p>
+      Un greffon ajoute une icône à la barre de l'atelier CAM de FreeCAD. Il poste
+      le Job courant et ouvre le résultat dans le visualiseur, en processus séparé.
+      Le G-code n'est pas écrit sur le disque et le document n'est pas modifié.
+    </p>
+
+    <p>
+      FreeCAD a pourtant déjà son simulateur. Mais il lit
+      <code>operations[i].Path.Commands</code> — les objets Path <b>internes</b>. Il
+      montre donc ce que FreeCAD a l'<i>intention</i> de faire, jamais ce que le
+      post-processeur a <i>écrit</i>. Il est structurellement aveugle à un défaut de
+      post-traitement, et ces défauts existent : sur 167 fichiers de l'atelier,
+      <b>49 portaient un mot <code>K</code> sur des arcs G17</b>, émis par le
+      post-processeur. Le simulateur les montre parfaits ; l'interpréteur de LinuxCNC
+      les refuse.
+    </p>
+
+    <div class="callout tip">
+      <span class="ci">Le même défaut, sur une vraie pièce</span>
+      <p>
+        Un ancien fichier de guitare, dont le Job visait encore GRBL. Le
+        post-processeur écrit <code>K0.000</code> sur <b>les 275 arcs</b> du
+        programme — pas un seul non nul, donc pas un seul qui porte la moindre
+        information. GRBL les ignore, LinuxCNC s'arrête au premier. Résultat à
+        l'écran : <b>5 segments au lieu de 2 173</b>, et un bandeau rouge qui nomme
+        la ligne et la raison. Le simulateur intégré, lui, l'aurait dessiné entier.
+      </p>
+    </div>
+
+    <h3>Choisir ce qu'on veut voir</h3>
+    <p>
+      Le Job entier est rarement ce qu'on cherche : on cherche l'opération dont on
+      doute. Le greffon demande donc lesquelles tracer, les cases suivant l'état du
+      Job. Sur une rosace de 18 opérations, tout donne 2 103 lignes de G-code et la
+      seule opération de contour en donne 111.
+    </p>
+    <p>
+      Le Job n'est pas modifié pour autant. La voie évidente — désactiver les
+      opérations puis les réactiver — laisserait un Job amputé si quoi que ce soit
+      s'interrompait entre les deux, et ce Job-là finirait un jour posté pour de
+      vrai. Le greffon restreint plutôt ce que le post-processeur <i>considère</i> :
+      cocher les 18 redonne le fichier entier à deux lignes près, l'horodatage.
+    </p>
+
+    <h3>Une opération en échec ne passe plus</h3>
+    <p>
+      Une opération que FreeCAD n'a pas su recalculer garde le parcours de son
+      dernier calcul <i>réussi</i>. Le post-processeur le poste sans broncher, et le
+      tracé sort complet, crédible, périmé. C'est le défaut d'origine de ce projet,
+      refait à l'intérieur même de l'outil censé le débusquer. Le greffon nomme
+      désormais l'opération fautive et laisse choisir.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">1 064</span><span class="l">lignes postées avec<br>l'opération cassée</span></div>
+      <div class="chiffre"><span class="v">964</span><span class="l">une fois réparée<br>— sans un mot d'écart</span></div>
+      <div class="chiffre"><span class="v">1 / 366</span><span class="l">opérations de l'atelier<br>déclenchent l'alarme</span></div>
+    </div>
+
+    <p>
+      Ce dernier chiffre est la raison d'être du contrôle. Une alarme qui se trompe
+      s'apprend à ignorer, et cesse alors de servir le jour utile : le seuil a donc
+      été choisi sur un relevé des <b>366 opérations des 87 Jobs</b> de l'atelier.
+      L'état « à recalculer » touche 57 fichiers sur 87 — inutilisable. L'état « en
+      échec » sort à une opération sur 366, et c'était la bonne.
     </p>
   </div>
 </section>
