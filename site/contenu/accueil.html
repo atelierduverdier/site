@@ -1,3 +1,33 @@
+<!-- ================= LE FILET À ANCRES (chantier 2) =====================
+     Cette page prendra la racine atelierduverdier.fr, aujourd'hui occupée
+     par le journal PrintNC. Les liens partagés depuis des mois — Instagram,
+     forum — pointent sur la racine AVEC UNE ANCRE, et une ancre n'atteint
+     jamais le serveur : aucune redirection GitHub Pages ne peut les
+     rattraper. Seule la page d'arrivée le peut, en JS.
+
+     La grammaire vient du journal lui-même (initFromHash de son
+     generer_site.py), relevée le 12/08/2026 — PAS devinée :
+       #v-…            les 265 ancres de vidéos
+       #doc-… #gloss-…  les sections de la documentation et du glossaire
+       #all #doc #gloss #maj #recit   les onglets
+       #2026-01 … #2026-08            les onglets de mois (AAAA-MM)
+     Les ancres PROPRES au portail (#logiciels, #atelier, #projets, #qui)
+     ne matchent aucun de ces motifs : elles restent ici.
+
+     Placé en TÊTE du corps, pour partir avant que la page ne se peigne.
+     `location.replace` et non une affectation : pas d'entrée d'historique,
+     le bouton Retour ne repasse pas par la redirection. -->
+<script>
+(function(){
+  var h = location.hash.slice(1);
+  if (!h) return;
+  var journal = /^(v-|doc-|gloss-)/.test(h)
+             || /^(all|doc|gloss|maj|recit)$/.test(h)
+             || /^\d{4}-\d{2}$/.test(h);
+  if (journal) location.replace('https://printnc.atelierduverdier.fr/#' + h);
+})();
+</script>
+
 <!-- Page d'accueil du portail. Corps seul : l'en-tête et le pied viennent
      du kit, collés par generer.py.
 
@@ -107,17 +137,17 @@
         <div class="head">
           <span class="ci">✂️</span>
           <h3>Pupitre Graphtec</h3>
-          <span class="etat prive">privé</span>
+          <span class="etat public">public</span>
         </div>
         <p>
           Pilotage du traceur de découpe <b>Graphtec CE6000-60</b> sous Linux, sans
           driver constructeur : sonde de l'état machine, tracé de contrôle,
           nuancier de force, et conversion SVG vers HP-GL.
         </p>
-        <p class="muted">Terminé en août 2026.</p>
+        <p class="muted">Terminé en août 2026 · GPL-3.0</p>
         <div class="liens">
           <a href="{{RACINE}}logiciels/pupitre-graphtec.html">Comment il marche</a>
-          <span class="muted">dépôt privé</span>
+          <a href="https://github.com/atelierduverdier/graphtec-ce6000">Dépôt</a>
         </div>
       </div>
 

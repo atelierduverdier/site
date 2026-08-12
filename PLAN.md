@@ -270,15 +270,39 @@ vérifiée intacte** avant et après, md5 et mtime identiques.
 Reste à faire ici : le paragraphe « qui je suis » sur l'accueil (encadré en place).
 **Rien n'est en ligne** — pas de dépôt, pas de DNS.
 
-### Chantier 2 — La bascule de la racine ⚠️ (½ journée, le seul risque)
-1. `printnc-build` **reste son propre dépôt** (choix D4) : on remplace juste son `CNAME` par
-   `printnc.atelierduverdier.fr`. Le générateur et le CSV ne bougent pas.
-2. DNS : nouvel enregistrement pour `printnc`.
-3. **Filet pour les vieux liens** : la nouvelle page d'accueil embarque quelques lignes de JS
-   qui, si l'URL arrive avec une ancre du journal (`#video-…`, `#mois-…`), redirigent vers
-   `printnc.atelierduverdier.fr/#même-ancre`. C'est la seule façon de rattraper une ancre, et
-   ça doit être **testé sur trois vrais liens** partagés (Instagram, forum) avant bascule.
-4. Vérifier GoatCounter : le changement de domaine coupe la continuité des stats du journal.
+### Chantier 2 — La bascule de la racine ⚠️ — filet ÉCRIT et ÉPROUVÉ le 12/08/2026
+
+**La grammaire supposée par ce plan était fausse.** Les ancres du journal ne sont pas
+`#video-…`/`#mois-…` mais, relevées dans `initFromHash` de son `generer_site.py` puis
+comptées sur le site EN LIGNE : `#v-…` (266), `#doc-…` (17), `#gloss-…` (8), les onglets
+`#all #doc #gloss #maj #recit`, et les mois `#AAAA-MM`. Tester sur du réel n'était pas un
+luxe : le filet imaginé par ce plan n'aurait rien rattrapé du tout.
+
+**Le filet** vit en tête du corps de l'accueil (`site/contenu/accueil.html`), en
+`location.replace` (pas d'entrée d'historique). Les ancres propres au portail
+(`#logiciels #atelier #projets #qui`…) ne matchent aucun motif du journal et restent.
+
+**Éprouvé au navigateur le 12/08/2026 :**
+- flux réel — la page chargée avec une vraie ancre `v-` tente immédiatement de partir vers
+  `printnc.atelierduverdier.fr/#même-ancre` (visible dans les journaux du serveur : la page
+  est servie puis le navigateur ressort) ; sans ancre, ou avec `#logiciels`, elle reste ;
+- grammaire déployée — extraite de la page PRODUITE et rejouée sur **18 cas** : 9 ancres
+  réelles du site en ligne partent avec l'ancre préservée, 9 ancres du portail restent.
+  Zéro erreur.
+
+**Reste, dans cet ordre — rien n'est fait tant que les 3 liens ne sont pas essayés :**
+1. **Christophe fournit trois vrais liens partagés** (Instagram, forum) ; on les rejoue
+   contre la grammaire — l'essai prend une minute, il est outillé.
+2. Créer le dépôt GitHub du portail, y pousser, activer Pages, `CNAME atelierduverdier.fr`.
+   Publier d'abord sous l'URL GitHub (`*.github.io`) pour un dernier regard.
+3. `printnc-build` : remplacer son `CNAME` par `printnc.atelierduverdier.fr` (une ligne).
+4. DNS chez le registraire : enregistrement `printnc` → GitHub Pages. **Geste de
+   Christophe.**
+5. GoatCounter : le compte est commun à tout le domaine et n'enregistre que le CHEMIN —
+   après bascule, le `/` du portail et l'historique `/` du journal se mélangeraient dans la
+   même courbe. Recommandation : donner au journal un préfixe de chemin
+   (`data-goatcounter-settings` avec `path`) ou un second code de site. Décision à
+   Christophe, aucune n'est irréversible.
 
 ### Chantier 3 — Diffuser la charte (½ journée)
 `diffuser_kit.py`, puis passage du site laser et du journal sous la charte commune.
