@@ -28,8 +28,8 @@ Tout est hébergé sur GitHub Pages. GoatCounter est déjà branché sur le jour
 |---|---|---|---|
 | LaserAtelier (workbench FreeCAD) | `LaserAtelier` | **public** | v2.99.15, cap sur une v3 stable |
 | Config LinuxCNC PrintNC + changeur d'outil | `printnc-config` | **public** | changeur poussé le 09/08/2026 |
-| Visualiseur G-code LinuxCNC | `visualiseur-gcode` | **privé** | v1 le 10/08/2026 |
-| Pupitre Graphtec CE6000-60 | `graphtec-ce6000` | **privé** | fini le 11/08/2026 |
+| Visualiseur G-code LinuxCNC | `visualiseur-gcode` | **public** | v1 le 10/08/2026, publié le 12/08/2026 |
+| Pupitre Graphtec CE6000-60 | `graphtec-ce6000` | **public** | fini le 11/08/2026 |
 
 Satellites publics qui existent aussi : `gsr-gui` (enregistreur d'écran, hors atelier),
 `huanyang-vfd-reader` (lecture VFD, atelier-adjacent).
@@ -204,11 +204,24 @@ générateur colle dans les pages pour qu'elle suive le bouton de thème. Texte 
 courbes (Fira Sans, licence OFL). Il remplace le chapeau seul dans la barre du haut, le pied
 et le héros de l'accueil.
 
-**Pages des deux logiciels privés** (12/08/2026) — fiches vitrines sans lien dépôt (choix D3),
-faits et chiffres repris des README des projets :
+**Pages des deux derniers logiciels** (12/08/2026) — faits et chiffres repris des README
+des projets :
 
 - `logiciels/visualiseur-gcode.html`, six schémas SVG ;
 - `logiciels/pupitre-graphtec.html`, cinq schémas SVG.
+
+Écrites d'abord en **fiches vitrines sans lien dépôt** (choix D3, les deux étaient
+privés). **Les deux dépôts sont publics depuis le 12/08/2026**, et les pages portent
+maintenant leur lien : pastille « public » sur les cartes de l'accueil, licence en badge
+de bandeau, encadré « Le code est public » en fin de page — le même motif partout. Voir
+D3 au §6, révisée.
+
+Le visualiseur a été relu avant publication, et ce n'était pas une formalité : aucun
+secret, mais **douze chemins absolus** vers des fichiers hors dépôt, dont un vers un
+partage réseau privé. La configuration machine (`remora-flexi.ini`, `tool.tbl`) est
+désormais embarquée dans le dépôt — avec un contrôle qui refuse qu'elle vieillisse — et
+le chemin du partage passe par une variable d'environnement. Il reste dix chemins vers
+des fichiers d'atelier non publiés, et le README dit lesquels.
 
 **Captures du pupitre** (12/08/2026) — `site/outils/capturer_pupitre.py` lance l'application
 **hors écran** (`QT_QPA_PLATFORM=offscreen`), lui fait ouvrir un SVG, et grabbe ses trois
@@ -433,13 +446,19 @@ une reconstitution.
 
 Le chantier 3 est **fait**.
 
-### Chantier 4 — Les deux logiciels privés (½ journée)
+### Chantier 4 — Les deux derniers logiciels ✅ **fait le 12/08/2026**
 **Fiche vitrine, sans lien dépôt** (choix D3) : captures + ce que ça fait + état, pour
 `visualiseur-gcode` et `graphtec-ce6000`. Réversible : le jour où l'un passe en public, on
 ajoute le lien, rien d'autre à refaire.
 
-Si ce jour arrive, la relecture préalable n'est pas une formalité — secrets, chemins
-personnels, `config.env`, adresses. Une fois poussé, c'est public pour toujours.
+**Ce jour est arrivé le soir même**, pour les deux. Le pari de la réversibilité a tenu :
+une pastille, un badge de licence, un encadré de fin, et le lien. Rien d'autre n'a bougé.
+
+Et la relecture préalable n'était pas une formalité. Sur le visualiseur : aucun secret,
+mais **douze chemins absolus** vers des fichiers hors dépôt, dont
+`/mnt/srv-partage/…` — de l'infrastructure privée qui n'a rien à faire dans un dépôt
+public. Corrigé avant publication. La leçon vaut pour la prochaine fois : ce ne sont pas
+les mots de passe qu'on trouve, ce sont les chemins.
 
 ### Chantier 5 — Découper le journal PrintNC : **mesuré le 12/08/2026, PAS FAIT, et à raison**
 
@@ -518,14 +537,19 @@ soustraction, pour qu'il ne puisse pas vieillir.
 |---|---|---|
 | **D1** | Statique ou dynamique ? | ✅ **Statique, script Python maison** (ni Hugo ni Zola) |
 | **D2** | Le portail prend-il la racine ? | ✅ **Oui.** Le journal PrintNC déménage sur `printnc.`, avec le filet à ancres |
-| **D3** | `visualiseur-gcode` et `graphtec-ce6000` | ✅ **Fiche vitrine sans lien dépôt.** Ils restent privés |
+| **D3** | `visualiseur-gcode` et `graphtec-ce6000` | ~~Fiche vitrine sans lien dépôt, ils restent privés~~ → **révisée le 12/08/2026 : les deux dépôts sont publics**, les pages portent leur lien |
 | **D4** | Sous-domaines ou sous-dossiers ? | ✅ **Sous-domaines** : chaque doc reste dans le dépôt de son logiciel |
 | **D5** | Générateur | ✅ **Script maison**, dans la lignée de `generer_site.py` |
 | **D6** | Projets non logiciels | ✅ **Oui, rubrique `/projets/`, mais après la mise en ligne** |
 
-Ces six décisions n'engagent rien d'irréversible : la seule opération qui touche du visible
-est le chantier 2, et elle est protégée par le filet à ancres et par le passage préalable sur
-`nouveau.atelierduverdier.fr`.
+Au 11/08/2026, ces six décisions n'engageaient rien d'irréversible : la seule opération
+qui touchait du visible était le chantier 2, protégée par le filet à ancres et par le
+passage préalable sur `nouveau.atelierduverdier.fr`.
+
+**Ce n'est plus vrai depuis la révision de D3.** Publier un dépôt ne se défait pas : on
+peut le repasser en privé, mais ce qui a été cloné, forké ou indexé est dehors pour de
+bon. C'est la première décision de ce plan qui ne se rejoue pas — d'où la relecture
+préalable, qui a effectivement trouvé quelque chose.
 
 ---
 
