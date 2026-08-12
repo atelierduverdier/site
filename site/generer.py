@@ -99,11 +99,13 @@ def logo_en_ligne() -> str:
 ANNEE = '2026'
 
 # Domaine de production, écrit dans public/CNAME à chaque génération pour
-# survivre à la reconstruction. None tant que la racine appartient encore au
-# journal PrintNC : un CNAME posé trop tôt entrerait en CONFLIT avec
-# printnc-build, qui réclame encore atelierduverdier.fr auprès de GitHub.
-# À armer au moment de la bascule — voir PLAN.md, chantier 2, geste 2b.
-DOMAINE = None
+# survivre à la reconstruction de public/.
+#
+# ARMÉ le 12/08/2026, et pas avant : tant que printnc-build réclamait
+# atelierduverdier.fr auprès de GitHub, un CNAME posé ici serait entré en
+# conflit. L'ordre a été DNS (OVH) → libération par le journal → cette
+# ligne. Voir PLAN.md, chantier 2.
+DOMAINE = 'atelierduverdier.fr'
 
 # --- Les pages -----------------------------------------------------------
 # `sortie` est relatif à public/ ; la profondeur en déduit {{RACINE}}.
