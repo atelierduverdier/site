@@ -294,19 +294,42 @@ luxe : le filet imaginé par ce plan n'aurait rien rattrapé du tout.
   réelles du site en ligne partent avec l'ancre préservée, 9 ancres du portail restent.
   Zéro erreur.
 
-**Reste, dans cet ordre — rien n'est fait tant que les 3 liens ne sont pas essayés :**
-1. **Christophe fournit trois vrais liens partagés** (Instagram, forum) ; on les rejoue
-   contre la grammaire — l'essai prend une minute, il est outillé.
-2. Créer le dépôt GitHub du portail, y pousser, activer Pages, `CNAME atelierduverdier.fr`.
-   Publier d'abord sous l'URL GitHub (`*.github.io`) pour un dernier regard.
-3. `printnc-build` : remplacer son `CNAME` par `printnc.atelierduverdier.fr` (une ligne).
-4. DNS chez le registraire : enregistrement `printnc` → GitHub Pages. **Geste de
-   Christophe.**
-5. GoatCounter : le compte est commun à tout le domaine et n'enregistre que le CHEMIN —
-   après bascule, le `/` du portail et l'historique `/` du journal se mélangeraient dans la
-   même courbe. Recommandation : donner au journal un préfixe de chemin
-   (`data-goatcounter-settings` avec `path`) ou un second code de site. Décision à
-   Christophe, aucune n'est irréversible.
+**12/08/2026, sur « fais-le » de Christophe — le portail est EN LIGNE sous l'URL GitHub :**
+<https://atelierduverdier.github.io/site/> — dépôt public `atelierduverdier/site`, source sur
+`main`, produit poussé sur `gh-pages` par `site/publier.py` (un commit unique, force-poussé,
+estampillé du commit de `main` qui l'a engendré). La page servie est **md5-identique** à celle
+éprouvée au navigateur : les tests du filet valent pour la production. CSS, page ATC et
+captures WebP répondent 200.
+
+**L'ORDRE DE FIN DE BASCULE A CHANGÉ — le DNS passe AVANT les CNAME.** L'ordre initial de ce
+plan (CNAME puis DNS) aurait laissé le journal HORS LIGNE entre les deux : dès que
+`printnc-build` lâche la racine, le journal n'est joignable qu'à `printnc.…`, qui ne résout
+pas encore. Relevé au `dig` le 12/08/2026 : l'apex et `www`/`laser`/`liens` pointent bien vers
+GitHub Pages, **`printnc` n'existe pas, pas de wildcard**.
+
+**Reste, dans cet ordre :**
+1. **DNS, geste de Christophe** — chez le registraire, un seul enregistrement, à l'identique
+   de `laser` et `liens` :
+   `printnc  CNAME  atelierduverdier.github.io.`
+   (Avant les CNAME, il ne sert à rien : GitHub répond 404 pour un domaine non réclamé.
+   C'est l'état sûr.)
+2. **Dès qu'il résout** (`dig +short printnc.atelierduverdier.fr` rend les IP GitHub), la
+   permutation, deux gestes de deux minutes :
+   a. dans `printnc-build` : `CNAME` passe de `atelierduverdier.fr` à
+      `printnc.atelierduverdier.fr` — le journal quitte la racine et répond aussitôt sur
+      son nouveau domaine ;
+   b. dans `atelierduverdier/site` : fichier `CNAME` = `atelierduverdier.fr` dans
+      `site/public/` (à faire écrire par `generer.py` pour survivre à la reconstruction)
+      + domaine posé côté Pages. La racine sert le portail, le filet rattrape les ancres.
+3. **Contrôles d'arrivée** : les trois liens réels rejoués de bout en bout (racine → filet
+   → journal → la vidéo se centre), `laser.` et `liens.` intacts.
+4. **GoatCounter, décision de Christophe** : le compte n'enregistre que le CHEMIN — le `/`
+   du portail et l'historique `/` du journal se mélangeraient. Préfixe de chemin sur le
+   journal (`data-goatcounter-settings` avec `path`) ou second code de site ; aucune des
+   deux n'est irréversible.
+5. Les liens partagés d'origine (Instagram, forum) restent introuvables publiquement —
+   testés à défaut sur les ancres réelles du site en ligne. Si Christophe retrouve les
+   liens exacts, les rejouer prend une minute.
 
 ### Chantier 3 — Diffuser la charte (½ journée)
 `diffuser_kit.py`, puis passage du site laser et du journal sous la charte commune.

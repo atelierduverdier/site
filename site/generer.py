@@ -98,6 +98,13 @@ def logo_en_ligne() -> str:
 
 ANNEE = '2026'
 
+# Domaine de production, écrit dans public/CNAME à chaque génération pour
+# survivre à la reconstruction. None tant que la racine appartient encore au
+# journal PrintNC : un CNAME posé trop tôt entrerait en CONFLIT avec
+# printnc-build, qui réclame encore atelierduverdier.fr auprès de GitHub.
+# À armer au moment de la bascule — voir PLAN.md, chantier 2, geste 2b.
+DOMAINE = None
+
 # --- Les pages -----------------------------------------------------------
 # `sortie` est relatif à public/ ; la profondeur en déduit {{RACINE}}.
 
@@ -311,6 +318,10 @@ def main() -> None:
     logo = logo_en_ligne()
 
     copier_ressources()
+
+    if DOMAINE:
+        (PUBLIC / 'CNAME').write_text(DOMAINE + '\n', encoding='utf-8')
+        print(f"  CNAME → {DOMAINE}")
 
     for page in PAGES:
         sortie = PUBLIC / page['sortie']
