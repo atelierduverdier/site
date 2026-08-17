@@ -76,6 +76,15 @@ SATELLITES = {
                     / 'Mod' / 'LaserAtelier' / 'docs' / 'assets'), FICHIERS),
     'journal PrintNC': ((Path.home() / 'Projets' / 'site' / 'Site_PrintNC'
                          / 'kit_site' / 'kit'), JETONS_SEULS),
+    # La page de liens garde sa mise en page — une carte centrée, rien de
+    # commun avec un site à barre du haut et à sections — donc les jetons
+    # seuls, comme le journal. Elle prend quand même `verdier.js` : la
+    # bascule de thème y range son choix dans un cookie de domaine, et
+    # c'est ce qui fait qu'un visiteur passant d'ici au site laser garde
+    # son réglage. Le dépôt est servi tel quel par GitHub Pages : ce qui
+    # est posé ici part en ligne au prochain push.
+    'page de liens': ((Path.home() / 'Projets' / 'site' / 'Site_Liens'),
+                      JETONS_SEULS),
 }
 
 BANDEAU = {
