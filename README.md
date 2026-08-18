@@ -64,10 +64,34 @@ Trois garde-fous du même esprit :
 « engendré, ne pas éditer ici » :
 
 * **site laser** — la charte entière ;
-* **journal PrintNC** — les **jetons seuls**. La charte complète lui faisait
-  grandir la page de 258 px : dix-sept sélecteurs du kit gagnaient sur les
-  siens. Il garde sa mise en page et ses quatre couleurs de phase, qui sont des
-  accents de contenu.
+* **journal PrintNC** — les **jetons seuls**, plus `verdier-entete.css`. La
+  charte complète lui faisait grandir la page de 258 px : dix-sept sélecteurs
+  du kit gagnaient sur les siens. Il garde sa mise en page et ses quatre
+  couleurs de phase, qui sont des accents de contenu.
+
+`verdier-entete.css` est tiré de `verdier.css` par `kit/extraire_entete.py`,
+comme les jetons le sont par `kit/extraire_jetons.py` — la section « en-tête »
+et rien d'autre, pour les sites à jetons seuls. Il existe parce que les jetons
+ne portent pas la barre du haut, **et que c'est elle qui fait le chemin du
+retour**. Relevé le 18/08/2026 : le journal citait `atelierduverdier.fr` cinq
+fois, et les cinq étaient `laser.atelierduverdier.fr` ; la marque du site laser
+pointait sur `#top`. Depuis la bascule du 12/08 la racine sert le portail —
+personne arrivé d'un reel Instagram n'avait de porte de sortie vers l'atelier.
+
+Le HTML, lui, se branche **à la main, une fois, avec les yeux dessus** :
+`diffuser_kit.py` ne touche jamais aux pages. Trois choses mesurées au
+navigateur en le faisant, qu'aucune relecture n'aurait données :
+
+* le journal avait une règle `header{padding:70px 0 44px}` qui réclamait
+  **tous** les `<header>` — la barre en héritait et faisait 175 px au lieu
+  de 60, recouvrant les onglets. Portée à `header:not(.topbar)` ;
+* `.topbar .wrap` avait une hauteur **fixe** : les neuf liens du site laser
+  passaient à deux lignes sous 1052 px de fenêtre et débordaient par-dessous.
+  Passée en `min-height` — le portail, quatre liens sur une ligne, n'en voit
+  rien ;
+* les ancres `#doc-…` du journal atterrissaient sous les barres collantes.
+  La marge de défilement est désormais **mesurée** par son JS, parce qu'elle
+  change avec l'onglet (128 px sur Documentation, 265 px sur Timeline).
 
 ## Outils
 

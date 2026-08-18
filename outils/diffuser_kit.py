@@ -70,12 +70,25 @@ JETONS_SEULS = {
     'logo.svg': 'verdier-logo.svg',
 }
 
+# Les jetons NE PORTENT PAS la barre du haut — et c'est elle qui fait le
+# chemin du retour vers le portail. Relevé le 18/08/2026 : le journal
+# citait `atelierduverdier.fr` cinq fois, et les CINQ étaient
+# `laser.atelierduverdier.fr`. Aucun lien vers la racine du domaine : un
+# visiteur venu d'un reel Instagram n'avait pas de porte de sortie.
+#
+# `verdier-entete.css` (extrait par kit/extraire_entete.py) ajoute la
+# section 3 de la charte, et rien d'autre : la barre, la marque, les liens,
+# le bouton de thème. La page de liens n'en a pas besoin — c'est une carte
+# centrée, sans barre, et elle pointe déjà vers les quatre adresses.
+JETONS_ET_ENTETE = {**JETONS_SEULS,
+                    'verdier-entete.css': 'verdier-entete.css'}
+
 # nom lisible -> dossier où poser la charte, chez le satellite.
 SATELLITES = {
     'site laser': ((Path.home() / '.local' / 'share' / 'FreeCAD' / 'v1-1'
                     / 'Mod' / 'LaserAtelier' / 'docs' / 'assets'), FICHIERS),
     'journal PrintNC': ((Path.home() / 'Projets' / 'site' / 'Site_PrintNC'
-                         / 'kit_site' / 'kit'), JETONS_SEULS),
+                         / 'kit_site' / 'kit'), JETONS_ET_ENTETE),
     # La page de liens garde sa mise en page — une carte centrée, rien de
     # commun avec un site à barre du haut et à sections — donc les jetons
     # seuls, comme le journal. Elle prend quand même `verdier.js` : la
