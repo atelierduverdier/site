@@ -265,6 +265,7 @@ PAGES = [
 ]
 
 LIENS_PIED = [
+    ('https://ko-fi.com/atelierduverdier', '☕ Ko-fi'),
     ('https://github.com/atelierduverdier', 'GitHub'),
     ('https://laser.atelierduverdier.fr', 'Atelier Laser'),
     ('https://printnc.atelierduverdier.fr', 'Journal PrintNC'),

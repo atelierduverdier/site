@@ -78,8 +78,13 @@ JETONS_SEULS = {
 #
 # `verdier-entete.css` (extrait par kit/extraire_entete.py) ajoute la
 # section 3 de la charte, et rien d'autre : la barre, la marque, les liens,
-# le bouton de thème. La page de liens n'en a pas besoin — c'est une carte
-# centrée, sans barre, et elle pointe déjà vers les quatre adresses.
+# le bouton de thème.
+#
+# La page de liens le prend AUSSI depuis le 18/08/2026. Ce commentaire disait
+# d'abord qu'elle n'en avait pas besoin — elle a bien une carte « Le site de
+# l'atelier », donc pas le cul-de-sac des deux autres. Mais ce qui tranche
+# n'est pas le chemin du retour, c'est que les quatre adresses se ressemblent :
+# une seule barre, un seul sous-titre qui dit où l'on est.
 JETONS_ET_ENTETE = {**JETONS_SEULS,
                     'verdier-entete.css': 'verdier-entete.css'}
 
@@ -90,14 +95,15 @@ SATELLITES = {
     'journal PrintNC': ((Path.home() / 'Projets' / 'site' / 'Site_PrintNC'
                          / 'kit_site' / 'kit'), JETONS_ET_ENTETE),
     # La page de liens garde sa mise en page — une carte centrée, rien de
-    # commun avec un site à barre du haut et à sections — donc les jetons
-    # seuls, comme le journal. Elle prend quand même `verdier.js` : la
-    # bascule de thème y range son choix dans un cookie de domaine, et
-    # c'est ce qui fait qu'un visiteur passant d'ici au site laser garde
-    # son réglage. Le dépôt est servi tel quel par GitHub Pages : ce qui
-    # est posé ici part en ligne au prochain push.
+    # commun avec un site à sections — donc pas `verdier.css` en entier,
+    # mais les jetons ET l'en-tête : depuis le 18/08/2026 elle porte la
+    # même barre que les trois autres adresses. Elle prend aussi
+    # `verdier.js` : la bascule de thème y range son choix dans un cookie
+    # de domaine, et c'est ce qui fait qu'un visiteur passant d'ici au
+    # site laser garde son réglage. Le dépôt est servi tel quel par
+    # GitHub Pages : ce qui est posé ici part en ligne au prochain push.
     'page de liens': ((Path.home() / 'Projets' / 'site' / 'Site_Liens'),
-                      JETONS_SEULS),
+                      JETONS_ET_ENTETE),
 }
 
 BANDEAU = {

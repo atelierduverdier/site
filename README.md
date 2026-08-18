@@ -64,10 +64,18 @@ Trois garde-fous du même esprit :
 « engendré, ne pas éditer ici » :
 
 * **site laser** — la charte entière ;
-* **journal PrintNC** — les **jetons seuls**, plus `verdier-entete.css`. La
-  charte complète lui faisait grandir la page de 258 px : dix-sept sélecteurs
-  du kit gagnaient sur les siens. Il garde sa mise en page et ses quatre
-  couleurs de phase, qui sont des accents de contenu.
+* **journal PrintNC** — les **jetons** + `verdier-entete.css`. La charte
+  complète lui faisait grandir la page de 258 px : dix-sept sélecteurs du kit
+  gagnaient sur les siens. Il garde sa mise en page et ses quatre couleurs de
+  phase, qui sont des accents de contenu ;
+* **page de liens** — les **jetons** + `verdier-entete.css` aussi, depuis le
+  18/08/2026. Elle n'était pas un cul-de-sac : sa première carte mène à
+  l'atelier. Ce qui a tranché n'est pas le chemin du retour mais que les
+  **quatre adresses se ressemblent** — même marque, même sous-titre qui dit
+  où l'on est. Sa carte reste sa carte.
+
+**Les quatre sous-titres :** rien (le portail) · Journal PrintNC · Atelier
+Laser · Mes liens.
 
 `verdier-entete.css` est tiré de `verdier.css` par `kit/extraire_entete.py`,
 comme les jetons le sont par `kit/extraire_jetons.py` — la section « en-tête »
