@@ -1,0 +1,769 @@
+<!-- =========================================================================
+     entete.html — haut de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/entete.html
+
+     Marques à remplacer par le générateur :
+       Magasin ATC ER20 — la note de calcul de la bille        titre de l'onglet
+       Comment trois billes acier Ø5 retiennent un écrou ER20 : pourquoi la saillie vaut 1,20 mm, où la bille porte sur l'écrou, et la contrainte la plus serrée du projet.  méta description (une phrase, pour les moteurs)
+       ../       préfixe vers le kit depuis la page : "" ou "../"
+       magasin ATC   « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/">Projets</a>          les <a> de navigation
+           <link> vers la feuille propre au site, ou vide
+
+     IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
+     Le site laser écrivait data-theme="light" : comme
+     :root[data-theme="light"] est plus spécifique que le bloc
+     @media (prefers-color-scheme: dark), un visiteur dont le système est
+     en sombre recevait quand même la page blanche (vérifié le 11/08/2026 :
+     fond rendu rgb(255,255,255) système en sombre). Son thème sombre
+     existait bel et bien — #14171b — mais seul le bouton ◐ y donnait accès.
+     ========================================================================= -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magasin ATC ER20 — la note de calcul de la bille</title>
+<meta name="description" content="Comment trois billes acier Ø5 retiennent un écrou ER20 : pourquoi la saillie vaut 1,20 mm, où la bille porte sur l'écrou, et la contrainte la plus serrée du projet.">
+<link rel="icon" type="image/svg+xml" href="../chapeau.svg">
+
+<!-- Anti-clignotement : pose le thème choisi AVANT que la feuille de style
+     ne peigne. Placé ici et pas dans verdier.js, qui est chargé en fin de
+     page — sinon le visiteur voit le thème clair une fraction de seconde
+     avant la bascule. Volontairement minuscule et en ligne. -->
+<script>
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
+  var v=m?m[1]:localStorage.getItem('verdier-theme');
+  if(v)document.documentElement.setAttribute('data-theme',v);
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="../verdier.css">
+
+</head>
+<body>
+<a id="top"></a>
+
+<header class="topbar">
+  <div class="wrap">
+    <!-- Le logo est COLLÉ ici, pas chargé en <img> : en ligne, son
+         mot-symbole suit `currentColor`, donc le bouton de thème. En <img>
+         il ne suivrait que le réglage du système. -->
+    <a class="brand" href="https://atelierduverdier.fr/" aria-label="Atelier du Verdier">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      <span class="brand-sub">magasin ATC</span>
+    </a>
+    <button class="nav-btn" type="button" aria-label="Ouvrir le menu"
+            aria-controls="menu-principal">☰</button>
+    <nav class="navlinks" id="menu-principal">
+      <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/">Projets</a>
+    </nav>
+    <button class="theme-btn" type="button" title="Thème clair / sombre"
+            aria-label="Basculer entre le thème clair et le thème sombre">◐</button>
+  </div>
+</header>
+
+<!-- Magasin ATC ER20 — la note de calcul de la bille.
+
+     AUCUN NOMBRE N'EST ÉCRIT DANS CETTE PAGE. Chaque marque « atc point
+     quelque-chose » est lue au moment de la génération dans
+     `note_calcul.valeurs()` du projet magasin-atc — la fonction même qui
+     engendre la note de calcul en PDF. Le tableau des saillies est engendré
+     entier : changer BILLE_SAILLIE dans le modèle déplace la ligne en gras
+     tout seul, sans toucher à ce fichier.
+
+     Une clé absente du modèle ARRÊTE la génération plutôt que de laisser
+     passer un trou — ou pire, un nombre périmé. Voir site/valeurs_atc.py.
+     (Pas d'exemple littéral de marque dans ce commentaire : le générateur
+     le prendrait pour une vraie, et refuserait de produire la page.)
+
+     Les schémas sont des SVG EN LIGNE, pas des images : ils utilisent les
+     variables du thème et suivent donc le clair/sombre, et leurs étiquettes
+     chiffrées sont des marques comme le reste. Les planches TechDraw, elles,
+     ont leurs traits en dur et vivent sur plaque claire. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">Broche <b>ER20</b></span>
+          <span class="badge">6 postes</span>
+          <span class="badge">18 billes acier <b>Ø5</b></span>
+        </div>
+        <h1>Trois billes contre un écrou</h1>
+        <p class="lede">
+          Comment un changeur d'outil automatique tient sur une seule cote libre —
+          et pourquoi elle vaut 1,20 mm.
+        </p>
+      </div>
+      <div class="hero-art">
+        <!-- Vue de dessus, à l'échelle vraie : les trois rayons en jeu y sont
+             volontairement indiscernables. C'est tout le propos. -->
+        <svg style="font-size:9.9px" viewBox="0 0 340 340" role="img" aria-label="Vue de dessus : l'écrou hexagonal dans la chambre, retenu par trois billes">
+          <g class="figure">
+            <circle cx="170" cy="170" r="87.5" fill="none" stroke="var(--fg-3)"
+                    stroke-width="1.2" stroke-dasharray="4 3"/>
+            <polygon points="256.6,170 213.3,95 126.7,95 83.4,170 126.7,245 213.3,245"
+                     fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.8"/>
+            <circle cx="170" cy="76" r="12.5" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.2"/>
+            <circle cx="88.6" cy="217" r="12.5" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.2"/>
+            <circle cx="251.4" cy="217" r="12.5" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.2"/>
+            <text x="170" y="174" text-anchor="middle" fill="var(--fg-2)">écrou</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Le principe</div>
+    <h2>Une butée franche, et rien d'autre</h2>
+    <p class="sec-lede">
+      Chaque poste tient un écrou ER20 — avec sa pince et son outil — suspendu dans une
+      chambre Ø35, retenu par trois billes acier Ø5 qui font
+      saillie de 1,20 mm.
+    </p>
+
+    <p>
+      L'écrou descend six-pans en avant. Ses <b>plats</b> passent entre les billes, ses
+      <b>angles</b> non : il tourne librement d'un angle fini, puis <b>bute net</b>. La
+      broche lancée à 1 500 tr/min s'arrête sec sur cette butée, et c'est cet arrêt qui
+      fournit le couple de vissage ou de dévissage. Il n'y a pas d'autre moteur, pas de
+      doigt, pas de vérin : toute la mécanique du changement d'outil tient dans ce
+      contact.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">1,20 mm</span><span class="l">saillie des billes<br>la seule cote vraiment libre</span></div>
+      <div class="chiffre"><span class="v">1,02 mm</span><span class="l">mordant sur les angles<br>ce qui retient</span></div>
+      <div class="chiffre"><span class="v">46,1°</span><span class="l">rotation libre<br>avant la butée</span></div>
+      <div class="chiffre"><span class="v">5,56 mm</span><span class="l">hauteur du contact<br>la cote la plus critique</span></div>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">D'où viennent ces nombres</span>
+      <p>
+        De <code>docs/note-de-calcul-ER20.pdf</code>, huit pages <b>engendrées depuis le
+        modèle</b> : aucun chiffre n'y est recopié, un paramètre qui change dans le code
+        change dans le document. L'écrou, lui, a été mesuré au pied à coulisse — 22 mm
+        hors tout, dont <b>8 mm seulement de six-pans</b> et 30 sur plats.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Le calcul</div>
+    <h2>Pourquoi la saillie vaut 1,20 mm</h2>
+    <p class="sec-lede">
+      C'est le seul chiffre du mécanisme qui soit vraiment libre. Il n'est ni mesuré ni
+      copié : il se déduit de deux impossibilités, et on le place dans ce qui reste.
+    </p>
+
+    <h3>Les trois rayons qui décident de tout</h3>
+    <p>
+      Vue de dessus et à l'échelle, les trois rayons en jeu sont indiscernables — ils
+      tiennent dans 2,5 mm. Il faut les déplier pour voir quoi que ce soit. Notons
+      <var>r<sub>b</sub></var> le rayon du cercle tangent intérieurement aux trois billes.
+    </p>
+
+    <figure class="figure">
+      <svg style="font-size:10.1px" viewBox="0 0 540 250" role="img" aria-label="Les rayons dépliés : plats à 15,00, tangente aux billes à 16,30, angles à 17,32, chambre à 17,50">
+        <!-- axe -->
+        <line x1="60" y1="140" x2="500" y2="140" class="cote"/>
+        <polygon points="500,140 492,136.5 492,143.5" fill="var(--fg-2)"/>
+        <text x="500" y="158" text-anchor="end" class="petit">rayon (mm)</text>
+
+        <!-- graduations : x = 60 + (r - 14.6) * 130 -->
+        <g class="trait-fin">
+          <line x1="112" y1="134" x2="112" y2="146"/>
+          <line x1="281" y1="134" x2="281" y2="146"/>
+          <line x1="413.6" y1="134" x2="413.6" y2="146"/>
+          <line x1="437" y1="134" x2="437" y2="146"/>
+        </g>
+        <text x="112" y="160" text-anchor="middle" class="petit">15,00</text>
+        <text x="281" y="160" text-anchor="middle" class="petit">16,30</text>
+        <text x="413.6" y="160" text-anchor="middle" class="petit">17,32</text>
+        <text x="437" y="176" text-anchor="middle" class="petit">17,50</text>
+
+        <!-- repères verticaux -->
+        <line x1="112" y1="140" x2="112" y2="72" stroke="var(--fg-3)" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <text x="112" y="62" text-anchor="middle" class="petit">rayon des plats</text>
+        <text x="112" y="50" text-anchor="middle" class="petit">E/2</text>
+
+        <line x1="281" y1="140" x2="281" y2="88" class="accent"/>
+        <text x="281" y="78" text-anchor="middle" class="orange">tangente aux billes</text>
+        <text x="281" y="64" text-anchor="middle" class="orange">r_b = 16,30</text>
+
+        <line x1="413.6" y1="140" x2="413.6" y2="72" stroke="var(--fg-3)" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <text x="413.6" y="62" text-anchor="middle" class="petit">rayon des angles</text>
+        <text x="413.6" y="50" text-anchor="middle" class="petit">E_a/2</text>
+
+        <line x1="437" y1="140" x2="437" y2="108" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="2 3"/>
+        <text x="470" y="104" text-anchor="middle" class="petit">chambre</text>
+
+        <!-- les deux parts -->
+        <g class="cote">
+          <line x1="112" y1="196" x2="281" y2="196"/>
+          <line x1="112" y1="191" x2="112" y2="201"/>
+          <line x1="281" y1="191" x2="281" y2="201"/>
+          <line x1="281" y1="196" x2="413.6" y2="196"/>
+          <line x1="413.6" y1="191" x2="413.6" y2="201"/>
+        </g>
+        <text x="196" y="214" text-anchor="middle" class="petit">jeu sur les plats</text>
+        <text x="196" y="228" text-anchor="middle" class="fort">1,30</text>
+        <text x="347" y="214" text-anchor="middle" class="petit">mordant sur les angles</text>
+        <text x="347" y="228" text-anchor="middle" class="fort">1,02</text>
+
+        <!-- la saillie -->
+        <g class="cote">
+          <line x1="281" y1="120" x2="437" y2="120"/>
+          <line x1="281" y1="115" x2="281" y2="125"/>
+          <line x1="437" y1="115" x2="437" y2="125"/>
+        </g>
+        <text x="359" y="112" text-anchor="middle" class="orange">s = 1,20</text>
+      </svg>
+      <figcaption>
+        Les mêmes rayons, dépliés. Tout se joue sur la position du cercle tangent aux
+        billes entre le rayon des plats et celui des angles.
+      </figcaption>
+    </figure>
+
+    <h3>Deux impossibilités encadrent la solution</h3>
+
+    <p>
+      <b>Première impossibilité.</b> Si <var>r<sub>b</sub></var> dépasse le rayon des
+      angles, les angles passent entre les billes et <b>plus rien ne bloque</b> :
+    </p>
+    <div class="formule">
+      D<sub>c</sub>/2 − <var>s</var> &lt; E<sub>a</sub>/2
+      &nbsp;&nbsp;⟹&nbsp;&nbsp;
+      <var>s</var> &gt; (D<sub>c</sub> − E<sub>a</sub>)/2 = <span class="res">0,18 mm</span>
+    </div>
+
+    <p>
+      <b>Seconde impossibilité.</b> Si <var>r<sub>b</sub></var> descend sous le rayon des
+      plats, les plats ne passent plus et <b>l'écrou n'entre même pas</b> :
+    </p>
+    <div class="formule">
+      D<sub>c</sub>/2 − <var>s</var> &gt; E/2
+      &nbsp;&nbsp;⟹&nbsp;&nbsp;
+      <var>s</var> &lt; (D<sub>c</sub> − E)/2 = <span class="res">2,50 mm</span>
+    </div>
+
+    <p>
+      Reste une fenêtre de <b>2,32 mm</b>, et toute la question est où s'y placer. Deux
+      grandeurs s'y partagent la place, et elles s'opposent : le <b>mordant</b> sur les
+      angles, <var>s</var> − 0,18, qui est ce qui retient ; et le <b>jeu</b> sur les
+      plats, 2,50 − <var>s</var>, qui est ce qui laisse l'écrou entrer et tourner. Ce
+      qu'on donne à l'un, on le retire à l'autre.
+    </p>
+
+    <figure class="figure">
+      <svg style="font-size:10.1px" viewBox="0 0 540 300" role="img" aria-label="La fenêtre de 2,32 mm : le mordant croît et le jeu décroît, ils se croisent à 1,34 mm ; 1,20 est retenu">
+        <!-- zones interdites : x = 70 + s*160 -->
+        <rect x="30" y="70" width="68.8" height="160" class="zone-non"/>
+        <rect x="470" y="70" width="40" height="160" class="zone-non"/>
+
+        <!-- axe -->
+        <line x1="30" y1="230" x2="512" y2="230" class="cote"/>
+        <g class="trait-fin">
+          <line x1="98.8" y1="224" x2="98.8" y2="236"/>
+          <line x1="262" y1="224" x2="262" y2="236"/>
+          <line x1="284.4" y1="224" x2="284.4" y2="236"/>
+          <line x1="470" y1="224" x2="470" y2="236"/>
+        </g>
+        <text x="98.8" y="250" text-anchor="middle" class="petit">0,18</text>
+        <text x="262" y="250" text-anchor="middle" class="orange">1,20</text>
+        <text x="284.4" y="264" text-anchor="middle" class="petit">1,34</text>
+        <text x="470" y="250" text-anchor="middle" class="petit">2,50</text>
+        <text x="512" y="250" text-anchor="end" class="petit">saillie s (mm)</text>
+
+        <!-- les deux droites qui se croisent -->
+        <line x1="98.8" y1="230" x2="470" y2="70" stroke="var(--tip-b)" stroke-width="2.2" fill="none"/>
+        <line x1="98.8" y1="70" x2="470" y2="230" stroke="var(--note-b)" stroke-width="2.2" fill="none"/>
+        <circle cx="284.4" cy="150" r="4" fill="var(--fg-2)"/>
+
+        <text x="478" y="66" class="petit" fill="var(--tip-b)">mordant</text>
+        <text x="478" y="80" class="petit" fill="var(--tip-b)">ce qui retient</text>
+        <text x="62" y="66" class="petit" fill="var(--note-b)">jeu</text>
+        <text x="62" y="80" class="petit" fill="var(--note-b)">ce qui fait entrer</text>
+
+        <!-- le choix retenu -->
+        <line x1="262" y1="42" x2="262" y2="230" class="accent"/>
+        <text x="262" y="34" text-anchor="middle" class="orange">retenu : 1,20</text>
+        <circle cx="262" cy="160.4" r="4" fill="var(--tip-b)"/>
+        <circle cx="262" cy="139.6" r="4" fill="var(--note-b)"/>
+
+        <text x="106" y="96" class="petit" fill="var(--warn-b)">les angles</text>
+        <text x="106" y="110" class="petit" fill="var(--warn-b)">passent</text>
+        <text x="464" y="96" text-anchor="end" class="petit" fill="var(--warn-b)">les plats ne</text>
+        <text x="464" y="110" text-anchor="end" class="petit" fill="var(--warn-b)">passent plus</text>
+
+        <text x="284.4" y="286" text-anchor="middle" class="petit">partage exact : 1,34 mm</text>
+      </svg>
+      <figcaption>
+        Les deux grandeurs se croisent à <b>1,34 mm</b> — le partage exact. Le modèle
+        retient pourtant <b>1,20</b>, délibérément un peu plus de jeu que de mordant.
+      </figcaption>
+    </figure>
+
+    <div class="formule">
+      <var>s</var> − 0,18 = 2,50 − <var>s</var>
+      &nbsp;&nbsp;⟹&nbsp;&nbsp;
+      <var>s</var> = <span class="res">1,34 mm</span>
+      <span class="ou">le partage exact — qui n'est pas celui qu'on a retenu</span>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Pourquoi 1,20 et pas 1,34</span>
+      <p>
+        La raison est d'atelier, pas de calcul. Sur une pièce imprimée, la panne qu'on
+        rencontre en premier est l'écrou qui <b>n'entre pas</b> ou ne tourne pas — la
+        chambre ne lui laisse déjà que 0,18 mm au rayon. Le mordant, lui, se vérifie sur
+        le gabarit d'essai avant d'imprimer quoi que ce soit ; un écrou qui n'entre pas,
+        c'est une impression jetée.
+      </p>
+    </div>
+
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th class="num">saillie s</th><th class="num">mordant</th><th class="num">jeu plats</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">0,18</td><td class="num">0,00</td><td class="num">2,32</td><td>les angles passent : rien ne bloque</td></tr>
+          <tr><td class="num">0,50</td><td class="num">0,32</td><td class="num">2,00</td><td></td></tr>
+          <tr><td class="num"><b>1,20</b></td><td class="num"><b>1,02</b></td><td class="num"><b>1,30</b></td><td><b>retenu</b></td></tr>
+          <tr><td class="num">1,34</td><td class="num">1,16</td><td class="num">1,16</td><td>partage exact</td></tr>
+          <tr><td class="num">1,50</td><td class="num">1,32</td><td class="num">1,00</td><td></td></tr>
+          <tr><td class="num">2,00</td><td class="num">1,82</td><td class="num">0,50</td><td></td></tr>
+          <tr><td class="num">2,50</td><td class="num">2,32</td><td class="num">0,00</td><td>les plats ne passent plus</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Vérification</div>
+    <h2>Les plats passent, les angles non</h2>
+
+    <div class="figure-row">
+      <figure class="figure">
+        <svg style="font-size:6.9px" viewBox="0 0 300 250" role="img" aria-label="Hexagone : 30,0 mm sur plats, 34,64 mm sur angles">
+          <polygon points="235,125 190,47 100,47 55,125 100,203 190,203"
+                   fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.8"/>
+          <circle cx="145" cy="125" r="78" fill="none" stroke="var(--fg-3)"
+                  stroke-width="1" stroke-dasharray="4 3"/>
+          <g class="cote">
+            <line x1="262" y1="47" x2="262" y2="203"/>
+            <line x1="257" y1="47" x2="267" y2="47"/>
+            <line x1="257" y1="203" x2="267" y2="203"/>
+            <line x1="55" y1="222" x2="235" y2="222"/>
+            <line x1="55" y1="217" x2="55" y2="227"/>
+            <line x1="235" y1="217" x2="235" y2="227"/>
+          </g>
+          <text x="276" y="129" text-anchor="middle" class="petit" transform="rotate(-90 276 129)">sur plats E = 30,0</text>
+          <text x="145" y="240" text-anchor="middle" class="petit">sur angles E_a = 34,64</text>
+        </svg>
+        <figcaption>Un hexagone régulier de 30 sur plats mesure 34,64 sur angles.</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <svg style="font-size:6.9px" viewBox="0 0 300 250" role="img" aria-label="Comparaison : plats 30,00 passent, passage 32,60, angles 34,64 ne passent pas">
+          <g class="cote">
+            <line x1="76" y1="70" x2="224" y2="70"/>
+            <line x1="76" y1="64" x2="76" y2="76"/>
+            <line x1="224" y1="64" x2="224" y2="76"/>
+          </g>
+          <text x="150" y="56" text-anchor="middle" class="petit">plats de l'écrou · 30,00</text>
+
+          <line x1="70" y1="125" x2="230" y2="125" class="accent"/>
+          <line x1="70" y1="117" x2="70" y2="133" class="accent"/>
+          <line x1="230" y1="117" x2="230" y2="133" class="accent"/>
+          <text x="150" y="111" text-anchor="middle" class="orange">passage entre billes · 32,60</text>
+
+          <g class="cote">
+            <line x1="65" y1="180" x2="235" y2="180"/>
+            <line x1="65" y1="174" x2="65" y2="186"/>
+            <line x1="235" y1="174" x2="235" y2="186"/>
+          </g>
+          <text x="150" y="166" text-anchor="middle" class="petit">angles de l'écrou · 34,64</text>
+          <text x="150" y="212" text-anchor="middle" class="fort">30,00 &lt; 32,60 &lt; 34,64</text>
+          <text x="150" y="230" text-anchor="middle" class="petit">l'encadrement strict est vérifié</text>
+        </svg>
+        <figcaption>La condition de fonctionnement, en une ligne.</figcaption>
+      </figure>
+    </div>
+
+    <div class="formule">
+      P = D<sub>c</sub> − 2<var>s</var> = 35 − 2 × 1,20 = <span class="res">32,60 mm</span>
+      <span class="ou">puis l'interférence au rayon : i = (E<sub>a</sub> − P)/2 = 1,02 mm</span>
+    </div>
+
+    <h3>De combien l'écrou tourne-t-il avant de buter ?</h3>
+    <p>
+      L'écrou tourne jusqu'à ce qu'un angle vienne toucher une bille. L'angle libre se lit
+      sur la position où la distance de l'axe au plat atteint <var>r<sub>b</sub></var> :
+    </p>
+
+    <div class="formule">
+      θ = 2·arccos( (E/2) / <var>r<sub>b</sub></var> ) = <span class="res">46,1°</span>
+      <span class="ou">bille centrée dans son logement, r_b = 16,300 mm</span>
+    </div>
+
+    <figure class="figure">
+      <svg style="font-size:7.9px" viewBox="0 0 420 380" role="img" aria-label="L'écrou dans ses deux positions extrêmes, séparées de 46,1 degrés">
+        <circle cx="210" cy="200" r="105" fill="none" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="3 3"/>
+        <!-- Position 1, tournée de -23,04°. Sommets d'un hexagone RÉGULIER de
+             rayon 103,9 px (= 17,32 mm à 6 px/mm) : centre + R·cos/sin des six
+             angles. Recalculés le 12/08/2026 — la première version avait deux
+             sommets sur six à 75,9 px, et l'écrou n'était plus hexagonal. -->
+        <polygon points="305.6,240.7 293.0,137.5 197.4,96.9 114.4,159.3 127.0,262.5 222.6,303.1"
+                 fill="none" stroke="var(--fg-3)" stroke-width="1.6" stroke-dasharray="6 3"/>
+        <!-- position 2, tournée de +23,04° -->
+        <polygon points="305.6,159.3 222.6,96.9 127.0,137.5 114.4,240.7 197.4,303.1 293.0,262.5"
+                 fill="var(--bg-3)" fill-opacity="0.75" stroke="var(--fg)" stroke-width="1.8"/>
+        <!-- la bille, fixe -->
+        <circle cx="210" cy="87.2" r="15" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.2"/>
+        <text x="210" y="60" text-anchor="middle" class="petit">bille (fixe)</text>
+        <!-- l'angle parcouru, suivi sur un sommet : de 36,96° à 83,04° -->
+        <path d="M 319.4 117.6 A 137 137 0 0 0 226.6 64.0" fill="none" class="accent"/>
+        <text x="316" y="52" text-anchor="middle" class="orange">θ = 46,1°</text>
+        <text x="210" y="345" text-anchor="middle" class="petit">les deux positions où l'écrou bute</text>
+        <text x="210" y="362" text-anchor="middle" class="petit">entre les deux, il tourne librement</text>
+      </svg>
+      <figcaption>
+        Ce n'est pas un nombre unique : le logement a du jeu, et sous l'effort l'écrou
+        repousse la bille vers l'extérieur — <b>46,1°</b> bille centrée,
+        <b>47,7°</b> bille repoussée.
+      </figcaption>
+    </figure>
+
+    <div class="callout warn">
+      <span class="ci">La sensibilité qui interdit les substituts</span>
+      <p>
+        Cette lecture d'angle bouge de <b>1,6 degré par dixième de millimètre</b> de
+        diamètre de bille. Un substitut de diamètre inconnu — un rond quelconque, une
+        queue de foret — rend la mesure inexploitable sur le gabarit d'essai.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">La contrainte la plus serrée</div>
+    <h2>Où la bille porte sur l'écrou</h2>
+    <p class="sec-lede">
+      La bille doit toucher l'écrou sur sa partie à six faces, et nulle part ailleurs.
+      Trop haut elle tombe sur la partie ronde ; trop bas, sur le chanfrein de pied.
+      Ni l'une ni l'autre ne retient quoi que ce soit.
+    </p>
+
+    <p>
+      Premier point contre-intuitif : <b>la bille ne touche jamais le plat en son
+      milieu</b>. Son point intérieur est à 16,30 de l'axe, le plat à 15,0 en son milieu
+      mais à 17,32 à ses extrémités. La bille passe donc au large du milieu et vient
+      rencontrer le plat près de son extrémité, à 2,28 mm de l'arête. L'arête elle-même
+      reste à 2,644 mm du centre de la bille alors qu'il en faudrait 2,500 pour toucher :
+      <b>elle ne touche pas</b>.
+    </p>
+
+    <p>
+      Second point, celui qui fixe la hauteur : ce plat est une surface <b>verticale</b>.
+      Une sphère qui touche un plan vertical le touche à la hauteur de son <b>centre</b>,
+      en un seul point. Ce n'est donc pas toute la silhouette de la bille qui porte, mais
+      son équateur.
+    </p>
+
+    <figure class="figure">
+      <svg style="font-size:12px" viewBox="0 0 640 340" role="img" aria-label="Coupe verticale : le contact tombe à 5,56 mm, avec 4,06 mm de marge dessous et 2,44 dessus">
+        <!-- repères horizontaux : y0 = 290, k = 26 px/mm -->
+        <g class="trait-fin">
+          <line x1="80" y1="82" x2="392" y2="82" stroke-dasharray="5 3" stroke="var(--fg-2)" stroke-width="1.3"/>
+          <line x1="80" y1="145.4" x2="392" y2="145.4" stroke-dasharray="5 3" stroke="var(--orange)" stroke-width="1.5"/>
+          <line x1="100" y1="251" x2="392" y2="251" stroke-dasharray="4 3"/>
+          <line x1="100" y1="290" x2="392" y2="290" stroke-dasharray="4 3"/>
+        </g>
+        <text x="402" y="78" class="petit">haut des plats · h₆ = 8 mm</text>
+        <text x="402" y="141" class="orange">contact · 5,56 mm</text>
+        <text x="402" y="247" class="petit">chanfrein de pied · c = 1,50 mm</text>
+        <text x="402" y="294" class="petit">face d'appui de l'écrou</text>
+
+        <!-- l'arête de l'angle, vue de côté -->
+        <rect x="100" y="82" width="30" height="208" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.6"/>
+        <rect x="100" y="251" width="30" height="39" fill="var(--fg-3)" stroke="var(--fg)" stroke-width="1.6"/>
+
+        <!-- zone utile, à gauche -->
+        <g class="cote">
+          <line x1="72" y1="82" x2="72" y2="251"/>
+          <line x1="67" y1="82" x2="77" y2="82"/>
+          <line x1="67" y1="251" x2="77" y2="251"/>
+        </g>
+        <text x="60" y="158" text-anchor="end" class="petit">arête à plein</text>
+        <text x="60" y="172" text-anchor="end" class="petit">rayon · 6,50 mm</text>
+
+        <!-- la bille : centre à 5,56 mm, tangente au plat -->
+        <circle cx="195" cy="145.4" r="65" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.4"/>
+        <text x="195" y="150" text-anchor="middle" fill="#e6e9ee" class="gros">bille</text>
+        <circle cx="130" cy="145.4" r="3.5" fill="var(--orange)"/>
+
+        <!-- les deux marges, à droite de la bille -->
+        <g class="cote">
+          <line x1="300" y1="145.4" x2="300" y2="251"/>
+          <line x1="295" y1="251" x2="305" y2="251"/>
+          <line x1="300" y1="82" x2="300" y2="145.4"/>
+          <line x1="295" y1="82" x2="305" y2="82"/>
+          <line x1="295" y1="145.4" x2="305" y2="145.4"/>
+        </g>
+        <text x="312" y="204" class="petit">4,06 mm</text>
+        <text x="312" y="118" class="petit">2,44 mm</text>
+      </svg>
+      <figcaption>
+        Le contact se fait au <b>centre</b> de la bille, à 5,56 mm au-dessus de la face
+        d'appui. Il reste 4,06 mm de marge dessous et 2,44 dessus.
+      </figcaption>
+    </figure>
+
+    <div class="formule">
+      z<sub>e</sub> = h<sub>p</sub> + h<sub>c</sub>·(E<sub>a</sub> − D<sub>p</sub>)/(D<sub>c</sub> − D<sub>p</sub>) − c
+      = 5 + 1,5 × (34,64 − 26)/(35 − 26) − 1,50 = <span class="res">4,94 mm</span>
+      <span class="ou">hauteur d'appui de l'écrou sur le cône du siège</span>
+    </div>
+    <div class="formule">
+      z<sub>b</sub> = z<sub>fond</sub> + d<sub>b</sub>/2 = 8,0 + 5,0/2 = <span class="res">10,50 mm</span>
+      <span class="ou">hauteur du centre de la bille</span>
+    </div>
+    <div class="formule">
+      z<sub>b</sub> − z<sub>e</sub> = <span class="res">5,56 mm</span>
+      &nbsp;&nbsp;et&nbsp;&nbsp; 1,50 ≤ 5,56 ≤ 8 ✓
+      <span class="ou">le contact tombe bien dans la zone où l'arête est à plein rayon</span>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">Ne jamais viser les 11 mm</span>
+      <p>
+        Le six-pans fait 8 mm, 11 en comptant le chanfrein du haut. Mais <b>au-delà des
+        8 mm, ce chanfrein rogne les angles et l'interférence tombe à zéro : plus rien ne
+        bloque</b>. C'est la contrainte la plus serrée de tout le projet, et elle est
+        restée invisible tant que la hauteur du six-pans — puis son chanfrein de pied —
+        n'avaient pas été mesurés.
+      </p>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">1,5 mm qui ont fait bouger toute la chaîne</span>
+      <p>
+        L'arête de l'angle est chanfreinée en pied sur 1,50 mm. Elle n'est donc à plein
+        rayon que de 1,5 à 8,0 mm : <b>6,50 mm d'arête utile, et non 8</b>. Sans ce terme,
+        le modèle se trompait de 1,50 mm sur toute la chaîne verticale — écart retrouvé
+        par <b>deux mesures indépendantes</b> sur pièce imprimée.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Les planches</div>
+    <h2>Le reste du magasin</h2>
+    <p class="sec-lede">
+      Les plans sortent de TechDraw, et leurs cotes sont lues directement sur le modèle :
+      74 cotes vérifiées à chaque régénération. Cliquer pour agrandir.
+    </p>
+
+    <figure class="plan">
+      <img src="../projets/plans/07-ensemble-monte.svg"
+           alt="Planche TechDraw : l'ensemble monté du magasin ATC six postes" data-agrandir>
+      <figcaption>
+        <b>L'ensemble monté.</b> 6 postes, chacun avec son siège à billes coulissant
+        contre un ressort préchargé. La course du siège — 12 mm — doit rester supérieure
+        à la longueur de filetage engagée entre l'écrou et le nez de broche (10 mm,
+        mesurés), sinon le siège arrive en butée avant que l'écrou ait fini de se
+        dévisser.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="../projets/plans/01-siege-billes.svg"
+           alt="Planche TechDraw : le siège à billes, avec ses trois logements Ø5,2" data-agrandir>
+      <figcaption>
+        <b>Le siège à billes.</b> Trois logements Ø5,2 à 120° pour des billes Ø5.
+        Les parois de ces logements font 6,20 mm — d'où les
+        4 périmètres minimum à l'impression.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="../projets/plans/08-gabarit-essai.svg"
+           alt="Planche TechDraw : le gabarit d'essai qui reproduit l'engagement bille/écrou" data-agrandir>
+      <figcaption>
+        <b>Le gabarit d'essai.</b> Même chambre Ø35, même saillie de 1,20 : il reproduit
+        l'engagement bille/écrou à l'identique. On y dépose trois billes, on engage un
+        écrou, on le tourne — et on lit l'angle avant butée. C'est ce qui se vérifie
+        <b>avant</b> d'imprimer six sièges à 28 g et 40 minutes pièce.
+      </figcaption>
+    </figure>
+
+    <div class="callout note">
+      <span class="ci">Ce qui n'est pas publié ici</span>
+      <p>
+        Le magasin est modélisé d'après la demande de brevet <b>US 2024/0278368 A1</b>
+        (Greilick Industries LLC, publiée le 22/08/2024, statut « pending » — une demande
+        en instance, pas un brevet délivré). Cette page explique des calculs et montre des
+        plans ; elle ne diffuse ni modèle 3D, ni STL. Les macros du changeur d'outil
+        LinuxCNC, elles, portent la logique des macros
+        <a href="https://github.com/greilick-industries/rcatc-scripts-grblhal">RapidChange ATC</a>
+        de Greilick, sous GPL-3.0, et sont
+        <a href="https://github.com/atelierduverdier/printnc-config">dans la config PrintNC</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     pied.html — bas de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/pied.html
+
+     Marques à remplacer par le générateur :
+       ../     préfixe vers le kit depuis la page : "" ou "../"
+       magasin ATC nom du site dans la marque du pied
+       Changeur d'outil automatique à billes pour broche ER20 sur PrintNC. Notes de calcul et planches.     une ou deux phrases sur ce qu'est ce site-là
+       <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>      les <a> du pied
+       2026      année du copyright
+          <script> propre au site, ou vide
+     ========================================================================= -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+        <span class="brand-sub">magasin ATC</span>
+      </div>
+      <p class="muted" style="margin:.2em 0 0">
+        Changeur d'outil automatique à billes pour broche ER20 sur PrintNC. Notes de calcul et planches.<br>
+        © 2026 Atelier du Verdier.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>
+      <a href="#top">Haut de page ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Visionneuse : présente sur toutes les pages, verdier.js ne s'y accroche
+     que s'il trouve des images à agrandir. -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Fermer">×</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-hint">Cliquer n'importe où, ou Échap, pour fermer</div>
+</div>
+
+<script src="../verdier.js"></script>
+
+
+<!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
+     tous les sous-domaines remontent au même endroit. Pas de cookie, pas
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+<script>
+  window.goatcounter = {
+    path: function (p) { return '/portail' + p }
+  };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>

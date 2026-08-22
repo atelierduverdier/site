@@ -1,0 +1,499 @@
+<!-- =========================================================================
+     entete.html — haut de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/entete.html
+
+     Marques à remplacer par le générateur :
+       Atelier du Verdier — l'atelier et ses logiciels        titre de l'onglet
+       Une fraiseuse PrintNC, une tête laser, un traceur de découpe, et les logiciels écrits pour les faire tourner : LaserAtelier, visualiseur G-code LinuxCNC, pupitre Graphtec, config PrintNC.  méta description (une phrase, pour les moteurs)
+              préfixe vers le kit depuis la page : "" ou "../"
+          « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       <a href="index.html">Accueil</a>
+      <a href="index.html#logiciels">Logiciels</a>
+      <a href="index.html#atelier">L'atelier</a>
+      <a href="projets/">Projets</a>          les <a> de navigation
+           <link> vers la feuille propre au site, ou vide
+
+     IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
+     Le site laser écrivait data-theme="light" : comme
+     :root[data-theme="light"] est plus spécifique que le bloc
+     @media (prefers-color-scheme: dark), un visiteur dont le système est
+     en sombre recevait quand même la page blanche (vérifié le 11/08/2026 :
+     fond rendu rgb(255,255,255) système en sombre). Son thème sombre
+     existait bel et bien — #14171b — mais seul le bouton ◐ y donnait accès.
+     ========================================================================= -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier du Verdier — l'atelier et ses logiciels</title>
+<meta name="description" content="Une fraiseuse PrintNC, une tête laser, un traceur de découpe, et les logiciels écrits pour les faire tourner : LaserAtelier, visualiseur G-code LinuxCNC, pupitre Graphtec, config PrintNC.">
+<link rel="icon" type="image/svg+xml" href="chapeau.svg">
+
+<!-- Anti-clignotement : pose le thème choisi AVANT que la feuille de style
+     ne peigne. Placé ici et pas dans verdier.js, qui est chargé en fin de
+     page — sinon le visiteur voit le thème clair une fraction de seconde
+     avant la bascule. Volontairement minuscule et en ligne. -->
+<script>
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
+  var v=m?m[1]:localStorage.getItem('verdier-theme');
+  if(v)document.documentElement.setAttribute('data-theme',v);
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="verdier.css">
+
+</head>
+<body>
+<a id="top"></a>
+
+<header class="topbar">
+  <div class="wrap">
+    <!-- Le logo est COLLÉ ici, pas chargé en <img> : en ligne, son
+         mot-symbole suit `currentColor`, donc le bouton de thème. En <img>
+         il ne suivrait que le réglage du système. -->
+    <a class="brand" href="https://atelierduverdier.fr/" aria-label="Atelier du Verdier">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      <span class="brand-sub"></span>
+    </a>
+    <button class="nav-btn" type="button" aria-label="Ouvrir le menu"
+            aria-controls="menu-principal">☰</button>
+    <nav class="navlinks" id="menu-principal">
+      <a href="index.html">Accueil</a>
+      <a href="index.html#logiciels">Logiciels</a>
+      <a href="index.html#atelier">L'atelier</a>
+      <a href="projets/">Projets</a>
+    </nav>
+    <button class="theme-btn" type="button" title="Thème clair / sombre"
+            aria-label="Basculer entre le thème clair et le thème sombre">◐</button>
+  </div>
+</header>
+
+<!-- ================= LE FILET À ANCRES (chantier 2) =====================
+     Cette page prendra la racine atelierduverdier.fr, aujourd'hui occupée
+     par le journal PrintNC. Les liens partagés depuis des mois — Instagram,
+     forum — pointent sur la racine AVEC UNE ANCRE, et une ancre n'atteint
+     jamais le serveur : aucune redirection GitHub Pages ne peut les
+     rattraper. Seule la page d'arrivée le peut, en JS.
+
+     La grammaire vient du journal lui-même (initFromHash de son
+     generer_site.py), relevée le 12/08/2026 — PAS devinée :
+       #v-…            les 265 ancres de vidéos
+       #doc-… #gloss-…  les sections de la documentation et du glossaire
+       #all #doc #gloss #maj #recit   les onglets
+       #2026-01 … #2026-08            les onglets de mois (AAAA-MM)
+     Les ancres PROPRES au portail (#logiciels, #atelier, #projets, #qui)
+     ne matchent aucun de ces motifs : elles restent ici.
+
+     Placé en TÊTE du corps, pour partir avant que la page ne se peigne.
+     `location.replace` et non une affectation : pas d'entrée d'historique,
+     le bouton Retour ne repasse pas par la redirection. -->
+<script>
+(function(){
+  var h = location.hash.slice(1);
+  if (!h) return;
+  var journal = /^(v-|doc-|gloss-)/.test(h)
+             || /^(all|doc|gloss|maj|recit)$/.test(h)
+             || /^\d{4}-\d{2}$/.test(h);
+  if (journal) location.replace('https://printnc.atelierduverdier.fr/#' + h);
+})();
+</script>
+
+<!-- Page d'accueil du portail. Corps seul : l'en-tête et le pied viennent
+     du kit, collés par generer.py.
+
+     Les faits techniques sont exacts et vérifiés. Le récit personnel — qui
+     tu es, pourquoi l'atelier — est laissé en encadré à remplir : ça ne
+     s'invente pas à ta place. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">Fraiseuse <b>PrintNC</b></span>
+          <span class="badge">Laser <b>diode 10 W optiques</b></span>
+          <span class="badge">Traceur <b>Graphtec CE6000-60</b></span>
+        </div>
+        <h1>L'atelier, et ce qu'on y écrit</h1>
+        <p class="lede">
+          Une fraiseuse sous LinuxCNC, une tête laser qui suit les surfaces courbes,
+          un traceur de découpe — et les logiciels qu'il a fallu écrire pour les
+          faire tourner ensemble.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#logiciels">Les logiciels</a>
+          <a class="btn btn-ghost" href="#atelier">L'atelier</a>
+          <a class="btn btn-ghost" href="#projets">Les projets</a>
+          <!-- Même bouton que le héros du site laser : .btn-kofi est déjà
+               dans kit/verdier.css, il n'y avait que le portail à ne pas
+               s'en servir — et à ne citer ko-fi nulle part. -->
+          <a class="btn btn-kofi" href="https://ko-fi.com/atelierduverdier"
+             target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="logiciels">
+  <div class="wrap">
+    <div class="sec-tag">Logiciels</div>
+    <h2>Quatre outils, écrits pour cet atelier</h2>
+    <p class="sec-lede">
+      Aucun n'a été écrit pour être un logiciel. Chacun règle un problème que la
+      machine posait, et qu'aucun outil existant ne réglait à ma place.
+    </p>
+
+    <div class="cartes">
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">🔥</span>
+          <h3>LaserAtelier</h3>
+          <span class="etat public">public</span>
+        </div>
+        <p>
+          Un atelier FreeCAD qui transforme de la géométrie 2D et 3D en G-code laser :
+          marquage, gravure remplie, photo tramée, découpe multi-passes, grilles de
+          test et planches de calibration. Il suit les <b>surfaces courbes</b> en
+          pilotant la défocalisation, ce qui est la raison d'être du projet.
+        </p>
+        <p class="muted">
+          Version 2.99.40 · FreeCAD 1.1 · LinuxCNC, GRBL, grblHAL · LGPL-2.1-or-later
+        </p>
+        <div class="liens">
+          <a href="logiciels/laseratelier.html">Comment il marche</a>
+          <a href="https://laser.atelierduverdier.fr">Documentation</a>
+          <a href="https://laser.atelierduverdier.fr/Manuel-LaserAtelier.pdf">Manuel (PDF)</a>
+          <a href="https://github.com/atelierduverdier/LaserAtelier">Dépôt</a>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">📐</span>
+          <h3>Visualiseur G-code</h3>
+          <span class="etat public">public</span>
+        </div>
+        <p>
+          Un traceur de parcours LinuxCNC en PySide6/OpenGL, appuyé sur
+          <code>rs274</code> — l'interpréteur de LinuxCNC lui-même. Il affiche donc
+          les fichiers <b>paramétrés</b> (<code>#&lt;nom&gt;</code>, expressions,
+          O-words) que les visualiseurs génériques refusent d'ouvrir.
+        </p>
+        <p class="muted">Première version en août 2026 · LGPL-2.1</p>
+        <div class="liens">
+          <a href="logiciels/visualiseur-gcode.html">Comment il marche</a>
+          <a href="https://github.com/atelierduverdier/visualiseur-gcode">Dépôt</a>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">✂️</span>
+          <h3>Pupitre Graphtec</h3>
+          <span class="etat public">public</span>
+        </div>
+        <p>
+          Pilotage du traceur de découpe <b>Graphtec CE6000-60</b> sous Linux, sans
+          driver constructeur : sonde de l'état machine, tracé de contrôle,
+          nuancier de force, et conversion SVG vers HP-GL.
+        </p>
+        <p class="muted">Terminé en août 2026 · GPL-3.0</p>
+        <div class="liens">
+          <a href="logiciels/pupitre-graphtec.html">Comment il marche</a>
+          <a href="https://github.com/atelierduverdier/graphtec-ce6000">Dépôt</a>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">⚙️</span>
+          <h3>Config PrintNC</h3>
+          <span class="etat public">public</span>
+        </div>
+        <p>
+          La configuration LinuxCNC de la machine, documentée : cinématique, HAL,
+          pilotage du laser en <code>spindle.1</code>, sorties auxiliaires, et les
+          sous-programmes du changeur d'outil automatique.
+        </p>
+        <p class="muted">Flexi-HAL + Remora · GPL-3.0</p>
+        <div class="liens">
+          <a href="https://printnc.atelierduverdier.fr">Journal de construction</a>
+          <a href="https://printnc.atelierduverdier.fr/#doc">Documentation machine</a>
+          <a href="https://github.com/atelierduverdier/printnc-config">Dépôt</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section id="atelier">
+  <div class="wrap">
+    <div class="sec-tag">L'atelier</div>
+    <h2>Les machines</h2>
+    <p class="sec-lede">Trois machines, un même fil : tout finit en G-code ou en HP-GL.</p>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>La fraiseuse</h3>
+        <p>
+          Une <b>PrintNC</b> sous LinuxCNC, carte Flexi-HAL et Remora, quatre drivers
+          CL57T, l'axe Y en <b>tandem</b>. Broche 2,2 kW pilotée par variateur Huanyang
+          en RS485.
+        </p>
+        <p class="muted">
+          Son accélération est basse : le genou utile se situe entre 600 et
+          800 mm/min, ce qui change tout au moment d'estimer un temps d'usinage.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>La tête laser</h3>
+        <p>
+          Un module diode <b>LT-80W-AA-PRO</b>, capot carré retiré pour qu'il puisse
+          suivre des surfaces courbes. Il occupe <code>spindle.1</code> et sa puissance
+          est mise à l'échelle par la vitesse réelle : <b>à l'arrêt, la puissance
+          tombe à zéro</b>.
+        </p>
+        <p class="muted">
+          Ce détail-là commande toute la génération du G-code : un point ne peut pas
+          être une temporisation, il doit être un micro-déplacement.
+        </p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Le traceur de découpe</h3>
+        <p>
+          Un <b>Graphtec CE6000-60</b>, piloté en HP-GL directement sur son descripteur
+          USB. La commande doit être réglée sur <b>HP-GL et jamais sur AUTO</b> : en
+          AUTO, la machine imprime le fichier au lieu de le découper.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Le changeur d'outil</h3>
+        <p>
+          Un magasin ATC à billes pour pinces ER20, en cours de montage : six postes,
+          trois billes acier par poste, et un mécanisme dont tout tient dans une
+          fenêtre de <b>1,02 mm</b>.
+        </p>
+        <div class="liens">
+          <a href="projets/magasin-atc.html">La note de calcul de la bille →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projets">
+  <div class="wrap">
+    <div class="sec-tag">Projets</div>
+    <h2>Ce qui sort de l'atelier</h2>
+    <p class="sec-lede">
+      Les pièces et les montages, avec les calculs et les erreurs qui vont avec.
+    </p>
+
+    <div class="cartes">
+      <div class="carte">
+        <div class="head">
+          <span class="ci">🔩</span>
+          <h3>Magasin ATC ER20</h3>
+          <span class="etat chantier">en cours</span>
+        </div>
+        <p>
+          Changeur d'outil automatique à billes pour broche ER20. La note de calcul
+          détaille pourquoi la saillie des billes vaut 1,20 mm et pas autre chose —
+          et pourquoi la contrainte la plus serrée du projet est restée invisible
+          jusqu'à ce qu'on mesure un chanfrein de 1,5 mm.
+        </p>
+        <div class="liens">
+          <a href="projets/magasin-atc.html">Lire la note de calcul</a>
+          <a href="projets/">Tous les projets</a>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">📓</span>
+          <h3>Journal de construction</h3>
+          <span class="etat public">en ligne</span>
+        </div>
+        <p>
+          Le montage de la PrintNC en vidéo, mois par mois : mécanique, électronique,
+          LinuxCNC, puis laser.
+        </p>
+        <div class="liens">
+          <a href="https://printnc.atelierduverdier.fr">Voir le journal</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     pied.html — bas de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/pied.html
+
+     Marques à remplacer par le générateur :
+            préfixe vers le kit depuis la page : "" ou "../"
+        nom du site dans la marque du pied
+       L'atelier d'un menuisier-bricoleur outillé : une PrintNC, un laser diode, un traceur de découpe, et le logiciel qui va avec.     une ou deux phrases sur ce qu'est ce site-là
+       <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>      les <a> du pied
+       2026      année du copyright
+          <script> propre au site, ou vide
+     ========================================================================= -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+        <span class="brand-sub"></span>
+      </div>
+      <p class="muted" style="margin:.2em 0 0">
+        L'atelier d'un menuisier-bricoleur outillé : une PrintNC, un laser diode, un traceur de découpe, et le logiciel qui va avec.<br>
+        © 2026 Atelier du Verdier.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>
+      <a href="#top">Haut de page ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Visionneuse : présente sur toutes les pages, verdier.js ne s'y accroche
+     que s'il trouve des images à agrandir. -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Fermer">×</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-hint">Cliquer n'importe où, ou Échap, pour fermer</div>
+</div>
+
+<script src="verdier.js"></script>
+
+
+<!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
+     tous les sous-domaines remontent au même endroit. Pas de cookie, pas
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+<script>
+  window.goatcounter = {
+    path: function (p) { return '/portail' + p }
+  };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>

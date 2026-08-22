@@ -1,0 +1,917 @@
+<!-- =========================================================================
+     entete.html — haut de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/entete.html
+
+     Marques à remplacer par le générateur :
+       Visualiseur de parcours G-code LinuxCNC        titre de l'onglet
+       Un aperçu de trajectoire pour LinuxCNC qui ne ment pas sur les fichiers paramétrés : il appelle rs274, l'interprète de LinuxCNC lui-même, au lieu d'écrire un parseur de plus.  méta description (une phrase, pour les moteurs)
+       ../       préfixe vers le kit depuis la page : "" ou "../"
+       visualiseur G-code   « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/">Projets</a>          les <a> de navigation
+           <link> vers la feuille propre au site, ou vide
+
+     IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
+     Le site laser écrivait data-theme="light" : comme
+     :root[data-theme="light"] est plus spécifique que le bloc
+     @media (prefers-color-scheme: dark), un visiteur dont le système est
+     en sombre recevait quand même la page blanche (vérifié le 11/08/2026 :
+     fond rendu rgb(255,255,255) système en sombre). Son thème sombre
+     existait bel et bien — #14171b — mais seul le bouton ◐ y donnait accès.
+     ========================================================================= -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visualiseur de parcours G-code LinuxCNC</title>
+<meta name="description" content="Un aperçu de trajectoire pour LinuxCNC qui ne ment pas sur les fichiers paramétrés : il appelle rs274, l'interprète de LinuxCNC lui-même, au lieu d'écrire un parseur de plus.">
+<link rel="icon" type="image/svg+xml" href="../chapeau.svg">
+
+<!-- Anti-clignotement : pose le thème choisi AVANT que la feuille de style
+     ne peigne. Placé ici et pas dans verdier.js, qui est chargé en fin de
+     page — sinon le visiteur voit le thème clair une fraction de seconde
+     avant la bascule. Volontairement minuscule et en ligne. -->
+<script>
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
+  var v=m?m[1]:localStorage.getItem('verdier-theme');
+  if(v)document.documentElement.setAttribute('data-theme',v);
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="../verdier.css">
+
+</head>
+<body>
+<a id="top"></a>
+
+<header class="topbar">
+  <div class="wrap">
+    <!-- Le logo est COLLÉ ici, pas chargé en <img> : en ligne, son
+         mot-symbole suit `currentColor`, donc le bouton de thème. En <img>
+         il ne suivrait que le réglage du système. -->
+    <a class="brand" href="https://atelierduverdier.fr/" aria-label="Atelier du Verdier">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      <span class="brand-sub">visualiseur G-code</span>
+    </a>
+    <button class="nav-btn" type="button" aria-label="Ouvrir le menu"
+            aria-controls="menu-principal">☰</button>
+    <nav class="navlinks" id="menu-principal">
+      <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/">Projets</a>
+    </nav>
+    <button class="theme-btn" type="button" title="Thème clair / sombre"
+            aria-label="Basculer entre le thème clair et le thème sombre">◐</button>
+  </div>
+</header>
+
+<!-- Visualiseur de parcours G-code LinuxCNC.
+
+     Tous les faits et tous les chiffres viennent du README du projet
+     (~/Projets/logiciels/visualiseur-gcode/README.md). Rien n'est inventé ici, et
+     rien n'est arrondi dans un sens flatteur.
+
+     ORDRE DE LA PAGE, comme pour le pupitre : ce qu'on voit à l'écran
+     D'ABORD, l'architecture et les pièges ENSUITE et REPLIÉS. Le détail
+     n'est pas retiré, il est derrière un panneau à dérouler.
+
+     Les captures sont engendrées par site/outils/capturer_visualiseur.py,
+     qui appelle l'outil du projet lui-même — un grab() ordinaire ne
+     traverse pas la vue OpenGL.
+
+     Dépôt PRIVÉ (décision D3) : fiche vitrine, pas de lien vers le code.
+
+     Bases de police : 9,9 px pour le héros (échelle 1,21), 12 px pour un
+     viewBox de 640 (échelle 1), 10,1 px pour 540 (échelle 1,19). Mesuré. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">LinuxCNC · <b>rs274</b></span>
+          <span class="badge">PySide6 / OpenGL</span>
+          <span class="badge">LGPL-2.1</span>
+        </div>
+        <h1>Un tracé qui ne ment pas</h1>
+        <p class="lede">
+          Les visualiseurs G-code ordinaires n'implémentent pas le RS274NGC de
+          LinuxCNC. Sur un fichier paramétré, ils n'échouent pas : ils inventent.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#voir">Ce qu'on voit</a>
+          <a class="btn btn-ghost" href="#freecad">Dans FreeCAD</a>
+          <a class="btn btn-ghost" href="#capot">Sous le capot</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <!-- Le parti pris du projet, en une image : ne pas écrire de parseur. -->
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="Deux chemins : écrire son propre interpréteur, ou appeler celui de LinuxCNC">
+          <g class="figure">
+            <rect x="95" y="14" width="150" height="34" rx="9"
+                  fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="35" text-anchor="middle" class="fort">un .ngc paramétré</text>
+
+            <path d="M 150 48 L 80 86" class="cote"/>
+            <path d="M 190 48 L 260 86" class="accent"/>
+
+            <rect x="12" y="88" width="136" height="52" rx="9"
+                  fill="none" stroke="var(--warn-b)" stroke-width="1.5" stroke-dasharray="5 3"/>
+            <text x="80" y="108" text-anchor="middle" class="petit">écrire son</text>
+            <text x="80" y="122" text-anchor="middle" class="petit">propre parseur</text>
+            <text x="80" y="136" text-anchor="middle" class="petit" fill="var(--warn-b)">mêmes angles morts</text>
+
+            <rect x="192" y="88" width="136" height="52" rx="9"
+                  fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.8"/>
+            <text x="260" y="108" text-anchor="middle" class="orange">appeler rs274</text>
+            <text x="260" y="122" text-anchor="middle" class="petit">l'interprète de</text>
+            <text x="260" y="136" text-anchor="middle" class="petit">LinuxCNC lui-même</text>
+
+            <path d="M 80 140 L 80 172" class="cote" stroke-dasharray="4 3"/>
+            <path d="M 260 140 L 260 172" class="accent"/>
+
+            <text x="80" y="188" text-anchor="middle" class="petit" fill="var(--warn-b)">un dessin faux,</text>
+            <text x="80" y="202" text-anchor="middle" class="petit" fill="var(--warn-b)">présenté comme juste</text>
+            <text x="260" y="188" text-anchor="middle" class="petit">ce que la machine</text>
+            <text x="260" y="202" text-anchor="middle" class="petit">fera vraiment</text>
+
+            <text x="170" y="234" text-anchor="middle" class="petit">le programme ne fait que dessiner</text>
+            <text x="170" y="246" text-anchor="middle" class="petit">ce que l'interprète répond</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="voir">
+  <div class="wrap">
+    <div class="sec-tag">Ce qu'on voit</div>
+    <h2>Le parcours, le bois, et les erreurs</h2>
+    <p class="sec-lede">
+      Un demi-million de segments à la fréquence de l'écran, le brut qui se creuse au fil
+      du rejeu, et des erreurs qui s'expliquent au lieu de se taire.
+    </p>
+
+    <h3>Le tracé, coloré par profondeur</h3>
+    <figure class="capture">
+      <img src="../logiciels/captures/visualiseur-paquerette.04f08eda.webp"
+           alt="Le visualiseur affichant une gravure de pâquerettes vue de dessus, colorée par profondeur Z, avec le G-code à droite"
+           data-agrandir>
+      <figcaption>
+        <b>561 931 segments</b>, 3,8 s à charger, fluide ensuite. La coloration suit ici la
+        profondeur Z, avec sa légende en bas à gauche ; six modes existent — rapide/travail,
+        profondeur, puissance laser, avance, outil, et <b>programme</b>, qui montre d'un
+        coup d'œil quelle part du travail revient à quelle fraise. La barre d'état donne
+        l'étendue, la longueur travail/rapides et la durée estimée : ici
+        <b>3 h 56 min 57 s</b>, suivie de sa ventilation <b>travail / rapides</b> —
+        c'est la répartition, et non le total, qui départage deux stratégies
+        d'usinage.
+      </figcaption>
+    </figure>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Le code et le tracé, liés dans les deux sens</h3>
+        <p>
+          Cliquer un segment ouvre sa ligne ; poser le curseur sur une ligne éclaire ses
+          segments. <b>Y compris dans les sous-programmes</b> : un mouvement engendré par
+          <code>toolchange.ngc</code> ouvre <code>toolchange.ngc</code> à la bonne ligne,
+          pas la ligne de même numéro du programme principal.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Le rejeu suit le temps, pas les segments</h3>
+        <p>
+          La tête avance selon la <b>durée estimée</b>. Sur une gravure, dix mille
+          micro-traits pèsent un dixième du parcours mais la <b>moitié du temps</b> —
+          un rejeu au numéro de segment donnerait une idée fausse du travail.
+        </p>
+      </div>
+    </div>
+
+    <h3>Le bloc de bois se creuse</h3>
+    <figure class="capture">
+      <img src="../logiciels/captures/visualiseur-matiere.a6647264.webp"
+           alt="Le même travail avec la matière activée : le brut en bois s'est creusé là où la fraise est passée, à mi-parcours du rejeu"
+           data-agrandir>
+      <figcaption>
+        Touche <kbd>M</kbd> : le brut apparaît et se laisse usiner au fil du rejeu, éclairé
+        pour que le relief se lise. Ici à mi-parcours — <b>2 h 10 min</b> sur 3 h 57 —, avec
+        le <b>volume enlevé affiché en continu</b> : 33,7 cm³. Plusieurs programmes peuvent
+        s'empiler sur le même brut, chacun avec sa fraise : ébauche à la Ø6, finition à la
+        Ø3,175, détourage à la fraise en vé.
+      </figcaption>
+    </figure>
+
+    <h3>Une erreur, et la raison de l'erreur</h3>
+    <figure class="capture">
+      <img src="../logiciels/captures/visualiseur-erreur.c734b8de.webp"
+           alt="Bandeau rouge « tracé incomplet » expliquant qu'un mot K est interdit dans un arc du plan XY, avec la ligne fautive marquée dans la marge"
+           data-agrandir>
+      <figcaption>
+        La moindre erreur d'interprétation donne un <b>bandeau rouge</b>, la ligne fautive
+        marquée dans la marge, et la mention « tracé incomplet ». Le tracé partiel reste
+        affiché : voir jusqu'où la machine serait allée est ce qui aide à comprendre.
+      </figcaption>
+    </figure>
+
+    <div class="callout tip">
+      <span class="ci">Ajouter au message, jamais le remplacer</span>
+      <p>
+        Les messages de <code>rs274</code> sont exacts mais courts. « K word given for arc
+        in xy plane » n'apprend rien à qui veut juste tailler une pièce — alors le
+        visualiseur y <b>ajoute</b> le pourquoi et le remède : le mot K est interdit en G17,
+        certains post-processeurs FreeCAD en écrivent un à zéro que GRBL ignore mais que
+        LinuxCNC refuse, et il suffit de réexporter avec le bon post-processeur. Ce que dit
+        l'interprète n'est jamais effacé.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="pourquoi">
+  <div class="wrap">
+    <div class="sec-tag">L'origine</div>
+    <h2>Quelques cercles au mauvais endroit, sans un mot</h2>
+
+    <p>
+      <code>percage_lit_atc.ngc</code> perce le lit de la machine. Il emploie des
+      paramètres <code>#&lt;nom&gt;</code>, des expressions <code>[..]</code> et des
+      <code>O… IF</code> — c'est ce qui permet de le lancer <b>d'abord en essai à
+      blanc</b>, dix millimètres au-dessus du lit, avant de couper pour de bon.
+    </p>
+
+    <p>
+      Chargé dans un visualiseur en ligne, il a produit quelques cercles au mauvais
+      endroit. <b>Pas une alerte, pas un avertissement</b> : un dessin faux, présenté
+      comme juste. Ces outils lisent un G-code de base et ignorent le reste. Sur un
+      fichier ordinaire ça passe ; sur un fichier paramétré, ça invente.
+    </p>
+
+    <figure class="capture">
+      <img src="../logiciels/captures/visualiseur-percage.41838cb4.webp"
+           alt="Le fichier de perçage du lit affiché en vue isométrique : vingt perçages alignés, avec le G-code paramétré lisible à droite"
+           data-agrandir>
+      <figcaption>
+        Le fichier en question, tracé <b>juste</b> : vingt perçages, 8 999 segments,
+        4 min 38 s estimées. À droite, le G-code avec ses <code>#&lt;essai&gt;</code>,
+        <code>#&lt;ep_lit&gt;</code> et <code>#&lt;debouche&gt;</code> — ce sont eux que les
+        visualiseurs ordinaires ne savent pas lire.
+      </figcaption>
+    </figure>
+
+    <div class="callout tip">
+      <span class="ci">Le parti pris qui en découle</span>
+      <p>
+        <b>Ne pas écrire de parseur G-code.</b> Écrire le sien, c'est refaire le même
+        bug avec les mêmes angles morts. LinuxCNC livre l'interpréteur qui fait
+        autorité ; ce programme l'appelle et se contente de dessiner ce qu'il répond.
+      </p>
+    </div>
+
+    <h3>Le contrôle qui le prouve, à chaque exécution des tests</h3>
+    <p>
+      Le fichier paramétré et son jumeau développé à la main — écrit à l'époque
+      justement pour contourner les visualiseurs ordinaires — sont comparés segment
+      par segment.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">8 999</span><span class="l">segments identiques<br>entre les deux fichiers</span></div>
+      <div class="chiffre"><span class="v">&lt; 1 µm</span><span class="l">d'écart en XY<br>sur l'ensemble du parcours</span></div>
+    </div>
+
+    <p class="muted">
+      Le jumeau développé à la main n'a plus de raison d'être : c'est peut-être le
+      meilleur résultat du projet.
+    </p>
+  </div>
+</section>
+
+<section id="freecad">
+  <div class="wrap">
+    <div class="sec-tag">Dans l'atelier CAM</div>
+    <h2>Un bouton dans FreeCAD, et pourquoi ce n'est pas un doublon</h2>
+
+    <p>
+      Un greffon ajoute une icône à la barre de l'atelier CAM de FreeCAD. Il poste
+      le Job courant et ouvre le résultat dans le visualiseur, en processus séparé.
+      Le G-code n'est pas écrit sur le disque et le document n'est pas modifié.
+    </p>
+
+    <p>
+      FreeCAD a pourtant déjà son simulateur. Mais il lit
+      <code>operations[i].Path.Commands</code> — les objets Path <b>internes</b>. Il
+      montre donc ce que FreeCAD a l'<i>intention</i> de faire, jamais ce que le
+      post-processeur a <i>écrit</i>. Il est structurellement aveugle à un défaut de
+      post-traitement, et ces défauts existent : sur 167 fichiers de l'atelier,
+      <b>49 portaient un mot <code>K</code> sur des arcs G17</b>, émis par le
+      post-processeur. Le simulateur les montre parfaits ; l'interpréteur de LinuxCNC
+      les refuse.
+    </p>
+
+    <div class="callout tip">
+      <span class="ci">Le même défaut, sur une vraie pièce</span>
+      <p>
+        Un ancien fichier de guitare, dont le Job visait encore GRBL. Le
+        post-processeur écrit <code>K0.000</code> sur <b>les 275 arcs</b> du
+        programme — pas un seul non nul, donc pas un seul qui porte la moindre
+        information. GRBL les ignore, LinuxCNC s'arrête au premier. Résultat à
+        l'écran : <b>5 segments au lieu de 2 173</b>, et un bandeau rouge qui nomme
+        la ligne et la raison. Le simulateur intégré, lui, l'aurait dessiné entier.
+      </p>
+    </div>
+
+    <h3>Choisir ce qu'on veut voir</h3>
+    <p>
+      Le Job entier est rarement ce qu'on cherche : on cherche l'opération dont on
+      doute. Le greffon demande donc lesquelles tracer, les cases suivant l'état du
+      Job. Sur une rosace de 18 opérations, tout donne 2 103 lignes de G-code et la
+      seule opération de contour en donne 111.
+    </p>
+    <p>
+      Le Job n'est pas modifié pour autant. La voie évidente — désactiver les
+      opérations puis les réactiver — laisserait un Job amputé si quoi que ce soit
+      s'interrompait entre les deux, et ce Job-là finirait un jour posté pour de
+      vrai. Le greffon restreint plutôt ce que le post-processeur <i>considère</i> :
+      cocher les 18 redonne le fichier entier à deux lignes près, l'horodatage.
+    </p>
+
+    <h3>Une opération en échec ne passe plus</h3>
+    <p>
+      Une opération que FreeCAD n'a pas su recalculer garde le parcours de son
+      dernier calcul <i>réussi</i>. Le post-processeur le poste sans broncher, et le
+      tracé sort complet, crédible, périmé. C'est le défaut d'origine de ce projet,
+      refait à l'intérieur même de l'outil censé le débusquer. Le greffon nomme
+      désormais l'opération fautive et laisse choisir.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">1 064</span><span class="l">lignes postées avec<br>l'opération cassée</span></div>
+      <div class="chiffre"><span class="v">964</span><span class="l">une fois réparée<br>— sans un mot d'écart</span></div>
+      <div class="chiffre"><span class="v">1 / 366</span><span class="l">opérations de l'atelier<br>déclenchent l'alarme</span></div>
+    </div>
+
+    <p>
+      Ce dernier chiffre est la raison d'être du contrôle. Une alarme qui se trompe
+      s'apprend à ignorer, et cesse alors de servir le jour utile : le seuil a donc
+      été choisi sur un relevé des <b>366 opérations des 87 Jobs</b> de l'atelier.
+      L'état « à recalculer » touche 57 fichiers sur 87 — inutilisable. L'état « en
+      échec » sort à une opération sur 366, et c'était la bonne.
+    </p>
+  </div>
+</section>
+
+<section id="capot">
+  <div class="wrap">
+    <div class="sec-tag">Sous le capot</div>
+    <h2>Comment c'est fait</h2>
+    <p class="sec-lede">
+      La partie technique, repliée : à dérouler seulement si le sujet intéresse.
+    </p>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">La chaîne, du fichier à l'écran</span>
+        <span class="s">deux couches</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Un noyau qui ne connaît ni Qt ni OpenGL et se teste sans écran, et une interface
+          qui ne fait aucune géométrie.
+        </p>
+
+        <figure class="figure">
+          <svg style="font-size:12px" viewBox="0 0 640 240" role="img"
+               aria-label="La chaîne : fichier ngc, rs274 en sous-processus, flux canonique, tableaux numpy, rendu OpenGL">
+            <rect x="8" y="24" width="474" height="118" rx="10"
+                  fill="var(--bg-2)" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="5 3"/>
+            <text x="16" y="42" class="petit">noyau — ni Qt ni OpenGL, se teste sans écran</text>
+            <rect x="494" y="24" width="138" height="118" rx="10"
+                  fill="var(--bg-2)" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="5 3"/>
+            <text x="502" y="42" class="petit">interface</text>
+
+            <g>
+              <rect x="20" y="56" width="104" height="54" rx="8" fill="var(--card)" stroke="var(--fg)" stroke-width="1.5"/>
+              <text x="72" y="80" text-anchor="middle" class="fort">.ngc</text>
+              <text x="72" y="96" text-anchor="middle" class="petit">+ ses sous-progr.</text>
+
+              <rect x="144" y="56" width="104" height="54" rx="8" fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.8"/>
+              <text x="196" y="80" text-anchor="middle" class="orange">rs274</text>
+              <text x="196" y="96" text-anchor="middle" class="petit">sous-processus</text>
+
+              <rect x="268" y="56" width="104" height="54" rx="8" fill="var(--card)" stroke="var(--fg)" stroke-width="1.5"/>
+              <text x="320" y="80" text-anchor="middle" class="fort">flux canonique</text>
+              <text x="320" y="96" text-anchor="middle" class="petit">arcs découpés</text>
+
+              <rect x="392" y="56" width="104" height="54" rx="8" fill="var(--card)" stroke="var(--fg)" stroke-width="1.5"/>
+              <text x="444" y="80" text-anchor="middle" class="fort">numpy</text>
+              <text x="444" y="96" text-anchor="middle" class="petit">sommets, genre,</text>
+              <text x="444" y="108" text-anchor="middle" class="petit">avance, ligne</text>
+
+              <rect x="516" y="56" width="104" height="54" rx="8" fill="var(--card)" stroke="var(--fg)" stroke-width="1.5"/>
+              <text x="568" y="80" text-anchor="middle" class="fort">OpenGL</text>
+              <text x="568" y="96" text-anchor="middle" class="petit">tracé, caméra</text>
+            </g>
+
+            <g class="cote">
+              <line x1="124" y1="83" x2="140" y2="83"/><polygon points="144,83 138,80 138,86" fill="var(--fg-2)"/>
+              <line x1="248" y1="83" x2="264" y2="83"/><polygon points="268,83 262,80 262,86" fill="var(--fg-2)"/>
+              <line x1="372" y1="83" x2="388" y2="83"/><polygon points="392,83 386,80 386,86" fill="var(--fg-2)"/>
+              <line x1="496" y1="83" x2="512" y2="83"/><polygon points="516,83 510,80 510,86" fill="var(--fg-2)"/>
+            </g>
+
+            <text x="320" y="180" text-anchor="middle" class="petit">Aucun G-code n'est analysé par le programme lui-même.</text>
+            <text x="320" y="204" text-anchor="middle" class="fort">561 931 segments · 3,8 s à charger · fluide ensuite</text>
+          </svg>
+          <figcaption>
+            Le noyau se teste sans écran ; l'interface ne fait aucune géométrie. C'est ce
+            qui rend le parcours vérifiable en dehors de toute fenêtre.
+          </figcaption>
+        </figure>
+
+        <h3>Trois choses vérifiées avant d'être codées</h3>
+        <div class="cartes">
+          <div class="carte">
+            <div class="head"><span class="ci">⚖️</span><h3>Sous-processus, pas import</h3></div>
+            <p>
+              LinuxCNC est en <b>GPL-2.0</b>. Importer son module Python serait une édition
+              de liens et rendrait le dépôt dérivé. Un processus séparé qui échange du texte
+              garde les deux indépendants — et le format canonique est stable et facile à lire.
+            </p>
+          </div>
+          <div class="carte">
+            <div class="head"><span class="ci">🚫</span><h3>Jamais <code>-n 0</code></h3></div>
+            <p>
+              En mode « continuer », <code>rs274</code> signale l'erreur, poursuit, et
+              <b>sort avec le code 0</b>. Le parcours est tronqué sans que rien ne le dise.
+              Le mode par défaut sort avec 1 : c'est la garantie contre l'échec silencieux,
+              et elle ne se brade pas.
+            </p>
+          </div>
+          <div class="carte">
+            <div class="head"><span class="ci">🗑️</span><h3>Toujours un <code>.var</code> jetable</h3></div>
+            <p>
+              Sans <code>-v</code>, <code>rs274</code> écrit ses paramètres persistants dans
+              le fichier d'exemple de la configuration. Un <code>G10 L2</code> dans un
+              fichier regardé en passant polluerait <b>toutes les lectures suivantes</b>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Chaque segment sait d'où il vient</span>
+        <span class="s">le mot N, et les tranches d'un million</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Le lien entre le tracé et le code n'a rien coûté.
+          <code>print_nc_line_number()</code> de LinuxCNC relit le mot <code>N</code> du
+          texte source et le recopie dans la sortie canonique. En préfixant chaque ligne
+          d'une copie par son propre numéro, chaque segment porte son origine — aucune
+          analyse du G-code n'est nécessaire, et <b>rien ne peut diverger</b>.
+        </p>
+        <p>
+          Restait un manque : le mot <code>N</code> dit « ligne 42 », pas « ligne 42 de quel
+          fichier ». Chaque fichier reçoit donc <b>sa tranche d'un million</b>.
+        </p>
+
+        <figure class="figure">
+          <svg style="font-size:12px" viewBox="0 0 640 250" role="img"
+               aria-label="Chaque fichier reçoit une tranche d'un million de numéros de ligne">
+            <g>
+              <rect x="30" y="34" width="420" height="30" rx="6" fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.6"/>
+              <text x="42" y="54" class="orange">programme principal</text>
+              <text x="440" y="54" text-anchor="end" class="petit">1 → 999 999</text>
+
+              <rect x="30" y="72" width="420" height="30" rx="6" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.3"/>
+              <text x="42" y="92" class="petit">toolchange.ngc</text>
+              <text x="440" y="92" text-anchor="end" class="petit">1 000 000 → 1 999 999</text>
+
+              <rect x="30" y="110" width="420" height="30" rx="6" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.3"/>
+              <text x="42" y="130" class="petit">atc_config.ngc</text>
+              <text x="440" y="130" text-anchor="end" class="petit">2 000 000 → 2 999 999</text>
+
+              <text x="240" y="160" text-anchor="middle" class="petit">⋮</text>
+
+              <rect x="30" y="170" width="420" height="30" rx="6" fill="var(--bg-3)" stroke="var(--fg-3)" stroke-width="1.3" stroke-dasharray="5 3"/>
+              <text x="42" y="190" class="petit">le 2 147ᵉ fichier</text>
+              <text x="440" y="190" text-anchor="end" class="petit">2 146 000 000 → …</text>
+            </g>
+
+            <line x1="470" y1="34" x2="470" y2="200" class="accent"/>
+            <text x="482" y="104" class="orange">plafond du mot N</text>
+            <text x="482" y="120" class="petit">2 147 483 647</text>
+            <text x="482" y="136" class="petit">soit 2 147 fichiers</text>
+            <text x="482" y="152" class="petit">(vérifié)</text>
+
+            <text x="240" y="228" text-anchor="middle" class="petit">Les dossiers sont recopiés numérotés dans un cache, et l'.ini repointé dessus</text>
+            <text x="240" y="242" text-anchor="middle" class="petit">le temps de l'interprétation : la configuration de la machine n'est jamais modifiée.</text>
+          </svg>
+          <figcaption>
+            Le programme principal prend la première tranche, chaque sous-programme la
+            suivante. Le plafond du mot <code>N</code> a été <b>vérifié</b>, pas supposé.
+          </figcaption>
+        </figure>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">L'enlèvement de matière, et son oracle</span>
+        <span class="s">érosion, puis OpenCascade</span>
+      </summary>
+      <div class="corps">
+        <p>
+          La matière restante est décrite par une <b>carte de hauteurs</b> — une grille en
+          X/Y, une altitude par case. C'est ce qu'il faut pour trois axes, où la matière se
+          décrit entièrement par sa surface supérieure. Des voxels sauraient faire les
+          contre-dépouilles, qu'une PrintNC ne fait pas, et coûteraient cent fois plus.
+        </p>
+        <p>
+          Le calcul <b>ne parcourt pas les segments un par un</b> — ce serait un appel numpy
+          par segment, des dizaines de secondes sur un gros fichier. Il se ramène à une
+          <b>érosion en niveaux de gris</b> :
+        </p>
+
+        <figure class="figure">
+          <svg style="font-size:12px" viewBox="0 0 640 220" role="img"
+               aria-label="L'érosion en niveaux de gris : l'axe de l'outil, le profil, puis la surface">
+            <rect x="20" y="30" width="160" height="110" rx="8" fill="var(--bg-2)" stroke="var(--line-2)" stroke-width="1"/>
+            <g stroke="var(--line-2)" stroke-width="0.6">
+              <line x1="45" y1="30" x2="45" y2="140"/><line x1="70" y1="30" x2="70" y2="140"/>
+              <line x1="95" y1="30" x2="95" y2="140"/><line x1="120" y1="30" x2="120" y2="140"/>
+              <line x1="145" y1="30" x2="145" y2="140"/>
+              <line x1="20" y1="57" x2="180" y2="57"/><line x1="20" y1="85" x2="180" y2="85"/>
+              <line x1="20" y1="112" x2="180" y2="112"/>
+            </g>
+            <path d="M 40 120 L 75 70 L 125 100 L 162 55" fill="none" stroke="var(--orange)" stroke-width="2.4"/>
+            <text x="100" y="162" text-anchor="middle" class="petit">l'axe de l'outil,</text>
+            <text x="100" y="176" text-anchor="middle" class="petit">tracé dans la grille</text>
+
+            <rect x="240" y="30" width="160" height="110" rx="8" fill="var(--bg-2)" stroke="var(--line-2)" stroke-width="1"/>
+            <circle cx="320" cy="85" r="34" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.4"/>
+            <line x1="320" y1="85" x2="354" y2="85" stroke="var(--orange)" stroke-width="2"/>
+            <text x="337" y="78" class="orange">r</text>
+            <text x="320" y="162" text-anchor="middle" class="petit">le profil de l'outil :</text>
+            <text x="320" y="176" text-anchor="middle" class="petit">droit, hémisphérique, en vé</text>
+
+            <rect x="460" y="30" width="160" height="110" rx="8" fill="var(--bg-2)" stroke="var(--line-2)" stroke-width="1"/>
+            <path d="M 470 120 L 505 70 L 555 100 L 612 55" fill="none" stroke="var(--orange)"
+                  stroke-width="19" stroke-linecap="round" stroke-linejoin="round" opacity="0.30"/>
+            <path d="M 470 120 L 505 70 L 555 100 L 612 55" fill="none" stroke="var(--orange)" stroke-width="2.4"/>
+            <text x="540" y="162" text-anchor="middle" class="petit">la surface = l'érosion</text>
+            <text x="540" y="176" text-anchor="middle" class="petit">de l'axe par le profil</text>
+
+            <g class="cote">
+              <line x1="188" y1="85" x2="228" y2="85"/><polygon points="234,85 226,81 226,89" fill="var(--fg-2)"/>
+              <line x1="408" y1="85" x2="448" y2="85"/><polygon points="454,85 446,81 446,89" fill="var(--fg-2)"/>
+            </g>
+
+            <text x="320" y="206" text-anchor="middle" class="fort">le coût ne dépend plus du nombre de segments, mais de la longueur parcourue</text>
+          </svg>
+          <figcaption>
+            <b>0,2 s</b> pour les 562 000 segments de <code>paquerette2.ngc</code>, et
+            <b>3 ms par image</b> pendant le rejeu.
+          </figcaption>
+        </figure>
+
+        <p>
+          La carte de hauteurs donne un volume. En face, FreeCAD construit le solide balayé
+          par l'outil et le retire du brut en BRep exact. <b>Aucun code commun</b> : ni la
+          représentation, ni l'algorithme, ni la bibliothèque.
+        </p>
+
+        <figure class="figure">
+          <svg style="font-size:10.1px" viewBox="0 0 540 280" role="img"
+               aria-label="Écart au calcul exact selon la finesse de la case, pour trois cas d'usinage">
+            <line x1="70" y1="230" x2="500" y2="230" class="cote"/>
+            <line x1="70" y1="30" x2="70" y2="230" class="cote"/>
+            <g class="trait-fin">
+              <line x1="64" y1="230" x2="70" y2="230"/><line x1="64" y1="170" x2="70" y2="170"/>
+              <line x1="64" y1="110" x2="70" y2="110"/><line x1="64" y1="50" x2="70" y2="50"/>
+            </g>
+            <text x="58" y="234" text-anchor="end" class="petit">0 %</text>
+            <text x="58" y="174" text-anchor="end" class="petit">1 %</text>
+            <text x="58" y="114" text-anchor="end" class="petit">2 %</text>
+            <text x="58" y="54" text-anchor="end" class="petit">3 %</text>
+            <text x="130" y="250" text-anchor="middle" class="petit">case 0,20 mm</text>
+            <text x="270" y="250" text-anchor="middle" class="petit">0,10 mm</text>
+            <text x="410" y="250" text-anchor="middle" class="petit">0,05 mm</text>
+
+            <polyline points="130,47.6 270,139.4 410,185" fill="none" stroke="var(--orange)" stroke-width="2.4"/>
+            <circle cx="130" cy="47.6" r="4" fill="var(--orange)"/>
+            <circle cx="270" cy="139.4" r="4" fill="var(--orange)"/>
+            <circle cx="410" cy="185" r="4" fill="var(--orange)"/>
+            <text x="420" y="182" class="petit" fill="var(--orange-d)">contour</text>
+
+            <polyline points="130,182 270,207.8 410,219.2" fill="none" stroke="var(--note-b)" stroke-width="2.2"/>
+            <circle cx="130" cy="182" r="4" fill="var(--note-b)"/>
+            <circle cx="270" cy="207.8" r="4" fill="var(--note-b)"/>
+            <circle cx="410" cy="219.2" r="4" fill="var(--note-b)"/>
+            <text x="420" y="222" class="petit" fill="var(--note-b)">raster</text>
+
+            <polyline points="130,138.2 270,220.4 410,210.2" fill="none" stroke="var(--tip-b)" stroke-width="2.2" stroke-dasharray="6 3"/>
+            <circle cx="130" cy="138.2" r="4" fill="var(--tip-b)"/>
+            <circle cx="270" cy="220.4" r="4" fill="var(--tip-b)"/>
+            <circle cx="410" cy="210.2" r="4" fill="var(--tip-b)"/>
+            <text x="420" y="206" class="petit" fill="var(--tip-b)">hémisphérique</text>
+
+            <text x="285" y="24" text-anchor="middle" class="petit">écart entre la carte de hauteurs et le calcul BRep exact</text>
+          </svg>
+          <figcaption>
+            Pour le contour et le raster, <b>l'écart se divise par deux quand la case se
+            divise par deux</b> : c'est la signature d'une quantification de bord, pas d'un
+            modèle faux — un modèle faux garderait son écart.
+          </figcaption>
+        </figure>
+
+        <div class="callout tip">
+          <span class="ci">L'oracle a servi tout de suite</span>
+          <p>
+            Le chiffre attendu de tête pour le contour fermé était faux de <b>5 %</b> :
+            c'était la formule d'un chemin ouvert. Un test qui ne vérifie que ce qu'on avait
+            déjà en tête n'aurait rien vu.
+          </p>
+        </div>
+
+        <div class="callout warn">
+          <span class="ci">Où est le dessus de la planche ?</span>
+          <p>
+            Aucun programme ne dit où est le bois : il dit où va l'outil. Le premier jet
+            prenait le point le plus haut usiné — c'est-à-dire le <b>début du plongeon</b>,
+            qui part de la hauteur de garde. Sur 37 fichiers de l'atelier, il posait le
+            dessus à +2, +3 ou +10 mm quand la coupe commence à zéro : une peau de bois
+            fantôme, un volume gonflé d'autant — <b>50,9 cm³ annoncés contre 33,5 réels</b>
+            — et dix-sept fausses alarmes du contrôle des rapides.
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Les pièges, et ce que chacun a laissé</span>
+        <span class="s">un test par piège</span>
+      </summary>
+      <div class="corps">
+        <figure class="figure">
+          <svg style="font-size:10.1px" viewBox="0 0 540 260" role="img"
+               aria-label="Le piège du plan XZ : deux arcs de même centre, même rayon et mêmes extrémités, mais parcourus en sens inverse">
+            <circle cx="270" cy="130" r="88" fill="none" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="3 3"/>
+            <circle cx="270" cy="130" r="3" fill="var(--fg-2)"/>
+            <text x="270" y="148" text-anchor="middle" class="petit">même centre</text>
+
+            <circle cx="193.8" cy="86" r="5" fill="var(--fg)"/>
+            <circle cx="346.2" cy="86" r="5" fill="var(--fg)"/>
+            <text x="180" y="74" text-anchor="end" class="petit">A</text>
+            <text x="360" y="74" class="petit">B</text>
+
+            <path d="M 193.8 86 A 88 88 0 0 1 346.2 86" fill="none" class="accent"/>
+            <text x="270" y="34" text-anchor="middle" class="orange">l'arc attendu</text>
+
+            <path d="M 193.8 86 A 88 88 0 0 0 346.2 86" fill="none"
+                  stroke="var(--warn-b)" stroke-width="2.2" stroke-dasharray="7 4"/>
+            <text x="270" y="240" text-anchor="middle" class="petit" fill="var(--warn-b)">l'arc obtenu si l'on inverse les axes</text>
+
+            <text x="470" y="112" text-anchor="middle" class="petit">même rayon</text>
+            <text x="470" y="128" text-anchor="middle" class="petit">mêmes extrémités</text>
+            <text x="470" y="144" text-anchor="middle" class="fort">chemin inverse</text>
+          </svg>
+          <figcaption>
+            Dans le plan XZ, <code>ARC_FEED</code> reçoit <b>(fin_z, fin_x)</b> et non
+            (fin_x, fin_z). Un contrôle de centre ne voit rien : le test mesure donc le
+            <b>balayage déroulé</b>.
+          </figcaption>
+        </figure>
+
+        <div class="cols">
+          <div class="panel">
+            <h3>Des uniformes ignorés en silence</h3>
+            <p>
+              PySide6 accepte <code>setUniformValue(emplacement, 0.5)</code> et <b>ne fait
+              rien</b> : ni exception, ni erreur OpenGL. Tous les modes de coloration
+              affichaient le premier. Les scalaires tiennent maintenant dans un
+              <code>vec4</code>, et un test surveille.
+            </p>
+          </div>
+          <div class="panel">
+            <h3>Un cercle n'est pas une suite d'angles</h3>
+            <p>
+              Sans la limite centripète, découper un cercle plus fin ferait « ralentir » la
+              machine, et un <code>G61</code> ferait durer un cercle une éternité. Le test
+              exige que la durée d'un cercle <b>ne dépende pas de la finesse du découpage</b>.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="ci">Le tracé à deux mètres et quart de sa place</span>
+          <p>
+            Une version de LinuxCNC packagée multiplie les décalages d'outil par 25,4, et
+            aucun réglage d'unités n'y change rien. Le T100 de la PrintNC, décalage Y de
+            <b>88,75 mm</b>, ressortait à <b>2 254,25 mm</b> — sans un mot. Le facteur est
+            donc <b>mesuré</b> au lancement, sur un programme d'essai d'une ligne, puis
+            compensé. La mesure rend 1 depuis, et la compensation reste : rien ne garantit
+            la version du prochain poste.
+          </p>
+        </div>
+
+        <div class="callout note">
+          <span class="ci">Écrire un G-code sans l'abîmer</span>
+          <p>
+            Le panneau G-code est un vrai éditeur, et l'enregistrement est <b>atomique</b> :
+            un fichier tronqué par une écriture interrompue ne se signale pas — il s'ouvre,
+            s'interprète, se lance, et s'arrête au milieu du travail. Fins de ligne et saut
+            final sont relevés sur les octets d'origine et reproduits : sur 306 fichiers de
+            l'atelier, <b>4 sont en CRLF et 68 n'ont pas de saut final</b>. Les réécrire
+            « proprement » transformerait un chiffre modifié en un diff de cinq cents
+            lignes, et ces fichiers sont sous git.
+          </p>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Honnêteté</div>
+    <h2>Ce qu'il ne fait pas</h2>
+
+    <ul class="clean">
+      <li>Les axes rotatifs A, B, C ne sont pas représentés. S'ils bougent, un
+      avertissement le dit : le tracé XYZ ne montre pas la pièce qui tourne.</li>
+      <li>Les plans UV, VW, UW ne sont pas tracés.</li>
+      <li><code>G5.2</code>/<code>G5.3</code> (NURBS) ne sont pas traçables —
+      <code>rs274</code> n'écrit pas les points de contrôle. Le mouvement est omis et
+      <b>signalé</b>, jamais avalé.</li>
+      <li>L'enlèvement de matière suppose trois axes et un brut parallélépipédique :
+      pas de contre-dépouille, pas de brut de forme.</li>
+      <li>La carte laser montre une <b>énergie</b>, pas une teinte. Prédire la couleur du
+      bois demanderait le nuancier de l'essence.</li>
+      <li>L'estimation de durée est un <b>modèle</b>, pas une mesure : elle n'a pas été
+      comparée à un chronomètre sur la machine. Elle sert à comparer deux stratégies, pas
+      à promettre une heure de fin.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="ci">Le code est public</span>
+      <p>
+        Sous <b>LGPL-2.1</b>, sur
+        <a href="https://github.com/atelierduverdier/visualiseur-gcode">github.com/atelierduverdier/visualiseur-gcode</a> —
+        y compris la suite de douze modules, et le contrôle qui éprouve le contrat
+        entre le greffon et les entrailles de FreeCAD.
+      </p>
+      <p class="muted">
+        Deux de ces modules lisent des fichiers qui ne sont pas dans le dépôt : le
+        programme de perçage du lit de ma machine et son jumeau développé à la main,
+        pièces à conviction du contrôle le plus important du projet. Sans eux, ils
+        échouent <b>en nommant le fichier manquant</b> — jamais en silence.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     pied.html — bas de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/pied.html
+
+     Marques à remplacer par le générateur :
+       ../     préfixe vers le kit depuis la page : "" ou "../"
+       visualiseur G-code nom du site dans la marque du pied
+       Visualiseur de parcours LinuxCNC en PySide6/OpenGL, appuyé sur rs274. Code public, LGPL-2.1.     une ou deux phrases sur ce qu'est ce site-là
+       <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>      les <a> du pied
+       2026      année du copyright
+          <script> propre au site, ou vide
+     ========================================================================= -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+        <span class="brand-sub">visualiseur G-code</span>
+      </div>
+      <p class="muted" style="margin:.2em 0 0">
+        Visualiseur de parcours LinuxCNC en PySide6/OpenGL, appuyé sur rs274. Code public, LGPL-2.1.<br>
+        © 2026 Atelier du Verdier.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>
+      <a href="#top">Haut de page ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Visionneuse : présente sur toutes les pages, verdier.js ne s'y accroche
+     que s'il trouve des images à agrandir. -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Fermer">×</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-hint">Cliquer n'importe où, ou Échap, pour fermer</div>
+</div>
+
+<script src="../verdier.js"></script>
+
+
+<!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
+     tous les sous-domaines remontent au même endroit. Pas de cookie, pas
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+<script>
+  window.goatcounter = {
+    path: function (p) { return '/portail' + p }
+  };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>
