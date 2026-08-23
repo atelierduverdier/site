@@ -85,7 +85,7 @@ kbd{font:inherit; font-size:.85em; background:var(--bg-3); border:1px solid var(
   border-bottom-width:2px; border-radius:6px; padding:1px 7px}
 ul.clean{margin:.6em 0; padding-left:1.25em}
 ul.clean li{margin:.35em 0}
-img{max-width:100%}
+img,video{max-width:100%}
 .wrap{max-width:var(--maxw); margin:0 auto; padding:0 22px}
 .muted{color:var(--fg-3); font-size:.85rem}
 .pill{display:inline-block; background:var(--bg-3); border:1px solid var(--line);
@@ -282,7 +282,8 @@ section{padding:52px 0; border-bottom:1px solid var(--line)}
    coller un dessous ferait un liseré blanc autour d'une interface sombre. */
 .capture{background:var(--bg-2); border:1px solid var(--line); border-radius:12px;
   padding:10px; margin:22px 0; box-shadow:var(--shadow)}
-.capture img,.capture video{display:block; width:100%; height:auto; border-radius:7px}
+.capture img,.capture video{display:block; width:100%; max-width:100%; height:auto;
+  border-radius:7px}
 .capture figcaption{color:var(--fg-2); font-size:.88rem; margin:12px 6px 4px; line-height:1.55}
 .capture figcaption b{color:var(--fg)}
 
@@ -297,6 +298,17 @@ section{padding:52px 0; border-bottom:1px solid var(--line)}
 .capture.panneau figcaption{text-align:center; font-size:.85rem}
 
 .figure-row{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0}
+/* Une colonne `1fr` a `min-width:auto` : elle refuse de descendre sous la
+   largeur INTRINSÈQUE de son contenu. Une image a beau être en width:100%,
+   une VIDÉO de 1024 px de large force sa colonne à 1024 — la rangée fait
+   2048 et la page déborde en travers. Vu par Christophe le 23/08/2026, sur
+   le site en ligne. `min-width:0` rend aux colonnes le droit de rétrécir. */
+.figure-row>*{min-width:0}
+/* `.serree` — une rangée qui ne doit pas occuper toute la largeur. Deux
+   vidéos carrées de 14 s en pleine page font deux pavés de 520 px de haut
+   qui écrasent tout le reste ; à 720 de rangée elles retombent à ~350 et
+   redeviennent ce qu'elles sont, deux petites démonstrations. */
+.figure-row.serree{max-width:720px; margin-left:auto; margin-right:auto}
 .figure-row .figure,.figure-row .plan,.figure-row .capture{margin:0}
 @media(max-width:760px){ .figure-row{grid-template-columns:1fr} }
 

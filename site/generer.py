@@ -29,13 +29,16 @@ SITE = RACINE / 'site'
 CONTENU = SITE / 'contenu'
 PUBLIC = SITE / 'public'
 
-# Planches TechDraw reprises telles quelles depuis le projet ATC. Elles ne
-# sont PAS régénérées ici : le modèle FreeCAD en est la source.
-PLANS_ATC = chemins.ATC_PLANS
+# Planches reprises TELLES QUELLES depuis les projets, pour être servies
+# en fichier — pas en image. Elles ne sont PAS régénérées ici : le modèle
+# FreeCAD en est la source. Un dossier par projet : un projet absent ne
+# doit pas emporter les autres, ce que faisait le `return` d'avant.
 PLANS_REPRIS = [
-    '07-ensemble-monte.svg',
-    '01-siege-billes.svg',
-    '08-gabarit-essai.svg',
+    (chemins.ATC_PLANS, ['07-ensemble-monte.svg',
+                         '01-siege-billes.svg',
+                         '08-gabarit-essai.svg']),
+    # les cinq planches de la dust shoe, reliées : c'est ce qu'on imprime
+    (chemins.DUST_SHOE_PLANS, ['dust-shoe-plans.pdf']),
 ]
 
 FICHIERS_KIT = ['verdier.css', 'verdier.js', 'chapeau.svg', 'logo.svg']
@@ -470,19 +473,18 @@ def convertir_captures() -> dict:
               f"({100 - 100 * apres // avant} % de moins, {sans_perte} sans perte, "
               f"nommées par empreinte)")
 
-    if not PLANS_ATC.is_dir():
-        print(f"  ! planches ATC introuvables ({PLANS_ATC}) — pages sans planches")
-        return empreintes
-
     cible = PUBLIC / 'projets' / 'plans'
     cible.mkdir(parents=True, exist_ok=True)
-    for nom in PLANS_REPRIS:
-        source = PLANS_ATC / nom
-        if source.exists():
-            shutil.copy2(source, cible / nom)
-        else:
-            print(f"  ! planche absente : {nom}")
-
+    for dossier, noms in PLANS_REPRIS:
+        if not dossier.is_dir():
+            print(f"  ! planches introuvables ({dossier}) — page sans planches")
+            continue
+        for nom in noms:
+            source = dossier / nom
+            if source.exists():
+                shutil.copy2(source, cible / nom)
+            else:
+                print(f"  ! planche absente : {source}")
 
     return empreintes
 
