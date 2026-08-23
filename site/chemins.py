@@ -37,6 +37,7 @@ ATC_PLANS = MAGASIN_ATC / 'plans' / 'er20'         # planches TechDraw
 ATC_PERCAGE = MAGASIN_ATC / 'gcode' / 'percage_lit_atc.ngc'
 LASER_CORE = LASER_ATELIER / 'laser_core.py'       # la VERSION
 LASER_IMG = LASER_ATELIER / 'docs' / 'manuel_img'  # les 22 panneaux
+LASER_SHOTS = LASER_ATELIER / 'docs' / 'screenshots'   # les captures larges
 
 # Les projets d'atelier dont les cotes vivent dans le tableur de leur
 # document FreeCAD — lues par valeurs_fcstd, sans que FreeCAD tourne.
@@ -65,6 +66,7 @@ TOUT = {
     'dépôt LaserAtelier': LASER_ATELIER,
     'laser_core.py (VERSION)': LASER_CORE,
     'panneaux LaserAtelier': LASER_IMG,
+    'captures LaserAtelier': LASER_SHOTS,
     'paquerette2.ngc': PAQUERETTE,
     'modèle tonnelle': TONNELLE_FCSTD,
     'modèle meuble à balais': MEUBLE_FCSTD,

@@ -43,6 +43,17 @@ PLANS_REPRIS = [
 
 FICHIERS_KIT = ['verdier.css', 'verdier.js', 'chapeau.svg', 'logo.svg']
 
+# --- La carte de partage -------------------------------------------------
+# 1200 x 630, le format que Facebook, LinkedIn et Mastodon attendent pour
+# une grande vignette. En JPEG, et c'est le point : le robot de Facebook ne
+# lit PAS le WebP, et tout le reste du site est en WebP.
+PARTAGE_L, PARTAGE_H = 1200, 630
+PARTAGE_FOND = (246, 247, 249)      # --bg-2 clair : les rendus 3D s'y fondent
+PARTAGE_ENCRE = (35, 39, 46)        # --fg
+PARTAGE_ORANGE = (230, 122, 0)      # --orange-d
+PARTAGE_GRIS = (90, 98, 110)        # --fg-2
+POLICE = '/usr/share/fonts/TTF/DejaVuSans%s.ttf'
+
 
 LASER_CORE = chemins.LASER_CORE
 
@@ -196,6 +207,7 @@ PAGES = [
     {
         'contenu': 'laseratelier.html',
         'sortie': 'logiciels/laseratelier.html',
+        'partage': chemins.LASER_SHOTS / 'resultat-colore.png',
         'titre': "LaserAtelier — graver ce qui n'est pas plat",
         'description': "Atelier FreeCAD de G-code laser : suivi de surfaces courbes, "
                        "gravure remplie, photo tramée, découpe multi-passes. Pourquoi "
@@ -208,6 +220,7 @@ PAGES = [
     {
         'contenu': 'visualiseur-gcode.html',
         'sortie': 'logiciels/visualiseur-gcode.html',
+        'partage': CONTENU / 'captures' / 'visualiseur-paquerette.png',
         'titre': "Visualiseur de parcours G-code LinuxCNC",
         'description': "Un aperçu de trajectoire pour LinuxCNC qui ne ment pas sur les "
                        "fichiers paramétrés : il appelle rs274, l'interprète de LinuxCNC "
@@ -219,6 +232,7 @@ PAGES = [
     {
         'contenu': 'pupitre-graphtec.html',
         'sortie': 'logiciels/pupitre-graphtec.html',
+        'partage': CONTENU / 'captures' / 'pupitre-machine.png',
         'titre': "Pupitre Graphtec CE6000-60 — piloter un traceur sous Linux",
         'description': "Piloter le traceur de découpe Graphtec CE6000-60 depuis Linux, "
                        "sans driver : conversion SVG vers HP-GL, réglage de la machine, "
@@ -241,6 +255,7 @@ PAGES = [
     {
         'contenu': 'tonnelle-jasmin.html',
         'sortie': 'projets/tonnelle-jasmin.html',
+        'partage': CONTENU / 'captures' / 'vue3d-tonnelle.png',
         'titre': "Tonnelle à jasmin — modèle paramétrique",
         'description': "Tonnelle en bois à tenons et mortaises, entièrement pilotée par "
                        "un tableur de 99 cotes : on change une valeur, les plans "
@@ -251,6 +266,7 @@ PAGES = [
     {
         'contenu': 'meuble-balais.html',
         'sortie': 'projets/meuble-balais.html',
+        'partage': CONTENU / 'captures' / 'vue3d-meuble.png',
         'titre': "Meuble à balais — armoire de jardin paramétrique",
         'description': "Armoire de jardin à toit monopente et porte latérale, pilotée "
                        "par un tableur de 120 paramètres, avec sa feuille de débit "
@@ -278,6 +294,7 @@ PAGES = [
     {
         'contenu': 'dust-shoe.html',
         'sortie': 'projets/dust-shoe.html',
+        'partage': CONTENU / 'captures' / 'vue3d-dust-shoe-fraisage.png',
         'titre': "Dust shoe PrintNC — le laser et le tuyau se relaient",
         'description': "Aspiration pour broche Ø80 sur PrintNC : trois pièces "
                        "imprimées dont deux se retirent, et un adaptateur qui "
@@ -373,6 +390,163 @@ def remplir(gabarit: str, valeurs: dict, nom: str) -> str:
     if restantes:
         sys.exit(f"{nom} : marque(s) non remplacée(s) : {', '.join(sorted(restantes))}")
     return gabarit
+
+
+def _police(taille, gras=False):
+    from PIL import ImageFont
+    return ImageFont.truetype(POLICE % ('-Bold' if gras else ''), taille)
+
+
+def _chapeau(hauteur):
+    """Le chapeau de la maison, rasterisé depuis le SVG du kit.
+
+    Rasterisé et non redessiné : c'est la même image que la favicon et que
+    les icônes du greffon. Il est noir et orange — d'où le fond CLAIR de la
+    carte, sur une ardoise il disparaîtrait.
+    """
+    from PIL import Image
+    import subprocess, tempfile
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+        sortie = f.name
+    r = subprocess.run(['rsvg-convert', '-h', str(hauteur),
+                        str(KIT / 'chapeau.svg'), '-o', sortie],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        return None
+    im = Image.open(sortie).convert('RGBA')
+    Path(sortie).unlink()      # ce fichier n'a rien à faire dans /tmp
+    return im
+
+
+def _ecourter(texte, n):
+    """Coupe sur un espace, jamais en plein mot, et pose les points."""
+    if len(texte) <= n:
+        return texte
+    coupe = texte[:n].rsplit(' ', 1)[0]
+    return coupe.rstrip(' ,;:') + '…'
+
+
+def _replier(texte, largeur, lignes_max):
+    """Replie un texte en lignes de `largeur` caractères au plus.
+
+    Ce qui dépasse est écourté sur la dernière ligne, pas tranché : la
+    version d'avant rendait « une PrintNC, un laser diode, un t ».
+    """
+    if not texte:
+        return []
+    mots, lignes, courante = texte.split(), [], ''
+    for m in mots:
+        essai = (courante + ' ' + m).strip()
+        if len(essai) <= largeur:
+            courante = essai
+            continue
+        lignes.append(courante)
+        courante = m
+        if len(lignes) == lignes_max:
+            break
+    else:
+        if courante:
+            lignes.append(courante)
+    if len(lignes) > lignes_max:
+        lignes = lignes[:lignes_max]
+    reste = len(' '.join(lignes)) < len(texte)
+    if reste and lignes:
+        lignes[-1] = _ecourter(lignes[-1] + ' …', largeur)
+    return lignes
+
+
+def carte_partage(source, titre, sous_titre):
+    """Compose la vignette 1200 x 630 d'une page.
+
+    Avec une image : elle est CONTENUE (jamais recadrée — une planche
+    rognée ne veut plus rien dire), sur le fond clair de la maison, avec un
+    bandeau de marque en bas. Sans image : une carte de marque, titre
+    compris. Toutes se ressemblent, c'est le but : partagées côte à côte,
+    on doit voir qu'elles viennent du même atelier.
+    """
+    from PIL import Image, ImageDraw
+    carte = Image.new('RGB', (PARTAGE_L, PARTAGE_H), PARTAGE_FOND)
+    d = ImageDraw.Draw(carte)
+    bandeau = 108                      # hauteur réservée à la marque
+
+    if source is not None and source.exists():
+        im = Image.open(source).convert('RGB')
+        zone = (PARTAGE_L - 80, PARTAGE_H - bandeau - 56)
+        im.thumbnail(zone, Image.LANCZOS)
+        carte.paste(im, ((PARTAGE_L - im.width) // 2,
+                         28 + (zone[1] - im.height) // 2))
+        d.line([(40, PARTAGE_H - bandeau + 6), (PARTAGE_L - 40,
+                PARTAGE_H - bandeau + 6)], fill=PARTAGE_ORANGE, width=3)
+        ch = _chapeau(56)
+        x = 40
+        if ch:
+            carte.paste(ch, (x, PARTAGE_H - bandeau + 26), ch)
+            x += ch.width + 18
+        d.text((x, PARTAGE_H - bandeau + 26), "Atelier du Verdier",
+               font=_police(32, True), fill=PARTAGE_ENCRE)
+        d.text((x, PARTAGE_H - bandeau + 64), "atelierduverdier.fr",
+               font=_police(24), fill=PARTAGE_ORANGE)
+        return carte
+
+    ch = _chapeau(150)
+    if ch:
+        carte.paste(ch, ((PARTAGE_L - ch.width) // 2, 78), ch)
+    def centre(txt, y, police, coul):
+        l = d.textlength(txt, font=police)
+        d.text(((PARTAGE_L - l) / 2, y), txt, font=police, fill=coul)
+    centre("Atelier du Verdier", 248, _police(58, True), PARTAGE_ENCRE)
+
+    # Le titre de page commence souvent par le nom du site : le répéter
+    # sous lui donnait « Atelier du Verdier » deux fois, l'un sous l'autre.
+    morceaux = [m.strip() for m in titre.split('—')]
+    if morceaux and morceaux[0] == "Atelier du Verdier":
+        morceaux = morceaux[1:]
+    coupe = (' — '.join(morceaux)).strip()
+    y = 326
+    if coupe:
+        centre(_ecourter(coupe, 46), y, _police(36, True), PARTAGE_ENCRE)
+        y += 56
+    # Et la phrase se coupe sur un ESPACE, sur deux lignes au plus : la
+    # troncature brute rendait « un laser diode, un t ».
+    for ligne in _replier(sous_titre, 62, 2):
+        centre(ligne, y, _police(26), PARTAGE_GRIS)
+        y += 36
+    d.line([(450, 470), (750, 470)], fill=PARTAGE_ORANGE, width=3)
+    centre("atelierduverdier.fr", 502, _police(28), PARTAGE_ORANGE)
+    return carte
+
+
+def images_partage(pages) -> dict:
+    """Une vignette par page, nommée par l'empreinte de son contenu.
+
+    L'empreinte n'est pas un ornement : Facebook garde très longtemps la
+    carte qu'il a vue la première fois, et une adresse inchangée lui ferait
+    resservir l'ancienne image après une correction.
+    """
+    try:
+        from PIL import Image  # noqa: F401
+    except ImportError:
+        sys.exit("generer : il faut Pillow pour les cartes de partage.")
+    cible = PUBLIC / 'partage'
+    cible.mkdir(parents=True, exist_ok=True)
+    out, poids = {}, 0
+    for page in pages:
+        src = page.get('partage')
+        src = Path(src) if src else None
+        if src is not None and not src.exists():
+            print(f"  ! image de partage absente : {src} — carte de marque")
+            src = None
+        carte = carte_partage(src, page['titre'], page.get('resume', ''))
+        brut = cible / 'x.jpg'
+        carte.save(brut, 'JPEG', quality=86, optimize=True, progressive=True)
+        marque = hashlib.sha256(brut.read_bytes()).hexdigest()[:8]
+        slug = page['sortie'].replace('/', '-').replace('.html', '')
+        final = cible / f'{slug}.{marque}.jpg'
+        brut.replace(final)
+        out[page['sortie']] = final.name
+        poids += final.stat().st_size
+    print(f"  {len(out)} carte(s) de partage 1200x630 — {poids // 1024} Ko en JPEG")
+    return out
 
 
 def copier_ressources() -> dict:
@@ -498,6 +672,7 @@ def main() -> None:
     logo = logo_en_ligne()
 
     empreintes = copier_ressources()
+    cartes = images_partage(PAGES)
 
     if DOMAINE:
         (PUBLIC / 'CNAME').write_text(DOMAINE + '\n', encoding='utf-8')
@@ -528,6 +703,10 @@ def main() -> None:
                 'SOUS_TITRE': page['sous_titre'],
                 'NAV': nav(prefixe),
                 'LOCAL_CSS': page.get('entete_sup', ''),
+                'OG_URL': f"https://{DOMAINE}/{page['sortie']}".replace(
+                    '/index.html', '/'),
+                'OG_IMAGE': f"https://{DOMAINE}/partage/{cartes[page['sortie']]}",
+                'OG_ALT': page['sous_titre'] or 'Atelier du Verdier',
             }, 'entete.html')
             + '\n' + corps + '\n'
             + remplir(pied, {
