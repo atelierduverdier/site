@@ -282,7 +282,7 @@ section{padding:52px 0; border-bottom:1px solid var(--line)}
    coller un dessous ferait un liseré blanc autour d'une interface sombre. */
 .capture{background:var(--bg-2); border:1px solid var(--line); border-radius:12px;
   padding:10px; margin:22px 0; box-shadow:var(--shadow)}
-.capture img{display:block; width:100%; height:auto; border-radius:7px}
+.capture img,.capture video{display:block; width:100%; height:auto; border-radius:7px}
 .capture figcaption{color:var(--fg-2); font-size:.88rem; margin:12px 6px 4px; line-height:1.55}
 .capture figcaption b{color:var(--fg)}
 

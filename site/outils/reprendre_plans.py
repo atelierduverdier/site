@@ -75,7 +75,25 @@ PLANCHES = [
     ('vue3d-dust-shoe-parque',
      chemins.DUST_SHOE / 'rendu' / 'parque.png',
      None, "au parcage : la brosse seule reste dans le quai"),
+    # Le film du parcage, deux prises. Il ne se convertit pas — il se
+    # recopie —, mais il passe par le même contrôle de fraîcheur : une
+    # vidéo périmée ment exactement comme un dessin périmé.
+    ('video-dust-shoe-parcage-1',
+     chemins.DUST_SHOE / 'rendu' / 'parcage-1.mp4',
+     None, "le parcage en quatre temps, prise large"),
+    ('video-dust-shoe-parcage-2',
+     chemins.DUST_SHOE / 'rendu' / 'parcage-2.mp4',
+     None, "le même, cadré serré"),
 ]
+
+
+def _cible(nom: str, source: Path, page) -> Path:
+    """Le fichier produit dans contenu/captures/.
+
+    Un PDF devient un PNG ; une source déjà en image — ou en vidéo —
+    garde son extension.
+    """
+    return SORTIE / (nom + ('.png' if page else source.suffix))
 
 
 def _horodate(chemin: Path) -> str:
@@ -90,8 +108,8 @@ def perimees() -> list[str]:
     « ! absent » et le script sortait quand même en 0.
     """
     soucis = []
-    for nom, pdf, _page, _quoi in PLANCHES:
-        image = SORTIE / f'{nom}.png'
+    for nom, pdf, page, _quoi in PLANCHES:
+        image = _cible(nom, pdf, page)
         if not pdf.exists():
             soucis.append(f"{nom} : la source est introuvable — {pdf}")
         elif not image.exists():
@@ -129,7 +147,7 @@ def main() -> None:
             # gardée est celle d'avant, et personne ne le verra.
             sys.exit(f"reprendre_plans : source introuvable — {pdf}")
 
-        cible = SORTIE / f'{nom}.png'
+        cible = _cible(nom, pdf, page)
         if page is None:
             shutil.copy2(pdf, cible)
             total += cible.stat().st_size

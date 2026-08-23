@@ -449,6 +449,21 @@ def convertir_captures() -> dict:
         avant += src.stat().st_size
         apres += final.stat().st_size
 
+    # LES VIDÉOS NE SE CONVERTISSENT PAS, elles se recopient — mais avec
+    # la même empreinte de contenu dans le nom. Un fichier qui change sous
+    # un nom qui ne change pas est un mensonge que le cache répète, et
+    # c'est encore plus vrai d'un mégaoctet de vidéo que d'une image.
+    poids_video = 0
+    for src in sorted(captures.glob('*.mp4')):
+        marque = hashlib.sha256(src.read_bytes()).hexdigest()[:8]
+        final = cible / f'{src.stem}.{marque}.mp4'
+        shutil.copy2(src, final)
+        empreintes[f'{src.stem}.mp4'] = final.name
+        poids_video += final.stat().st_size
+    if poids_video:
+        print(f"  {len(list(captures.glob('*.mp4')))} vidéo(s) recopiée(s) — "
+              f"{poids_video // 1024} Ko, nommées par empreinte")
+
     n = len(list(captures.glob('*.png')))
     if n:
         print(f"  {n} capture(s) en WebP — {avant // 1024} Ko → {apres // 1024} Ko "
