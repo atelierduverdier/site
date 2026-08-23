@@ -80,6 +80,11 @@ def injecter_fcstd(corps: str, nom: str) -> str:
     docs = {
         'tonnelle': chemins.TONNELLE_FCSTD,
         'meuble': chemins.MEUBLE_FCSTD,
+        # La dust shoe a DEUX modèles (un Part scripté qui fait référence,
+        # un PartDesign d'où sortent les STL) et un seul tableur : c'est lui
+        # qui les pilote, donc c'est lui qu'on lit.
+        'dustshoe': chemins.DUST_SHOE_PARAMS,
+        'dustshoe1': chemins.DUST_SHOE_PARAMS_V1,
     }
 
     def remplacer(m):
@@ -250,6 +255,18 @@ PAGES = [
         'sous_titre': 'meuble à balais',
         'resume': "Armoire de jardin paramétrique, feuille de débit engendrée avec le "
                   "modèle.",
+    },
+    {
+        'contenu': 'dust-shoe.html',
+        'sortie': 'projets/dust-shoe.html',
+        'titre': "Dust shoe PrintNC — le laser et le tuyau se relaient",
+        'description': "Aspiration pour broche Ø80 sur PrintNC : trois pièces "
+                       "imprimées dont deux se retirent, et un adaptateur qui "
+                       "prend la place du laser sur sa glissière. Jamais imprimé "
+                       "ni essayé — le modèle et ses contrôles seulement.",
+        'sous_titre': 'dust shoe',
+        'resume': "Jupe d'aspiration paramétrique pour la broche G-PENNY Ø80 : "
+                  "semelle à demeure, brosse amovible, adaptateur de tuyau Ø100.",
     },
     {
         'contenu': 'magasin-atc.html',

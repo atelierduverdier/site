@@ -32,16 +32,27 @@
 #   python3 site/outils/reprendre_plans.py --verifier  # contrôle seul, ne rend rien
 # =========================================================================
 
+import shutil
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import chemins
+
 RACINE = Path(__file__).resolve().parent.parent.parent
 SORTIE = RACINE / 'site' / 'contenu' / 'captures'
 RESOLUTION = 150          # dpi ; au-delà le WebP grossit sans gagner en lisibilité
 
-# (nom sur le site, PDF source, page, ce que la planche montre)
+# (nom sur le site, source, page, ce que l'image montre)
+#
+# `page` à None = la source est DÉJÀ une image, on la recopie. La dust shoe
+# a son propre studio de rendu (Blender, `outils/rendu.sh` de son dépôt) :
+# refaire un rendu ici serait une seconde vérité à tenir à jour, exactement
+# ce que l'en-tête de ce fichier refuse. Ces PNG-là ne sont pas versionnés
+# (`rendu/` est ignoré chez eux) — d'où le contrôle de fraîcheur, qui dira
+# « source introuvable » plutôt que de publier l'image d'avant.
 PLANCHES = [
     ('plan-meuble-ensemble',
      Path.home() / 'Projets' / 'realisations' / 'meuble-balais' / 'Plan_Ensemble.pdf',
@@ -49,6 +60,21 @@ PLANCHES = [
     ('plan-tonnelle-ensemble',
      Path.home() / 'Projets' / 'realisations' / 'tonnelle-glycine' / 'docs' / 'plans.pdf',
      1, "élévation de face, vue de dessus, côté et perspective"),
+    # La dust shoe sort CINQ planches ; on en reprend deux — celle qui
+    # raconte le montage, et celle de la pièce qui explique tout le reste.
+    # Le chemin passe par `chemins.py` : c'est le seul endroit où il vit.
+    ('plan-dust-shoe-ensemble',
+     chemins.DUST_SHOE_PLANS / '05-ensemble.pdf',
+     1, "les deux montages, la perspective et la nomenclature"),
+    ('plan-dust-shoe-adaptateur',
+     chemins.DUST_SHOE_PLANS / '03-adaptateur.pdf',
+     1, "l'adaptateur : tenon en T, conduit en D, pied à cordon"),
+    ('vue3d-dust-shoe-fraisage',
+     chemins.DUST_SHOE / 'rendu' / 'fraisage.png',
+     None, "en fraisage : semelle, brosse et adaptateur en place"),
+    ('vue3d-dust-shoe-parque',
+     chemins.DUST_SHOE / 'rendu' / 'parque.png',
+     None, "au parcage : la brosse seule reste dans le quai"),
 ]
 
 
@@ -67,7 +93,7 @@ def perimees() -> list[str]:
     for nom, pdf, _page, _quoi in PLANCHES:
         image = SORTIE / f'{nom}.png'
         if not pdf.exists():
-            soucis.append(f"{nom} : la planche source est introuvable — {pdf}")
+            soucis.append(f"{nom} : la source est introuvable — {pdf}")
         elif not image.exists():
             soucis.append(f"{nom} : aucune image reprise — lancer "
                           f"reprendre_plans.py")
@@ -101,7 +127,14 @@ def main() -> None:
         if not pdf.exists():
             # Une source absente ne se contourne pas : sans elle, l'image
             # gardée est celle d'avant, et personne ne le verra.
-            sys.exit(f"reprendre_plans : planche source introuvable — {pdf}")
+            sys.exit(f"reprendre_plans : source introuvable — {pdf}")
+
+        cible = SORTIE / f'{nom}.png'
+        if page is None:
+            shutil.copy2(pdf, cible)
+            total += cible.stat().st_size
+            print(f"  {cible.name:<30} {cible.stat().st_size // 1024:>5} Ko   {quoi}")
+            continue
 
         # pdftoppm ajoute son propre suffixe de page : on l'enlève ensuite.
         prefixe = SORTIE / nom
@@ -115,7 +148,6 @@ def main() -> None:
         produits = sorted(SORTIE.glob(f'{nom}-*.png'))
         if not produits:
             sys.exit(f"reprendre_plans : aucune image produite pour {pdf.name}.")
-        cible = SORTIE / f'{nom}.png'
         produits[0].replace(cible)
         for reste in produits[1:]:
             reste.unlink()
@@ -123,7 +155,7 @@ def main() -> None:
         total += cible.stat().st_size
         print(f"  {cible.name:<30} {cible.stat().st_size // 1024:>5} Ko   {quoi}")
 
-    print(f"\n{len(PLANCHES)} planche(s), {total // 1024} Ko en PNG "
+    print(f"\n{len(PLANCHES)} image(s), {total // 1024} Ko en PNG "
           f"(generer.py les passera en WebP)")
 
 

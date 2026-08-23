@@ -43,6 +43,12 @@ LASER_IMG = LASER_ATELIER / 'docs' / 'manuel_img'  # les 22 panneaux
 TONNELLE_FCSTD = (PROJETS / 'realisations' / 'tonnelle-glycine' / 'Tonnelle.FCStd')
 MEUBLE_FCSTD = (PROJETS / 'realisations' / 'meuble-balais' / 'MeubleABalais.FCStd')
 DUST_SHOE = PROJETS / 'machine' / 'dust-shoe'
+DUST_SHOE_PARAMS = DUST_SHOE / 'fcstd' / 'ParametresV2.FCStd'   # le tableur v2
+# ... et celui de la v1, qui sert encore : le quai lui appartient, et c'est
+# LUI qui porte le Ø du tuyau d'aspirateur (100). Le tableur v2 ne porte que
+# le Ø de l'emboîture (99), qui en découle mais ne le dit pas.
+DUST_SHOE_PARAMS_V1 = DUST_SHOE / 'fcstd' / 'Parametres.FCStd'
+DUST_SHOE_PLANS = DUST_SHOE / 'plans'                           # les 5 planches A3
 
 # Un gros fichier d'atelier, pour montrer le visualiseur en charge.
 PAQUERETTE = (PROJETS / 'archives' / 'Conception' / 'FreeCAD' / 'Penderie'
@@ -63,6 +69,9 @@ TOUT = {
     'modèle tonnelle': TONNELLE_FCSTD,
     'modèle meuble à balais': MEUBLE_FCSTD,
     'dossier dust shoe': DUST_SHOE,
+    'tableur dust shoe v2': DUST_SHOE_PARAMS,
+    'tableur dust shoe v1': DUST_SHOE_PARAMS_V1,
+    'planches dust shoe': DUST_SHOE_PLANS,
 }
 
 

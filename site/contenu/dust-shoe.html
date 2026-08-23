@@ -1,0 +1,330 @@
+<!-- Dust shoe PrintNC.
+
+     LES COTES SONT LUES PAR ALIAS, jamais recopiées : `dustshoe` est le
+     tableur v2 (`ParametresV2.FCStd`), `dustshoe1` celui de la v1, qui
+     sert encore — le quai lui appartient, et c'est lui qui porte le Ø du
+     tuyau d'aspirateur. Le tableur v2 ne connaît que le Ø de l'EMBOÎTURE
+     (99), qui découle du tuyau de 100 mais ne le dit pas : la première
+     version de cette page a écrit « tuyau Ø99 » pour cette raison.
+
+     La règle appliquée ici : tout ce qui est une COTE en mm vient d'un
+     tableur ; un COMPTE de perçages ou d'aimants s'écrit en toutes
+     lettres, parce qu'un compte faux se voit sur la planche alors qu'un
+     millimètre faux, non.
+
+     Un projet jamais fabriqué ne se présente pas comme une réalisation :
+     l'état « jamais imprimé ni essayé » est dit dans le héros, répété en
+     encart, et la page ne montre que ce qui existe — un modèle, des
+     contrôles, des planches. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">3 pièces imprimées</span>
+          <span class="badge">tuyau Ø{{fcstd:dustshoe1:@tuyau_d}}</span>
+          <span class="badge">jamais essayé</span>
+        </div>
+        <h1>Le laser et le tuyau se relaient</h1>
+        <p class="lede">
+          Une jupe d'aspiration pour une broche Ø80, sur une machine où la place manque.
+          Le principe tient en une phrase : <b>l'adaptateur de tuyau prend la place du
+          laser</b> sur sa glissière. Les deux ne sont jamais montés ensemble, donc ils
+          n'ont plus rien à se disputer.
+        </p>
+      </div>
+      <div class="hero-art">
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="La glissière du porte-broche, occupée tour à tour par le laser qui se retire et par l'adaptateur de tuyau qui se pose">
+          <g class="figure">
+            <!-- la glissière en T, le passage partagé -->
+            <rect x="156" y="24" width="20" height="120" rx="2"
+                  fill="var(--card)" stroke="var(--fg)" stroke-width="1.8"/>
+            <!-- l'étiquette est POSÉE DANS le rail, à la verticale : à
+                 l'horizontale au-dessus, elle butait contre « on le
+                 remonte » (vu au rendu, pas au code). -->
+            <text x="166" y="84" text-anchor="middle" class="petit"
+                  transform="rotate(-90 166 84)">glissière</text>
+
+            <!-- le laser : il monte et s'en va -->
+            <rect x="98" y="52" width="44" height="76" rx="4"
+                  fill="var(--bg-3)" stroke="var(--fg-3)" stroke-width="1.6"/>
+            <text x="120" y="94" text-anchor="middle" class="petit">laser</text>
+            <line x1="120" y1="48" x2="120" y2="28" class="cote"/>
+            <polygon points="120,22 116,32 124,32" fill="var(--fg-2)"/>
+            <text x="120" y="16" text-anchor="middle" class="petit">on le remonte</text>
+
+            <!-- l'adaptateur : il descend et prend la place -->
+            <rect x="190" y="30" width="58" height="118" rx="4"
+                  fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.8"/>
+            <ellipse cx="219" cy="30" rx="29" ry="7"
+                     fill="var(--card)" stroke="var(--orange)" stroke-width="1.8"/>
+            <text x="219" y="96" text-anchor="middle" class="orange">tuyau</text>
+            <line x1="266" y1="30" x2="266" y2="120" class="cote"/>
+            <polygon points="266,126 262,116 270,116" fill="var(--fg-2)"/>
+            <text x="292" y="80" text-anchor="middle" class="petit">il prend</text>
+            <text x="292" y="92" text-anchor="middle" class="petit">sa place</text>
+
+            <!-- la semelle, serrée à demeure sur la broche -->
+            <rect x="72" y="152" width="196" height="14" rx="7"
+                  fill="var(--card)" stroke="var(--fg)" stroke-width="1.8"/>
+            <text x="52" y="163" text-anchor="end" class="petit">semelle</text>
+
+            <!-- la brosse, seule pièce qui se dépose -->
+            <path d="M84,166 h172 v22 h-172 z" fill="var(--bg-3)"
+                  stroke="var(--fg)" stroke-width="1.6"/>
+            <g stroke="var(--fg-3)" stroke-width="1.2">
+              <line x1="94" y1="188" x2="94" y2="212"/>
+              <line x1="112" y1="188" x2="112" y2="212"/>
+              <line x1="130" y1="188" x2="130" y2="212"/>
+              <line x1="148" y1="188" x2="148" y2="212"/>
+              <line x1="166" y1="188" x2="166" y2="212"/>
+              <line x1="184" y1="188" x2="184" y2="212"/>
+              <line x1="202" y1="188" x2="202" y2="212"/>
+              <line x1="220" y1="188" x2="220" y2="212"/>
+              <line x1="238" y1="188" x2="238" y2="212"/>
+            </g>
+            <text x="52" y="182" text-anchor="end" class="petit">brosse</text>
+            <text x="170" y="234" text-anchor="middle" class="petit">
+              elle seule se dépose, et va se parquer
+            </text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="montage">
+  <div class="wrap">
+    <div class="sec-tag">L'ouvrage</div>
+    <h2>Deux états, et c'est tout le projet</h2>
+    <p class="sec-lede">
+      Il n'y a que deux configurations à tenir : la machine fraise, ou la brosse est
+      parquée pour laisser passer autre chose. Rien entre les deux.
+    </p>
+
+    <figure class="capture">
+      <img src="{{RACINE}}logiciels/captures/vue3d-dust-shoe-fraisage.webp"
+           alt="Rendu 3D de l'aspiration montée : la broche en gris, la semelle bleue serrée sur sa collerette, la brosse dessous, et l'adaptateur orange qui monte vers le tuyau"
+           data-agrandir>
+      <figcaption>
+        <b>En fraisage.</b> La semelle (bleu) est serrée à demeure sur la collerette
+        Ø{{fcstd:dustshoe:@collerette_d|1}} de la broche ; la brosse pend dessous par ses
+        aimants ; l'adaptateur (orange) descend par la glissière du porte-broche, là où
+        le laser se monte d'habitude. Le manchon du tuyau de
+        Ø{{fcstd:dustshoe1:@tuyau_d}} vient coiffer son emboîture
+        Ø{{fcstd:dustshoe:@spigot_d}}.
+      </figcaption>
+    </figure>
+
+    <figure class="capture">
+      <img src="{{RACINE}}logiciels/captures/vue3d-dust-shoe-parque.webp"
+           alt="Rendu 3D du parcage : la brosse est restée dans son quai vert au bout de la table, la semelle et l'adaptateur sont repartis avec la broche"
+           data-agrandir>
+      <figcaption>
+        <b>Au parcage.</b> La machine se gare broche au centre du berceau, recule, et
+        <b>seule la brosse reste</b> dans le quai (vert). La semelle repart avec la
+        broche, l'adaptateur reste au tuyau. Un seul maillon magnétique dans toute la
+        chaîne — sinon c'est le hasard qui choisit lequel cède.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="pieces">
+  <div class="wrap">
+    <div class="sec-tag">Le principe</div>
+    <h2>Trois pièces, dont une seule se dépose</h2>
+    <p class="sec-lede">
+      La seule zone cylindrique libre sous le porte-broche est la collerette
+      Ø{{fcstd:dustshoe:@collerette_d|1}}. Tout part de là.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">{{fcstd:dustshoe:@collerette_d|1}}</span><span class="l">collerette,<br>Ø en mm</span></div>
+      <div class="chiffre"><span class="v">{{fcstd:dustshoe1:@tuyau_d}}</span><span class="l">tuyau,<br>Ø en mm</span></div>
+      <div class="chiffre"><span class="v">{{fcstd:dustshoe:@aimant_poche_d|1}}</span><span class="l">poche d'aimant,<br>Ø en mm</span></div>
+      <div class="chiffre"><span class="v">{{fcstd:dustshoe:@brosse_rainure}}</span><span class="l">rainure de brosse,<br>profondeur</span></div>
+    </div>
+
+    <div class="cartes">
+      <div class="carte">
+        <div class="head">
+          <span class="ci">⚓</span>
+          <h3>La semelle-collier</h3>
+          <span class="etat prive">à demeure</span>
+        </div>
+        <p>
+          Une bague fendue serrée par une vis M4 sur la collerette, prolongée en plaque
+          de {{fcstd:dustshoe:@sem_ep}} mm. Elle ne se dépose <b>jamais</b>. Une fente en
+          T et son couloir la traversent, pour que le laser puisse descendre
+          <b>semelle en place</b> : le corps par le couloir, la plaque par la fente.
+        </p>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">🧽</span>
+          <h3>La brosse</h3>
+          <span class="etat chantier">amovible</span>
+        </div>
+        <p>
+          La jupe à poils, parois de {{fcstd:dustshoe:@jupe_ep}} mm, avec une rainure
+          périphérique de {{fcstd:dustshoe:@brosse_rainure}} mm qui reçoit le dos de la
+          bande brosse du commerce. Elle pend sous la semelle par huit aimants et deux
+          pions Ø{{fcstd:dustshoe:@pion_d}}, et c'est <b>la seule pièce qui se parque</b>.
+        </p>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci">🌀</span>
+          <h3>L'adaptateur</h3>
+          <span class="etat prive">sur la glissière</span>
+        </div>
+        <p>
+          Un tenon copié sur la plaque du laser ({{fcstd:dustshoe:@plaque_ep|1}} mm
+          d'épaisseur), un conduit aplati en D, un pied à joint, et l'emboîture
+          Ø{{fcstd:dustshoe:@spigot_d}} du tuyau. Une rangée d'empreintes de cran
+          Ø{{fcstd:dustshoe:@cran_d}} lui permet de descendre d'un cran chaque fois
+          que la broche redescend dans son collier.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Pourquoi le conduit est en D</span>
+      <p>
+        L'axe du tuyau passe à 31,8 mm de la face arrière de la pince : un rond de
+        Ø{{fcstd:dustshoe:@conduit_d_int}} la traverserait de près de 15 mm. Le conduit
+        est donc <b>aplati d'un côté</b> sur toute la bande que la pince peut balayer
+        pendant la pose, puis il redevient rond par une rampe à 45°. La section utile du
+        D vaut encore <b>84 % de l'intérieur du tuyau</b> — contre 40 % qu'imposait le
+        port Ø63 de la version précédente.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="plans">
+  <div class="wrap">
+    <div class="sec-tag">Les plans</div>
+    <h2>Cinq planches, et quarante-huit cotes relues</h2>
+    <p class="sec-lede">
+      Les planches ne sont pas dessinées : elles sont <b>projetées</b> depuis les corps
+      PartDesign dont sortent les STL. Ce qu'on regarde est donc ce qu'on imprimerait.
+    </p>
+
+    <figure class="plan">
+      <img src="{{RACINE}}logiciels/captures/plan-dust-shoe-ensemble.webp"
+           alt="Planche d'ensemble de la dust shoe : le montage de fraisage en élévation et de côté, l'état parqué, une perspective et la nomenclature des dix repères"
+           data-agrandir>
+      <figcaption>
+        <b>La planche d'ensemble.</b> Les deux montages, une perspective, et la
+        nomenclature des dix repères. Cliquer pour agrandir.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="{{RACINE}}logiciels/captures/plan-dust-shoe-adaptateur.webp"
+           alt="Planche de définition de l'adaptateur : vue de droite, face, dessus et perspective, avec les cotes du tenon, du conduit en D, du pied et de l'emboîture"
+           data-agrandir>
+      <figcaption>
+        <b>L'adaptateur, en dessin de définition.</b> Le tenon en T qui coulisse dans la
+        glissière, le conduit aplati, la gorge du joint sous le pied, et l'emboîture du
+        tuyau. Vues disposées en <b>premier dièdre</b>, comme l'annonce le symbole du
+        cartouche.
+      </figcaption>
+    </figure>
+
+    <div class="callout note">
+      <span class="ci">Une cote fausse doit se voir toute seule</span>
+      <p>
+        Dans TechDraw, une cote s'accroche à une arête par son <b>index</b>, et cet index
+        n'a aucun sens stable : il dépend du calcul de projection. Aucun n'est donc
+        deviné ici. Chaque arête est retrouvée <b>par la mesure</b> — sa longueur, son
+        rayon, sa position — à partir des constantes du modèle de référence ; puis chaque
+        cote posée est <b>relue</b> et comparée à la valeur attendue. Une cote accrochée à
+        la mauvaise arête donne un nombre faux, donc se voit, et le script sort en erreur.
+      </p>
+      <p>
+        Et comme le trait vient d'un modèle (le PartDesign) tandis que l'attendu vient de
+        l'autre (le Part scripté), <b>une planche juste prouve au passage que les deux
+        disent la même chose</b>.
+      </p>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">Ce que quatre contrôles verts ne prouvaient pas</span>
+      <p>
+        Étendue des vues, tenue dans le cadre A3, disposition, poids du fichier exporté :
+        les quatre passaient au vert pendant qu'un pavé de texte s'imprimait
+        <b>par-dessus</b> la vue de dessus, que les vues étaient rangées à l'américaine
+        sous un symbole de premier dièdre, et qu'aucune vue ne portait son nom. Il a fallu
+        rendre les planches en image et les ouvrir. C'est la même règle que partout dans
+        cet atelier : <b>c'est la pièce qui juge, pas le rapport</b>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="etat">
+  <div class="wrap">
+    <div class="sec-tag">L'état</div>
+    <h2>Rien n'a été imprimé, et ça change tout</h2>
+
+    <div class="callout warn">
+      <span class="ci">Aucune de ces pièces n'existe</span>
+      <p>
+        Le modèle passe ses contrôles — recouvrement des deux modèles, sondes de points,
+        assemblages à vraies liaisons, interférences, étanchéité du conduit, retenue au
+        quai. Aucun de ces contrôles n'a rencontré la machine. Tous les jeux sont des
+        valeurs d'atelier. <b>La seule chose mesurée au pied à coulisse</b>, ce sont les
+        dépassements d'outil sous l'écrou — de 7 à 60 mm — et c'est ce relevé qui commande
+        la profondeur de la jupe.
+      </p>
+    </div>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>À confirmer devant la machine</th><th>pourquoi</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>La hauteur des poils de la bande brosse</td>
+            <td>C'est elle qui décide de ce qui touche vraiment la pièce.</td>
+          </tr>
+          <tr>
+            <td>Le dégagement arrière</td>
+            <td>La poutre de l'axe X est relevée à +60 ; on garde 2 mm. Cette cote
+                commande aussi le secteur où la languette du quai ne retient rien.</td>
+          </tr>
+          <tr>
+            <td>Le passage du magasin ATC sous la semelle</td>
+            <td>Au changement d'outil, la semelle reste sur la broche : le magasin doit
+                passer dessous.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Ce que la version précédente a coûté</span>
+      <p>
+        La forme a porté pendant douze jours une échancrure ouverte « du côté du laser »,
+        sur une prémisse fausse : le laser pend <b>du même côté que le conduit</b>, pas à
+        l'opposé. Le contrôle de collision validait sereinement la mauvaise orientation —
+        <b>un contrôle qui juge une orientation supposée valide la supposition, pas la
+        pièce.</b> C'est en regardant la machine que ça s'est réglé, pas en relisant du
+        code.
+      </p>
+    </div>
+
+    <div class="liens">
+      <a href="https://github.com/atelierduverdier/dust-shoe" target="_blank" rel="noopener">
+        Le dépôt, modèle et planches
+      </a>
+    </div>
+  </div>
+</section>
