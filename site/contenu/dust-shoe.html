@@ -187,9 +187,9 @@
         <p>
           Un tenon copié sur la plaque du laser ({{fcstd:dustshoe:@plaque_ep|1}} mm
           d'épaisseur), un conduit aplati en D, un pied à joint, et l'emboîture
-          Ø{{fcstd:dustshoe:@spigot_d}} du tuyau. Une rangée d'empreintes de cran
-          Ø{{fcstd:dustshoe:@cran_d}} lui permet de descendre d'un cran chaque fois
-          que la broche redescend dans son collier.
+          Ø{{fcstd:dustshoe:@spigot_d}} du tuyau. Son tenon monte 35 mm au-dessus
+          de la pince : de quoi suivre la broche quand elle redescend dans son
+          collier, en gardant le joint écrasé.
         </p>
       </div>
     </div>
@@ -213,8 +213,9 @@
     <div class="sec-tag">Les plans</div>
     <h2>Cinq planches, et quarante-huit cotes relues</h2>
     <p class="sec-lede">
-      Les planches ne sont pas dessinées : elles sont <b>projetées</b> depuis les corps
-      PartDesign dont sortent les STL. Ce qu'on regarde est donc ce qu'on imprimerait.
+      Les planches ne sont pas dessinées : elles sont <b>projetées</b> depuis les
+      volumes dont sortent les fichiers d'impression. Ce qu'on regarde est donc ce
+      qu'on imprimerait.
     </p>
 
     <figure class="plan">
@@ -242,17 +243,16 @@
     <div class="callout note">
       <span class="ci">Une cote fausse doit se voir toute seule</span>
       <p>
-        Dans TechDraw, une cote s'accroche à une arête par son <b>index</b>, et cet index
-        n'a aucun sens stable : il dépend du calcul de projection. Aucun n'est donc
-        deviné ici. Chaque arête est retrouvée <b>par la mesure</b> — sa longueur, son
-        rayon, sa position — à partir des constantes du modèle de référence ; puis chaque
-        cote posée est <b>relue</b> et comparée à la valeur attendue. Une cote accrochée à
-        la mauvaise arête donne un nombre faux, donc se voit, et le script sort en erreur.
+        Aucune cote n'est posée à la main. Chaque arête est retrouvée <b>par la
+        mesure</b> — sa longueur, son rayon, sa position — puis la cote posée dessus
+        est <b>relue</b> et comparée à la valeur qu'elle devrait avoir. Une cote
+        accrochée au mauvais endroit donne un nombre faux, donc se voit, et la
+        génération s'arrête en erreur.
       </p>
       <p>
-        Et comme le trait vient d'un modèle (le PartDesign) tandis que l'attendu vient de
-        l'autre (le Part scripté), <b>une planche juste prouve au passage que les deux
-        disent la même chose</b>.
+        Et il y a deux modèles derrière : le trait vient de l'un, la valeur attendue
+        de l'autre. <b>Une planche juste prouve donc au passage que les deux disent
+        la même chose.</b>
       </p>
     </div>
 
