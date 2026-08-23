@@ -40,7 +40,7 @@ LASER_IMG = LASER_ATELIER / 'docs' / 'manuel_img'  # les 22 panneaux
 
 # Les projets d'atelier dont les cotes vivent dans le tableur de leur
 # document FreeCAD — lues par valeurs_fcstd, sans que FreeCAD tourne.
-TONNELLE_FCSTD = (PROJETS / 'realisations' / 'tonnelle-glycine' / 'Tonnelle.FCStd')
+TONNELLE_FCSTD = (PROJETS / 'realisations' / 'tonnelle-jasmin' / 'Tonnelle.FCStd')
 MEUBLE_FCSTD = (PROJETS / 'realisations' / 'meuble-balais' / 'MeubleABalais.FCStd')
 DUST_SHOE = PROJETS / 'machine' / 'dust-shoe'
 DUST_SHOE_PARAMS = DUST_SHOE / 'fcstd' / 'ParametresV2.FCStd'   # le tableur v2

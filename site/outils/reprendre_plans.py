@@ -58,7 +58,7 @@ PLANCHES = [
      Path.home() / 'Projets' / 'realisations' / 'meuble-balais' / 'Plan_Ensemble.pdf',
      1, "élévations, dessus, perspective et tableau des cotes"),
     ('plan-tonnelle-ensemble',
-     Path.home() / 'Projets' / 'realisations' / 'tonnelle-glycine' / 'docs' / 'plans.pdf',
+     Path.home() / 'Projets' / 'realisations' / 'tonnelle-jasmin' / 'docs' / 'plans.pdf',
      1, "élévation de face, vue de dessus, côté et perspective"),
     # La dust shoe sort CINQ planches ; on en reprend deux — celle qui
     # raconte le montage, et celle de la pièce qui explique tout le reste.

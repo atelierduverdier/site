@@ -56,7 +56,7 @@ LARGEUR, HAUTEUR = 1600, 1200
 # illustrée des trois. Mieux vaut deux images justes qu'une troisième vide.
 MODELES = [
     ('vue3d-tonnelle',
-     Path.home() / 'Projets/realisations/tonnelle-glycine/Tonnelle.FCStd',
+     Path.home() / 'Projets/realisations/tonnelle-jasmin/Tonnelle.FCStd',
      "la tonnelle montée, poteaux, sablières, chevrons et plots"),
     ('vue3d-meuble',
      Path.home() / 'Projets/realisations/meuble-balais/MeubleABalais.FCStd',
