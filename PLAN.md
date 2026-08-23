@@ -501,7 +501,7 @@ En ligne : <https://atelierduverdier.fr/projets/>. Un **sommaire** qui dit surto
 | projet | état | page |
 |---|---|---|
 | Magasin ATC ER20 | impression lancée | oui, la note de calcul |
-| Tonnelle à glycine | modèle complet | oui |
+| Tonnelle à jasmin | modèle complet | oui |
 | Meuble à balais | modèle complet | oui |
 | Dust shoe | **jamais imprimé ni monté** | non — rien à montrer qui existe |
 

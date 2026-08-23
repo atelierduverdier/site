@@ -228,7 +228,7 @@ PAGES = [
         'contenu': 'projets.html',
         'sortie': 'projets/index.html',
         'titre': "Projets d'atelier — Atelier du Verdier",
-        'description': "Les projets de l'atelier : magasin ATC ER20, tonnelle à glycine, "
+        'description': "Les projets de l'atelier : magasin ATC ER20, tonnelle à jasmin, "
                        "meuble à balais, dust shoe. Tous paramétriques, pilotés par un "
                        "tableur, plans régénérables.",
         'sous_titre': 'projets',
@@ -236,14 +236,14 @@ PAGES = [
                   "valeur, les plans suivent.",
     },
     {
-        'contenu': 'tonnelle-glycine.html',
-        'sortie': 'projets/tonnelle-glycine.html',
-        'titre': "Tonnelle à glycine — modèle paramétrique",
+        'contenu': 'tonnelle-jasmin.html',
+        'sortie': 'projets/tonnelle-jasmin.html',
+        'titre': "Tonnelle à jasmin — modèle paramétrique",
         'description': "Tonnelle en bois à tenons et mortaises, entièrement pilotée par "
                        "un tableur de 99 cotes : on change une valeur, les plans "
                        "d'exécution suivent.",
         'sous_titre': 'tonnelle',
-        'resume': "Tonnelle à glycine paramétrique, assemblages à tenons et mortaises.",
+        'resume': "Tonnelle à jasmin paramétrique, assemblages à tenons et mortaises.",
     },
     {
         'contenu': 'meuble-balais.html',
@@ -255,6 +255,22 @@ PAGES = [
         'sous_titre': 'meuble à balais',
         'resume': "Armoire de jardin paramétrique, feuille de débit engendrée avec le "
                   "modèle.",
+    },
+    {
+        # L'ancienne adresse de la tonnelle. Elle a été servie du 12 au
+        # 23/08/2026 sous « glycine » — le projet s'appelait ainsi par
+        # erreur de plante. Une page renommée sans rien laisser derrière
+        # transforme en 404 tout lien déjà posé, et un 404 ne dit pas
+        # « déménagé », il dit « cassé ».
+        'contenu': 'redirection-tonnelle.html',
+        'sortie': 'projets/tonnelle-glycine.html',
+        'titre': "Tonnelle à jasmin — cette page a déménagé",
+        'description': "Le projet « tonnelle à glycine » est en réalité une tonnelle "
+                       "à jasmin : la page a changé d'adresse.",
+        'sous_titre': 'tonnelle',
+        'resume': "Cette adresse a déménagé vers projets/tonnelle-jasmin.html.",
+        'entete_sup': '<meta http-equiv="refresh" content="0; url=tonnelle-jasmin.html">\n'
+                      '<link rel="canonical" href="https://atelierduverdier.fr/projets/tonnelle-jasmin.html">',
     },
     {
         'contenu': 'dust-shoe.html',
@@ -494,7 +510,7 @@ def main() -> None:
                 'RACINE': prefixe,
                 'SOUS_TITRE': page['sous_titre'],
                 'NAV': nav(prefixe),
-                'LOCAL_CSS': '',
+                'LOCAL_CSS': page.get('entete_sup', ''),
             }, 'entete.html')
             + '\n' + corps + '\n'
             + remplir(pied, {

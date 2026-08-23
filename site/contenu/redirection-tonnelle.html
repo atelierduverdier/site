@@ -1,0 +1,35 @@
+<!-- L'ancienne adresse de la tonnelle, gardée vivante.
+
+     La page s'appelait `tonnelle-glycine.html` et a été servie sous ce nom
+     du 12 au 23/08/2026 : la renommer sans rien laisser derrière, c'est
+     transformer en 404 tout lien déjà posé — et un lien mort ne dit pas
+     qu'il a déménagé, il dit que le site est cassé.
+
+     La redirection est faite TROIS FOIS, parce qu'aucune des trois ne
+     couvre tous les cas : le `<meta refresh>` de l'en-tête (voir
+     `entete_sup` dans generer.py) part sans JavaScript, le `location.replace`
+     ne laisse pas d'entrée dans l'historique — sans quoi le bouton
+     « précédent » ramènerait ici en boucle — et le lien visible reste pour
+     qui n'a ni l'un ni l'autre. Le `<link rel=canonical>` de l'en-tête dit
+     aux moteurs laquelle des deux adresses compte. -->
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Cette page a déménagé</div>
+    <h2>C'est une tonnelle à jasmin</h2>
+    <p class="sec-lede">
+      Le projet a longtemps été nommé « tonnelle à glycine » : c'était une erreur de
+      plante, pas de bois. Rien d'autre n'a changé — mêmes cotes, même modèle, mêmes
+      plans.
+    </p>
+    <div class="liens">
+      <a href="{{RACINE}}projets/tonnelle-jasmin.html">Aller à la page de la tonnelle</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // `replace` et non `href` : la page d'origine ne doit pas rester dans
+  // l'historique, sinon « précédent » y revient et repart aussitôt.
+  location.replace('tonnelle-jasmin.html');
+</script>
