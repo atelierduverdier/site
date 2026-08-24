@@ -152,15 +152,20 @@
   </div>
 
   <div class="pleine">
-    <label class="lbl" for="ae">Passe radiale ae (mm)</label>
-    <input id="ae" inputmode="decimal" value="" placeholder="pleine largeur">
+    <label class="lbl" for="ae">Passe radiale ae (mm) — la largeur, pas la profondeur</label>
+    <input id="ae" inputmode="decimal" value="0.5" placeholder="pleine largeur">
     <span class="hint" id="hintAe"></span>
     <p class="aide">
-      La largeur de matière que la fraise mord <b>sur le côté</b>. En
-      <b>finition</b>, on ne reprend souvent que <b>0,1 à 0,5 mm</b> : le copeau
-      devient alors bien plus fin que prévu et la fraise brûle au lieu de couper
-      — l'appli corrige l'avance en conséquence. Laissé vide, c'est une pleine
-      largeur (rainure) et il n'y a rien à corriger.
+      Ce que la fraise mord <b>sur le côté</b>, à plat, perpendiculairement à sa
+      trajectoire. Ce n'est <b>pas</b> la profondeur : celle-là, c'est
+      <b>Ap</b>, rappelée sous les résultats.<br>
+      En <b>détourage pleine largeur</b> — une rainure, une découpe qui traverse —
+      la fraise coupe sur tout son diamètre : laisser le champ <b>vide</b>.<br>
+      En <b>reprise de contour</b>, quand on est passé une première fois en
+      laissant exprès une surépaisseur et qu'on revient la raser, ae vaut cette
+      surépaisseur — souvent <b>0,1 à 0,5&nbsp;mm</b>. C'est là que le copeau
+      devient bien plus fin que prévu et que la fraise brûle au lieu de couper ;
+      l'appli corrige l'avance en conséquence.
     </p>
   </div>
 
@@ -425,7 +430,7 @@ function compute(){
   $("oVz").textContent=fr(rnd(vz));
   $("oRpm").textContent=fr(rpm);
   $("oFpr").textContent=frd(fpr,3);
-  $("foot").innerHTML="Passe conseillée (Ap) : "+frd(MAT[material].apLow*d,1)+"&ndash;"+frd(MAT[material].apHigh*d,1)+" mm &nbsp;&middot;&nbsp; Vc "+rnd(vc,0)+" m/min &nbsp;&middot;&nbsp; "+MAT[material].note
+  $("foot").innerHTML="Profondeur de passe (Ap) : "+frd(MAT[material].apLow*d,1)+"&ndash;"+frd(MAT[material].apHigh*d,1)+" mm &nbsp;&middot;&nbsp; Vc "+rnd(vc,0)+" m/min &nbsp;&middot;&nbsp; "+MAT[material].note
     +(k>1.005 ? "<br><span style='color:var(--orange)'>Copeau aminci par la passe étroite : avance multipliée par "+frd(k,2)+" pour garder "+frd(fz,3)+" mm/dent réels ("+frd(fz*k,3)+" mm/dent programmés).</span>" : "");
 
   var alertes=[];
@@ -506,10 +511,10 @@ function compute(){
     : "l'avance que vous visez";
   var ae=num($("ae").value);
   $("hintAe").textContent = (k>1.005)
-    ? ("copeau aminci — avance ×"+frd(k,2)
+    ? ("reprise de contour — copeau aminci, avance ×"+frd(k,2)
        + (k>2 ? " : très fort, la machine plafonnera avant" : ""))
     : (ae>0 ? "au-delà de la demi-fraise : plus d'amincissement"
-            : "vide = pleine largeur, rien à corriger");
+            : "vide = détourage pleine largeur, rien à corriger");
 }
 
 function currentTool(){
