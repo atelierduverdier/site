@@ -20,7 +20,7 @@
 <style>
   /* Appli d'établi : UN SEUL thème, sombre — elle se lit à côté de la
      machine, souvent en plein soleil d'atelier, et le blanc éblouit. */
-  :root{ --bg:#09090b; --panel:#18181b; --panel2:#27272a; --line:#3f3f46; --txt:#e4e4e7; --dim:#71717a; --dim2:#52525b; --orange:#ff8a00; }
+  :root{ --bg:#09090b; --panel:#18181b; --panel2:#27272a; --line:#3f3f46; --txt:#e4e4e7; --dim:#71717a; --dim2:#52525b; --orange:#ff8a00; --vert:#4ade80; }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   body{margin:0; background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:env(safe-area-inset-top) 0 0;}
   .wrap{max-width:460px; margin:0 auto; padding:22px 16px 48px;}
@@ -37,6 +37,18 @@
   input{width:100%; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:11px 12px; color:var(--txt); font-size:16px; font-family:ui-monospace,Menlo,monospace;}
   input:focus{outline:none; border-color:var(--orange);}
   .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;}
+  .pleine{margin-bottom:16px;}
+  /* Les trois sens de calcul. Meme grammaire que les matieres : le choix
+     actif est plein orange, on le voit d'un coup d'oeil a l'etabli. */
+  .modes{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:0 0 16px;}
+  .mode{padding:10px 2px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--txt); font-size:13px; font-weight:500;}
+  .mode.on{background:var(--orange); border-color:var(--orange); color:#000;}
+  /* Le champ DEDUIT : ni saisissable, ni gris — c'est un resultat, il porte
+     donc la couleur des resultats. */
+  input.calcule{color:var(--orange); background:#141416; border-style:dashed; border-color:var(--line);}
+  .verdict{margin-top:10px; font-size:11px; line-height:1.5; color:var(--dim);}
+  .verdict b{color:var(--vert);}
+  .verdict.chaud b{color:var(--orange);}
   .mats{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:20px;}
   .mat{padding:11px 2px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--txt); font-size:13px; font-weight:500;}
   .mat.on{background:var(--orange); border-color:var(--orange); color:#000;}
@@ -102,6 +114,12 @@
     <div><label class="lbl" for="Z">Dents (Z)</label><input id="Z" inputmode="decimal" value="2"></div>
   </div>
 
+  <!-- Broche, copeau et avance sont liés par UNE seule équation,
+       Vf = broche x fz x dents : on en fixe deux, la troisième se déduit.
+       D'où ces trois sens de calcul, plutôt qu'un seul impose. -->
+  <span class="lbl">Ce que l'appli calcule</span>
+  <div class="modes" id="modes"></div>
+
   <div class="grid2">
     <div>
       <label class="lbl" for="rpm">Vitesse broche (tr/min)</label>
@@ -113,6 +131,12 @@
       <div class="fieldwrap"><input id="fz" inputmode="decimal" value="0.15"><button class="reset" data-r="fz" aria-label="Revenir au fz conseillé">&#8635;</button></div>
       <span class="hint" id="hintFz"></span>
     </div>
+  </div>
+
+  <div class="pleine">
+    <label class="lbl" for="vf">Avance Vf (mm/min)</label>
+    <input id="vf" inputmode="decimal" value="7200">
+    <span class="hint" id="hintVf"></span>
   </div>
 
   <div class="grid2">
@@ -136,6 +160,7 @@
       <div class="ro"><div class="k">Avance/tour</div><div class="v"><span id="oFpr">0</span><span class="u">mm/tr</span></div></div>
     </div>
     <div class="foot" id="foot"></div>
+    <div class="verdict" id="verdict" style="display:none"></div>
     <div class="warn" id="warn" style="display:none"></div>
   </div>
 
@@ -210,6 +235,22 @@ var K_TOOLS="fs_tools", K_PREFS="fs_prefs";
 var PREFS_VERSION=2;
 var material="bois_tendre", tools=[];
 
+// --- Les trois sens de calcul -------------------------------------------
+// Vf = broche x fz x dents. Trois grandeurs, une equation : on en saisit
+// deux, la troisieme se deduit. `mode` dit LAQUELLE est deduite.
+//   "vf"  : broche + copeau -> avance        (le cas classique)
+//   "rpm" : avance voulue + copeau -> broche (« je veux avancer a 800 »)
+//   "fz"  : avance + broche -> copeau        (« mes reglages, ils valent quoi ? »)
+var MODES = [
+  {cle:"vf",  label:"L'avance",  champ:"vf"},
+  {cle:"rpm", label:"La broche", champ:"rpm"},
+  {cle:"fz",  label:"Le copeau", champ:"fz"}
+];
+var mode="vf";
+// Les valeurs RESOLUES du dernier calcul : c'est elles qu'on enregistre et
+// qu'on exporte, jamais le contenu brut des champs, dont l'un est deduit.
+var ETAT={d:6,z:2,rpm:24000,fz:0.15,vf:7200,vz:2520,vc:0};
+
 function $(id){return document.getElementById(id);}
 function num(s){var v=parseFloat(String(s).replace(",",".")); return isFinite(v)?v:0;}
 function clamp(v,lo,hi){return Math.min(Math.max(v,lo),hi);}
@@ -252,31 +293,90 @@ function buildMats(){
     m.appendChild(b);
   });
 }
-function applyMat(k){
-  material=k;
+// Poser les valeurs conseillees de la matiere. On ne touche PAS au champ
+// deduit : ce serait ecraser un resultat par une consigne. En mode
+// « copeau », l'avance visee est le seul reglage libre avec la broche.
+function poserConseils(){
   var d=num($("D").value), lo=num($("rpmMin").value), hi=num($("rpmMax").value);
-  $("fz").value=recoFz(k,d);
-  $("rpm").value=recoRpm(k,d,lo,hi);
-  buildMats(); compute();
-}
-function onDiam(){
-  var d=num($("D").value), lo=num($("rpmMin").value), hi=num($("rpmMax").value);
-  $("fz").value=recoFz(material,d);
-  $("rpm").value=recoRpm(material,d,lo,hi);
+  if(mode!=="fz") $("fz").value=recoFz(material,d);
+  if(mode!=="rpm") $("rpm").value=recoRpm(material,d,lo,hi);
   compute();
+}
+function applyMat(k){ material=k; buildMats(); poserConseils(); }
+function onDiam(){ poserConseils(); }
+
+// --- les trois sens de calcul ---
+function buildModes(){
+  var m=$("modes"); m.innerHTML="";
+  MODES.forEach(function(o){
+    var b=document.createElement("button");
+    b.className="mode"+(o.cle===mode?" on":""); b.textContent=o.label;
+    b.onclick=function(){ setMode(o.cle); };
+    m.appendChild(b);
+  });
+}
+function setMode(k){
+  // On bascule SANS que rien ne bouge a l'ecran : le champ qui devient
+  // saisissable prend la valeur qu'il affichait comme resultat. Sinon
+  // changer de sens de calcul ferait sauter les chiffres sans raison.
+  $("rpm").value=Math.round(ETAT.rpm);
+  $("fz").value=rnd(ETAT.fz,4);
+  $("vf").value=rnd(ETAT.vf);
+  mode=k;
+  buildModes(); marquerChampCalcule(); compute();
+}
+function marquerChampCalcule(){
+  MODES.forEach(function(o){
+    var e=$(o.champ), calcule=(o.cle===mode);
+    e.readOnly=calcule;
+    e.classList.toggle("calcule", calcule);
+    // Le bouton « revenir au conseille » n'a pas de sens sur un resultat.
+    var r=document.querySelector('.reset[data-r="'+o.champ+'"]');
+    if(r) r.style.display=calcule?"none":"";
+  });
 }
 
 // --- calcul ---
 function compute(){
-  var d=num($("D").value), z=num($("Z").value), fz=num($("fz").value);
+  var d=num($("D").value), z=num($("Z").value);
   var lo=num($("rpmMin").value), hi=num($("rpmMax").value);
-  var rpmE=Math.round(num($("rpm").value));
-  var rpm=clamp(rpmE,lo,hi);
+  var vfMax=num($("vfMax").value);
+  var fz, rpm, vf, rpmE=null, vfDemande=null;
+
+  if(mode==="rpm"){
+    // Avance voulue + copeau -> broche.
+    fz=num($("fz").value); vfDemande=num($("vf").value);
+    var rpmBrut=(fz*z>0)?(vfDemande/(fz*z)):0;
+    // Arrondi vers le BAS : a l'entier superieur, l'avance obtenue depasse
+    // d'un cheveu celle demandee — assez pour franchir un plafond regle
+    // pile a cette valeur et declencher une alerte pour rien.
+    var rpmIdeal=Math.floor(rpmBrut);
+    rpm=clamp(rpmIdeal,lo,hi);
+    vf=rpm*fz*z;                       // l'avance REELLE, apres bornage
+    $("rpm").value=rpm;
+    // On n'alerte QUE si les bornes ont mordu — pas pour le tour perdu a
+    // l'arrondi, qui n'a rien a voir avec les limites de la broche.
+    if(rpmIdeal!==rpm) rpmE=rpmIdeal;
+  } else if(mode==="fz"){
+    // Avance + broche -> copeau. Le mode « mes reglages valent quoi ? »
+    rpmE=Math.round(num($("rpm").value)); rpm=clamp(rpmE,lo,hi);
+    if(rpmE===rpm) rpmE=null;
+    vf=num($("vf").value);
+    fz=(rpm*z>0)?(vf/(rpm*z)):0;
+    $("fz").value=rnd(fz,4);
+  } else {
+    // Broche + copeau -> avance. Le cas classique.
+    rpmE=Math.round(num($("rpm").value)); rpm=clamp(rpmE,lo,hi);
+    if(rpmE===rpm) rpmE=null;
+    fz=num($("fz").value);
+    vf=rpm*fz*z;
+    $("vf").value=rnd(vf);
+  }
+
   var vc=(Math.PI*d*rpm)/1000;
-  var vf=rpm*fz*z;
   var vz=vf*(num($("plunge").value)/100);
   var fpr=fz*z;
-  var vfMax=num($("vfMax").value);
+  ETAT={d:d,z:z,rpm:rpm,fz:fz,vf:vf,vz:vz,vc:vc};
   $("oVf").textContent=fr(rnd(vf));
   $("oVz").textContent=fr(rnd(vz));
   $("oRpm").textContent=fr(rpm);
@@ -284,7 +384,11 @@ function compute(){
   $("foot").innerHTML="Passe conseillée (Ap) : "+frd(MAT[material].apLow*d,1)+"&ndash;"+frd(MAT[material].apHigh*d,1)+" mm &nbsp;&middot;&nbsp; Vc "+rnd(vc,0)+" m/min &nbsp;&middot;&nbsp; "+MAT[material].note;
 
   var alertes=[];
-  if(rpmE!==rpm) alertes.push(fr(rpmE)+" tr/min hors limites broche, ramené à "+fr(rpm)+".");
+  if(rpmE!==null){
+    alertes.push(mode==="rpm"
+      ? ("Il faudrait "+fr(rpmE)+" tr/min pour avancer à "+fr(rnd(vfDemande))+" mm/min avec ce copeau — hors des limites de la broche. Ramenée à "+fr(rpm)+" tr/min, soit "+fr(rnd(vf))+" mm/min réels.")
+      : (fr(rpmE)+" tr/min hors limites broche, ramené à "+fr(rpm)+"."));
+  }
   // La broche mini peut FORCER la vitesse de coupe au-delà de la cible :
   // acier ou laiton en petit diamètre. Le calcul clignote plutôt que de
   // laisser croire que tout va bien — c'est l'arête qui paie, sinon.
@@ -294,7 +398,10 @@ function compute(){
   // Une avance que la machine ne tient pas ne fait pas gagner de temps :
   // le copeau réel s'amincit et la fraise frotte. On propose la broche qui
   // garde la charge par dent SOUS le plafond.
-  if(vfMax>0 && vf>vfMax && fz>0 && z>0){
+  // Le « +0.5 » n'est pas une coquetterie : sans lui, une avance calculée à
+  // 1 500,05 mm/min contre un plafond réglé à 1 500 alerte pour un
+  // vingtième de millimètre par minute.
+  if(vfMax>0 && vf>vfMax+0.5 && fz>0 && z>0){
     var rSugg=Math.floor(vfMax/(fz*z));
     if(rSugg>=lo){
       alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond machine "+fr(vfMax)+" mm/min : viser "+fr(clamp(rSugg,lo,hi))+" tr/min pour garder le copeau.");
@@ -318,21 +425,46 @@ function compute(){
       }
     }
   }
+  // Le VERDICT sur le copeau : ce que valent les reglages, compare au fz
+  // conseille pour cette matiere et ce diametre. Affiche en permanence en
+  // mode « copeau » — c'est tout l'objet de ce mode — et seulement quand
+  // ca sort des clous dans les autres, pour ne pas bavarder.
+  var conseille=recoFz(material,d), ratio=conseille>0?(fz/conseille):0;
+  var v=$("verdict"), texte=null, chaud=true;
+  if(ratio>0){
+    var pc=Math.round(ratio*100)+" % du conseillé";
+    if(ratio<0.5)       texte="<b>Copeau très fin</b> ("+pc+") : la fraise frotte plus qu'elle ne coupe. C'est ce qui chauffe, brûle le bois et use l'arête.";
+    else if(ratio<0.8)  texte="<b>Copeau fin</b> ("+pc+") : ça coupe, mais on chauffe plus que nécessaire.";
+    else if(ratio<=1.3){ texte="<b>Bon copeau</b> ("+pc+")."; chaud=false; }
+    else                texte="<b>Copeau épais</b> ("+pc+") : surveiller l'effort, la casse et l'état de l'arête.";
+  }
+  if(texte && (mode==="fz" || ratio<0.8 || ratio>1.3)){
+    v.style.display="block"; v.className="verdict"+(chaud?" chaud":""); v.innerHTML=texte;
+  } else v.style.display="none";
+
   var w=$("warn");
   if(alertes.length){ w.style.display="block"; w.innerHTML=alertes.join("<br>"); }
   else w.style.display="none";
-  // rappels sous les champs
-  $("hintRpm").textContent="conseillé : "+fr(recoRpm(material,d,lo,hi));
-  $("hintFz").textContent="conseillé : "+frd(recoFz(material,d),3);
+  // Rappels sous les champs. Un champ DEDUIT n'a pas de « conseillé » —
+  // c'est un resultat ; on y met plutot ce dont il decoule.
+  $("hintRpm").textContent = (mode==="rpm")
+    ? "déduit de l'avance et du copeau"
+    : "conseillé : "+fr(recoRpm(material,d,lo,hi));
+  $("hintFz").textContent = (mode==="fz")
+    ? "déduit de l'avance et de la broche — conseillé : "+frd(conseille,3)
+    : "conseillé : "+frd(conseille,3);
+  $("hintVf").textContent = (mode==="vf")
+    ? "déduite de la broche et du copeau"
+    : "l'avance que vous visez";
 }
 
 function currentTool(){
-  var d=num($("D").value), z=num($("Z").value), fz=num($("fz").value);
-  var lo=num($("rpmMin").value), hi=num($("rpmMax").value);
-  var rpm=clamp(Math.round(num($("rpm").value)),lo,hi);
-  var vf=rpm*fz*z, vz=vf*(num($("plunge").value)/100);
-  var nm=$("tname").value.trim() || (MAT[material].label+" "+d+"mm Z"+z);
-  return {name:nm, material:material, matLabel:MAT[material].label, D:d, Z:z, fz:fz, rpm:rpm, vf:rnd(vf), plunge:rnd(vz)};
+  // Les valeurs RESOLUES, jamais les champs bruts : selon le mode, l'un
+  // d'eux est un resultat et pourrait etre en cours de saisie.
+  var nm=$("tname").value.trim() || (MAT[material].label+" "+ETAT.d+"mm Z"+ETAT.z);
+  return {name:nm, material:material, matLabel:MAT[material].label,
+          D:ETAT.d, Z:ETAT.z, fz:rnd(ETAT.fz,4), rpm:Math.round(ETAT.rpm),
+          vf:rnd(ETAT.vf), plunge:rnd(ETAT.vz)};
 }
 
 // --- bibliothèque ---
@@ -356,7 +488,12 @@ function renderLib(){
 }
 function loadTool(t){
   material=(t.material in MAT)?t.material:"bois_tendre";
-  $("D").value=t.D; $("Z").value=t.Z; $("fz").value=t.fz; $("rpm").value=t.rpm; $("tname").value=t.name;
+  $("D").value=t.D; $("Z").value=t.Z; $("tname").value=t.name;
+  // Les trois grandeurs sont reposees telles qu'enregistrees : quel que
+  // soit le sens de calcul courant, le triplet est coherent, donc le champ
+  // deduit retombera sur sa valeur.
+  $("fz").value=t.fz; $("rpm").value=t.rpm;
+  if(t.vf) $("vf").value=t.vf;
   buildMats(); compute();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -414,7 +551,9 @@ function telecharger(nomFichier, contenu){
 // --- démarrage ---
 loadStore();
 buildMats();
-["D","Z","rpm","fz","rpmMin","rpmMax","plunge","vfMax","tname"].forEach(function(id){
+buildModes();
+marquerChampCalcule();
+["D","Z","rpm","fz","vf","rpmMin","rpmMax","plunge","vfMax","tname"].forEach(function(id){
   $(id).addEventListener("input", function(){
     if(id==="D"){ onDiam(); }
     else { compute(); }
