@@ -3,7 +3,7 @@
 // (coupe-v2 -> coupe-v3 ...) — sans quoi les visiteurs gardent l'ancienne
 // version, servie par leur propre cache. Le navigateur recompare ce fichier
 // à chaque visite : c'est lui qui déclenche le renouvellement.
-const CACHE = "coupe-v6";
+const CACHE = "coupe-v7";
 const ASSETS = [
   "./",
   "./index.html",
@@ -34,7 +34,13 @@ self.addEventListener("fetch", function(e){
   if(e.request.method !== "GET") return;
   // Même origine seulement : le compteur de fréquentation change d'adresse
   // à chaque appel, le mettre en cache ferait grossir celui-ci sans fin.
-  if(new URL(e.request.url).origin !== self.location.origin) return;
+  const url = new URL(e.request.url);
+  if(url.origin !== self.location.origin) return;
+  // version.json part TOUJOURS au réseau, jamais par ici : c'est le fichier
+  // qui dit quelle version est en ligne. Servi depuis le cache, il
+  // comparerait la version installée à elle-même et répondrait « à jour »
+  // pour l'éternité — exactement le contraire de ce qu'on lui demande.
+  if(url.pathname.endsWith("/version.json")) return;
   e.respondWith(
     caches.match(e.request).then(function(hit){
       return hit || fetch(e.request).then(function(resp){

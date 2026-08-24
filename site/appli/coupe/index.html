@@ -20,18 +20,23 @@
 <style>
   /* Appli d'établi : UN SEUL thème, sombre — elle se lit à côté de la
      machine, souvent en plein soleil d'atelier, et le blanc éblouit. */
-  :root{ --bg:#09090b; --panel:#18181b; --panel2:#27272a; --line:#3f3f46; --txt:#e4e4e7; --dim:#71717a; --dim2:#52525b; --orange:#ff8a00; --vert:#4ade80; }
+  :root{ --bg:#09090b; --panel:#18181b; --panel2:#27272a; --line:#3f3f46; --txt:#e4e4e7; --dim:#71717a; --dim2:#52525b; --orange:#ff8a00; --vert:#4ade80; --rouge:#dc2626; }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   body{margin:0; background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:env(safe-area-inset-top) 0 0;}
   .wrap{max-width:460px; margin:0 auto; padding:22px 16px 48px;}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
   h1{font-size:19px; font-weight:600; margin:0; letter-spacing:-.01em;}
   .head{display:flex; align-items:center; gap:8px;}
-  /* La marque de la maison, a DROITE du titre. `margin-left:auto` la pousse
-     au bout de la ligne ; elle a le droit de retrecir (flex-shrink) pour ne
-     jamais chasser le titre sur un ecran etroit. Le mot suit currentColor. */
-  .marque{margin-left:auto; line-height:0; color:var(--txt); min-width:0; flex:0 1 auto;}
-  .marque svg{height:19px; width:auto; max-width:100%; display:block;}
+  /* Le chapeau, a DROITE du titre. `margin-left:auto` le pousse au bout de
+     la ligne ; il a le droit de retrecir pour ne jamais chasser le titre. */
+  .marque{margin-left:auto; line-height:0; min-width:0; flex:0 0 auto;}
+  .marque svg{height:30px; width:auto; max-width:100%; display:block;}
+  /* La pastille de version, juste apres le chapeau. */
+  .ver{font-size:10px; font-weight:700; letter-spacing:.02em; padding:3px 7px;
+       border-radius:6px; border:1px solid var(--line); background:transparent;
+       color:var(--dim); flex:0 0 auto; white-space:nowrap;}
+  .ver.ok{background:var(--vert); border-color:var(--vert); color:#04140a;}
+  .ver.vieux{background:var(--rouge); border-color:var(--rouge); color:#fff; cursor:pointer;}
   .sub{font-size:12px; color:var(--dim); margin:2px 0 18px;}
   .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); display:block; margin-bottom:5px;}
   input{width:100%; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:11px 12px; color:var(--txt); font-size:16px; font-family:ui-monospace,Menlo,monospace;}
@@ -97,13 +102,14 @@
   <div class="head">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff8a00" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18l3 3 6.4-6.4a4 4 0 0 0 5.3-5.4l-2.6 2.6-2.1-2.1z"/></svg>
     <h1>Vitesses de coupe</h1>
-    <!-- Le logo est POSE ICI PAR generer.py depuis kit/logo-inline.svg (marque
-         ci-dessous). Variante « en ligne » et non <img> : son mot-symbole est en
-         currentColor, il suit donc l'encre claire de l'appli ; en <img> il
-         suivrait le theme du SYSTEME et deviendrait gris ardoise illisible sur
-         ce fond noir des qu'un visiteur est en theme clair. Le chapeau, lui,
-         porte son lisere blanc et se detache seul. -->
-    <div class="marque"><!--LOGO_VERDIER--></div>
+    <!-- Le chapeau SEUL (sans le mot-symbole), pose ici par generer.py depuis
+         kit/chapeau.svg. Il porte son lisere blanc, donc il se detache tout
+         seul du fond noir. -->
+    <div class="marque"><!--CHAPEAU_VERDIER--></div>
+    <!-- Pastille de version. Verte = c'est bien la derniere ; rouge = une
+         version plus recente est en ligne, et la toucher force la mise a
+         jour (l'equivalent du Ctrl+Maj+R, qui n'existe pas sur telephone). -->
+    <button class="ver" id="ver" type="button">…</button>
   </div>
   <p class="sub">Fraise carbure — des points de départ, à affiner sur la machine.</p>
 
@@ -140,16 +146,22 @@
   </div>
 
   <div class="grid2">
+    <div>
+      <label class="lbl" for="ae">Passe radiale ae (mm)</label>
+      <input id="ae" inputmode="decimal" value="" placeholder="pleine largeur">
+      <span class="hint" id="hintAe"></span>
+    </div>
+    <div><label class="lbl" for="plunge">Plongée (% de Vf)</label><input id="plunge" inputmode="decimal" value="35"></div>
+  </div>
+
+  <div class="grid2">
     <div><label class="lbl" for="rpmMin">Broche min (tr/min)</label><input id="rpmMin" inputmode="decimal" value="1000"></div>
     <div><label class="lbl" for="rpmMax">Broche max (tr/min)</label><input id="rpmMax" inputmode="decimal" value="24000"></div>
   </div>
-  <div class="grid2">
-    <div><label class="lbl" for="plunge">Plongée (% de Vf)</label><input id="plunge" inputmode="decimal" value="35"></div>
-    <div>
-      <label class="lbl" for="vfMax">Avance max (mm/min)</label>
-      <input id="vfMax" inputmode="decimal" value="1500" placeholder="sans limite">
-      <span class="hint">ce que la machine tient vraiment</span>
-    </div>
+  <div class="pleine">
+    <label class="lbl" for="vfMax">Avance max (mm/min)</label>
+    <input id="vfMax" inputmode="decimal" value="1500" placeholder="sans limite">
+    <span class="hint">ce que la machine tient vraiment</span>
   </div>
 
   <div class="card">
@@ -260,6 +272,22 @@ function fr(n){return n.toLocaleString("fr-FR");}
 // gardent le point (num() accepte les deux à la lecture).
 function frd(n,d){return n.toLocaleString("fr-FR",{maximumFractionDigits:d});}
 
+// --- Amincissement du copeau (passe radiale legere) ---------------------
+// Une fraise ne mord pas droit : elle entre et sort de la matiere en arc.
+// Quand elle n'engage qu'une bande etroite (ae < rayon), l'epaisseur reelle
+// du copeau est bien PLUS FINE que fz, et la fraise se met a frotter la ou
+// on croyait couper. Le facteur qui rattrape ca :
+//        D / (2 x racine(ae x (D - ae)))
+// Il vaut 1 a ae = D/2 (demi-fraise), 1,7 a ae = D/10, et grimpe vite en
+// dessous. C'est le calcul que font les tables professionnelles et
+// qu'ignorent les abaques amateur — d'ou des finitions qui brulent alors
+// que les memes reglages passent tres bien en pleine passe.
+function facteurAminci(d,ae){
+  if(!(d>0) || !(ae>0)) return 1;      // champ vide = pleine largeur
+  if(ae>=d/2) return 1;                // au-dela de la demi-fraise, sans effet
+  return d/(2*Math.sqrt(ae*(d-ae)));
+}
+
 function recoFz(mat,d){return rnd(MAT[mat].fzPerMm*d,3);}
 function recoRpm(mat,d,lo,hi){
   if(MAT[mat].mode==="rpm") return hi;
@@ -341,18 +369,21 @@ function compute(){
   var d=num($("D").value), z=num($("Z").value);
   var lo=num($("rpmMin").value), hi=num($("rpmMax").value);
   var vfMax=num($("vfMax").value);
+  // fz est le copeau VISE (l'epaisseur reelle voulue) ; ce qu'on programme
+  // est fz x k, ou k rattrape l'amincissement d'une passe radiale legere.
+  var k=facteurAminci(d,num($("ae").value));
   var fz, rpm, vf, rpmE=null, vfDemande=null;
 
   if(mode==="rpm"){
     // Avance voulue + copeau -> broche.
     fz=num($("fz").value); vfDemande=num($("vf").value);
-    var rpmBrut=(fz*z>0)?(vfDemande/(fz*z)):0;
+    var rpmBrut=(fz*k*z>0)?(vfDemande/(fz*k*z)):0;
     // Arrondi vers le BAS : a l'entier superieur, l'avance obtenue depasse
     // d'un cheveu celle demandee — assez pour franchir un plafond regle
     // pile a cette valeur et declencher une alerte pour rien.
     var rpmIdeal=Math.floor(rpmBrut);
     rpm=clamp(rpmIdeal,lo,hi);
-    vf=rpm*fz*z;                       // l'avance REELLE, apres bornage
+    vf=rpm*fz*k*z;                     // l'avance REELLE, apres bornage
     $("rpm").value=rpm;
     // On n'alerte QUE si les bornes ont mordu — pas pour le tour perdu a
     // l'arrondi, qui n'a rien a voir avec les limites de la broche.
@@ -362,26 +393,27 @@ function compute(){
     rpmE=Math.round(num($("rpm").value)); rpm=clamp(rpmE,lo,hi);
     if(rpmE===rpm) rpmE=null;
     vf=num($("vf").value);
-    fz=(rpm*z>0)?(vf/(rpm*z)):0;
+    fz=(rpm*k*z>0)?(vf/(rpm*k*z)):0;   // on remonte au copeau REEL
     $("fz").value=rnd(fz,4);
   } else {
     // Broche + copeau -> avance. Le cas classique.
     rpmE=Math.round(num($("rpm").value)); rpm=clamp(rpmE,lo,hi);
     if(rpmE===rpm) rpmE=null;
     fz=num($("fz").value);
-    vf=rpm*fz*z;
+    vf=rpm*fz*k*z;
     $("vf").value=rnd(vf);
   }
 
   var vc=(Math.PI*d*rpm)/1000;
   var vz=vf*(num($("plunge").value)/100);
-  var fpr=fz*z;
-  ETAT={d:d,z:z,rpm:rpm,fz:fz,vf:vf,vz:vz,vc:vc};
+  var fpr=fz*k*z;                      // ce que la machine avance par tour
+  ETAT={d:d,z:z,rpm:rpm,fz:fz,vf:vf,vz:vz,vc:vc,k:k};
   $("oVf").textContent=fr(rnd(vf));
   $("oVz").textContent=fr(rnd(vz));
   $("oRpm").textContent=fr(rpm);
   $("oFpr").textContent=frd(fpr,3);
-  $("foot").innerHTML="Passe conseillée (Ap) : "+frd(MAT[material].apLow*d,1)+"&ndash;"+frd(MAT[material].apHigh*d,1)+" mm &nbsp;&middot;&nbsp; Vc "+rnd(vc,0)+" m/min &nbsp;&middot;&nbsp; "+MAT[material].note;
+  $("foot").innerHTML="Passe conseillée (Ap) : "+frd(MAT[material].apLow*d,1)+"&ndash;"+frd(MAT[material].apHigh*d,1)+" mm &nbsp;&middot;&nbsp; Vc "+rnd(vc,0)+" m/min &nbsp;&middot;&nbsp; "+MAT[material].note
+    +(k>1.005 ? "<br><span style='color:var(--orange)'>Copeau aminci par la passe étroite : avance multipliée par "+frd(k,2)+" pour garder "+frd(fz,3)+" mm/dent réels ("+frd(fz*k,3)+" mm/dent programmés).</span>" : "");
 
   var alertes=[];
   if(rpmE!==null){
@@ -456,6 +488,11 @@ function compute(){
   $("hintVf").textContent = (mode==="vf")
     ? "déduite de la broche et du copeau"
     : "l'avance que vous visez";
+  var ae=num($("ae").value);
+  $("hintAe").textContent = (k>1.005)
+    ? "copeau aminci — avance ×"+frd(k,2)
+    : (ae>0 ? "au-delà de la demi-fraise : pas d'amincissement"
+            : "largeur réellement engagée, si passe légère");
 }
 
 function currentTool(){
@@ -548,12 +585,57 @@ function telecharger(nomFichier, contenu){
   setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
 }
 
+// --- Suis-je a jour ? ----------------------------------------------------
+// La version est posee par generer.py depuis le CACHE du service worker :
+// une seule valeur, jamais recopiee. version.json porte celle du serveur ;
+// le service worker le laisse expres passer au reseau.
+var VERSION="{{VERSION}}";
+function controlerVersion(){
+  var b=$("ver");
+  b.textContent=VERSION;
+  b.className="ver";
+  b.title="Version de l'appli. Vérification de la mise à jour…";
+  fetch("./version.json?t="+Date.now(), {cache:"no-store"})
+    .then(function(r){ return r.ok?r.json():null; })
+    .then(function(j){
+      if(!j || !j.version) return;
+      if(j.version===VERSION){
+        b.className="ver ok";
+        b.title="À jour : c'est bien la dernière version ("+VERSION+").";
+      } else {
+        b.className="ver vieux";
+        b.textContent=VERSION+" ⟳";
+        b.title="Version "+j.version+" disponible. Toucher pour mettre à jour "
+               +"(au clavier : Ctrl + Maj + R).";
+        b.onclick=forcerMaj;
+      }
+    })
+    .catch(function(){
+      // Hors-ligne : on ne SAIT pas, donc on n'affirme rien — ni vert ni rouge.
+      b.title="Version "+VERSION+". Hors-ligne : mise à jour non vérifiable.";
+    });
+}
+// L'equivalent du Ctrl+Maj+R, qui n'existe pas sur un telephone : on jette
+// le service worker et ses caches, puis on recharge sur une adresse neuve
+// pour que le cache HTTP du navigateur ne resserve pas l'ancienne page.
+function forcerMaj(){
+  var recharger=function(){
+    location.replace(location.pathname+"?maj="+Date.now());
+  };
+  if(!("serviceWorker" in navigator)){ recharger(); return; }
+  navigator.serviceWorker.getRegistrations()
+    .then(function(rs){ return Promise.all(rs.map(function(r){ return r.unregister(); })); })
+    .then(function(){ return caches.keys(); })
+    .then(function(ks){ return Promise.all(ks.map(function(k){ return caches.delete(k); })); })
+    .then(recharger, recharger);
+}
+
 // --- démarrage ---
 loadStore();
 buildMats();
 buildModes();
 marquerChampCalcule();
-["D","Z","rpm","fz","vf","rpmMin","rpmMax","plunge","vfMax","tname"].forEach(function(id){
+["D","Z","rpm","fz","vf","ae","rpmMin","rpmMax","plunge","vfMax","tname"].forEach(function(id){
   $(id).addEventListener("input", function(){
     if(id==="D"){ onDiam(); }
     else { compute(); }
@@ -583,6 +665,7 @@ $("dlJson").onclick=function(){
 
 compute();
 renderLib();
+controlerVersion();
 
 // Enregistrement du service worker : c'est lui qui rend l'appli disponible
 // hors-ligne une fois qu'elle a été ouverte une première fois.

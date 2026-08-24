@@ -217,6 +217,38 @@ def injecter_coupe(corps: str, nom: str) -> str:
     return corps
 
 
+def chapeau_en_ligne() -> str:
+    """Le chapeau seul, prêt à être collé dans l'appli.
+
+    Collé et non chargé en <img> : un fichier de moins à servir, et rien à
+    charger hors-ligne. On retire l'en-tête XML et le commentaire, qui n'ont
+    pas leur place au milieu d'un document HTML.
+    """
+    chemin = KIT / 'chapeau.svg'
+    if not chemin.exists():
+        sys.exit(f"generer : {chemin} manquant.")
+    s = chemin.read_text(encoding='utf-8')
+    return s[s.index('<svg'):].strip()
+
+
+def version_appli_coupe() -> str:
+    """La version de l'appli, LUE dans le `CACHE` de son service worker.
+
+    Une seule source : la constante que l'on incrémente déjà à chaque
+    retouche pour renouveler le cache. La pastille affichée dans l'appli et
+    le version.json interrogé au réseau en sortent tous les deux, donc ils
+    ne peuvent pas diverger — c'est tout l'intérêt, puisque leur comparaison
+    est précisément ce qui dit au visiteur s'il est à jour.
+    """
+    sw = APPLI_COUPE / 'sw.js'
+    m = re.search(r'^const CACHE = "coupe-(v\d+)"', sw.read_text(encoding='utf-8'),
+                  re.M)
+    if not m:
+        sys.exit(f"generer : version introuvable dans {sw} — la ligne "
+                 f"« const CACHE = \"coupe-vN\" » a dû changer de forme.")
+    return m.group(1)
+
+
 def copier_appli_coupe() -> None:
     """Recopie l'appli « vitesses de coupe » TELLE QUELLE dans public/coupe/.
 
@@ -231,21 +263,32 @@ def copier_appli_coupe() -> None:
                  "partie du site.")
     shutil.copytree(APPLI_COUPE, PUBLIC / 'coupe')
 
-    # Le logo de la maison est POSÉ ICI, jamais recopié dans l'appli : il sort
-    # de kit/logo-inline.svg comme celui des pages, donc il suit le kit. En
-    # ligne et non en <img> — son mot-symbole est en `currentColor` et suit
-    # l'encre claire de l'appli ; en <img>, il suivrait le thème du SYSTÈME et
-    # virerait au gris ardoise, illisible sur ce fond noir.
+    # Le chapeau de la maison est POSÉ ICI, jamais recopié dans l'appli : il
+    # sort de kit/chapeau.svg, donc il suit le kit. En ligne et non en <img>
+    # pour ne dépendre d'aucun fichier annexe hors-ligne ; son liseré blanc
+    # le détache seul du fond noir de l'appli.
     index = PUBLIC / 'coupe' / 'index.html'
     texte = index.read_text(encoding='utf-8')
-    if '<!--LOGO_VERDIER-->' not in texte:
-        sys.exit("generer : marque <!--LOGO_VERDIER--> absente de l'appli coupe — "
-                 "l'appli partirait en ligne sans la marque de la maison.")
-    index.write_text(texte.replace('<!--LOGO_VERDIER-->', logo_en_ligne(), 1),
-                     encoding='utf-8')
+    if '<!--CHAPEAU_VERDIER-->' not in texte:
+        sys.exit("generer : marque <!--CHAPEAU_VERDIER--> absente de l'appli "
+                 "coupe — elle partirait en ligne sans la marque de la maison.")
+    texte = texte.replace('<!--CHAPEAU_VERDIER-->', chapeau_en_ligne(), 1)
+
+    # La VERSION, lue dans le `CACHE` du service worker — une seule valeur,
+    # jamais recopiée. Elle sert deux fois : affichée dans la pastille de
+    # l'appli, et écrite dans version.json que l'appli interroge au réseau
+    # pour savoir si elle est à jour.
+    version = version_appli_coupe()
+    if '{{VERSION}}' not in texte:
+        sys.exit("generer : marque {{VERSION}} absente de l'appli coupe — "
+                 "la pastille de version ne saurait pas quoi afficher.")
+    texte = texte.replace('{{VERSION}}', version, 1)
+    index.write_text(texte, encoding='utf-8')
+    (PUBLIC / 'coupe' / 'version.json').write_text(
+        '{"version": "%s"}\n' % version, encoding='utf-8')
 
     n = len(list((PUBLIC / 'coupe').iterdir()))
-    print(f"  appli coupe → coupe/ ({n} fichiers, logo posé, cache géré par sw.js)")
+    print(f"  appli coupe → coupe/ ({n} fichiers, {version}, chapeau posé)")
 
 
 def partage_appli_coupe() -> None:
