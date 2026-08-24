@@ -142,6 +142,15 @@ def injecter_laser(corps: str, nom: str) -> str:
 # L'appli « vitesses de coupe », servie TELLE QUELLE sur /coupe/.
 APPLI_COUPE = SITE / 'appli' / 'coupe'
 
+# Ce que voit un réseau social qui partage l'appli. Titre, description et
+# sous-titre de sa carte 1200x630 — voir partage_appli_coupe().
+COUPE_TITRE = "Vitesses de coupe"
+COUPE_DESCRIPTION = ("Calculateur d'avances et de vitesses pour le fraisage CNC : "
+                     "neuf matières du sapin à l'acier doux, bibliothèque d'outils, "
+                     "export FreeCAD. Installable, hors-ligne, rien n'est envoyé.")
+COUPE_RESUME = ("Choisir broche et avance au pied de la fraiseuse — "
+                "neuf matières, hors-ligne.")
+
 
 def matieres_coupe() -> list:
     """Lit les matières DANS le code de l'appli — jamais recopiées.
@@ -223,6 +232,67 @@ def copier_appli_coupe() -> None:
     shutil.copytree(APPLI_COUPE, PUBLIC / 'coupe')
     n = len(list((PUBLIC / 'coupe').iterdir()))
     print(f"  appli coupe → coupe/ ({n} fichiers, cache géré par sw.js)")
+
+
+def partage_appli_coupe() -> None:
+    """Donne à l'appli /coupe/ sa carte Facebook et ses balises Open Graph.
+
+    L'appli est copiée HORS du gabarit entete.html — c'est ce qui lui garde
+    son identité d'appli plein écran. Mais du coup elle n'hérite d'AUCUNE
+    balise og : partagée telle quelle sur Facebook, elle n'affichait ni image
+    ni description, juste le domaine et le titre (vu le 24/08/2026 en
+    partageant atelierduverdier.fr/coupe/). On lui fabrique donc ici la même
+    carte de marque 1200x630 que les pages sans image, et on injecte ses
+    balises dans la copie servie — automatiquement, à chaque génération, pour
+    ne plus jamais avoir à y penser.
+
+    JPEG et pas WebP : le robot de Facebook ne lit pas le WebP. Empreinte de
+    contenu dans le nom : Facebook garde longtemps la dernière carte vue, une
+    adresse figée lui ferait resservir l'ancienne après une correction.
+    """
+    try:
+        from PIL import Image  # noqa: F401
+    except ImportError:
+        sys.exit("generer : il faut Pillow pour la carte de partage de l'appli.")
+
+    cible = PUBLIC / 'partage'
+    cible.mkdir(parents=True, exist_ok=True)
+    carte = carte_partage(None, COUPE_TITRE, COUPE_RESUME)   # carte de marque
+    brut = cible / 'x-coupe.jpg'
+    carte.save(brut, 'JPEG', quality=86, optimize=True, progressive=True)
+    marque = hashlib.sha256(brut.read_bytes()).hexdigest()[:8]
+    final = cible / f'coupe.{marque}.jpg'
+    brut.replace(final)
+
+    url = f"https://{DOMAINE}/coupe/"
+    image = f"https://{DOMAINE}/partage/{final.name}"
+    def att(s):
+        return html.escape(s, quote=True)
+    balises = '\n'.join([
+        f'<link rel="canonical" href="{url}">',
+        '<meta property="og:type" content="website">',
+        '<meta property="og:site_name" content="Atelier du Verdier">',
+        '<meta property="og:locale" content="fr_FR">',
+        f'<meta property="og:title" content="{att(COUPE_TITRE)}">',
+        f'<meta property="og:description" content="{att(COUPE_DESCRIPTION)}">',
+        f'<meta property="og:url" content="{url}">',
+        f'<meta property="og:image" content="{image}">',
+        '<meta property="og:image:type" content="image/jpeg">',
+        '<meta property="og:image:width" content="1200">',
+        '<meta property="og:image:height" content="630">',
+        f'<meta property="og:image:alt" content="{att(COUPE_TITRE)}">',
+        '<meta name="twitter:card" content="summary_large_image">',
+    ])
+
+    index = PUBLIC / 'coupe' / 'index.html'
+    texte = index.read_text(encoding='utf-8')
+    ancre = '<link rel="manifest" href="./manifest.webmanifest">'
+    if ancre not in texte:
+        sys.exit("generer : ancre manifest introuvable dans l'appli coupe — "
+                 "impossible d'injecter les balises de partage.")
+    texte = texte.replace(ancre, ancre + '\n' + balises, 1)
+    index.write_text(texte, encoding='utf-8')
+    print(f"  partage appli coupe → {final.name} + balises og injectées")
 
 
 def compteur_prefixe() -> str:
@@ -773,6 +843,7 @@ def main() -> None:
 
     empreintes = copier_ressources()
     copier_appli_coupe()
+    partage_appli_coupe()
     cartes = images_partage(PAGES)
 
     if DOMAINE:
