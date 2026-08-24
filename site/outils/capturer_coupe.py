@@ -21,14 +21,20 @@ import sys
 from pathlib import Path
 
 RACINE = Path(__file__).resolve().parent.parent
-APPLI = RACINE / 'appli' / 'coupe' / 'index.html'
+# On capture l'appli TELLE QU'ELLE EST PUBLIÉE, pas la source : c'est
+# generer.py qui y pose le logo de la maison, la source ne porte qu'une
+# marque. Lancer `python3 site/generer.py` d'abord.
+APPLI = RACINE / 'public' / 'coupe' / 'index.html'
 SORTIE = RACINE / 'contenu' / 'captures' / 'appli-coupe.png'
 
 # Échelle 2 : la page fait 460 px de large au plus, on la rend à 920 pour
 # que le texte de 11 px reste net une fois en WebP.
 ECHELLE = 2
 LARGEUR = 452        # un peu plus que le .wrap (460 - marges), sans vide latéral
-HAUTEUR = 760        # jusqu'au bas de la carte des résultats
+# Jusqu'au bas de la carte des résultats, ALERTE COMPRISE : avec les réglages
+# par défaut (Ø6, plafond 1 500) l'appli avertit que l'avance dépasse ce que
+# la machine tient — c'est le garde-fou qui la distingue, il doit se voir.
+HAUTEUR = 850
 
 
 def _rogner_marges(image):
@@ -72,7 +78,8 @@ def _rogner_marges(image):
 
 def main() -> None:
     if not APPLI.exists():
-        sys.exit(f"capturer_coupe : appli introuvable ({APPLI})")
+        sys.exit(f"capturer_coupe : appli introuvable ({APPLI}).\n"
+                 f"  Lancer d'abord : python3 site/generer.py")
 
     os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
     os.environ.setdefault('QTWEBENGINE_CHROMIUM_FLAGS',

@@ -230,8 +230,22 @@ def copier_appli_coupe() -> None:
         sys.exit("generer : site/appli/coupe/ introuvable — l'appli fait "
                  "partie du site.")
     shutil.copytree(APPLI_COUPE, PUBLIC / 'coupe')
+
+    # Le logo de la maison est POSÉ ICI, jamais recopié dans l'appli : il sort
+    # de kit/logo-inline.svg comme celui des pages, donc il suit le kit. En
+    # ligne et non en <img> — son mot-symbole est en `currentColor` et suit
+    # l'encre claire de l'appli ; en <img>, il suivrait le thème du SYSTÈME et
+    # virerait au gris ardoise, illisible sur ce fond noir.
+    index = PUBLIC / 'coupe' / 'index.html'
+    texte = index.read_text(encoding='utf-8')
+    if '<!--LOGO_VERDIER-->' not in texte:
+        sys.exit("generer : marque <!--LOGO_VERDIER--> absente de l'appli coupe — "
+                 "l'appli partirait en ligne sans la marque de la maison.")
+    index.write_text(texte.replace('<!--LOGO_VERDIER-->', logo_en_ligne(), 1),
+                     encoding='utf-8')
+
     n = len(list((PUBLIC / 'coupe').iterdir()))
-    print(f"  appli coupe → coupe/ ({n} fichiers, cache géré par sw.js)")
+    print(f"  appli coupe → coupe/ ({n} fichiers, logo posé, cache géré par sw.js)")
 
 
 def partage_appli_coupe() -> None:

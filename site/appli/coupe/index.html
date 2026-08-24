@@ -27,6 +27,11 @@
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
   h1{font-size:19px; font-weight:600; margin:0; letter-spacing:-.01em;}
   .head{display:flex; align-items:center; gap:8px;}
+  /* La marque de la maison, a DROITE du titre. `margin-left:auto` la pousse
+     au bout de la ligne ; elle a le droit de retrecir (flex-shrink) pour ne
+     jamais chasser le titre sur un ecran etroit. Le mot suit currentColor. */
+  .marque{margin-left:auto; line-height:0; color:var(--txt); min-width:0; flex:0 1 auto;}
+  .marque svg{height:19px; width:auto; max-width:100%; display:block;}
   .sub{font-size:12px; color:var(--dim); margin:2px 0 18px;}
   .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); display:block; margin-bottom:5px;}
   input{width:100%; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:11px 12px; color:var(--txt); font-size:16px; font-family:ui-monospace,Menlo,monospace;}
@@ -80,6 +85,13 @@
   <div class="head">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff8a00" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18l3 3 6.4-6.4a4 4 0 0 0 5.3-5.4l-2.6 2.6-2.1-2.1z"/></svg>
     <h1>Vitesses de coupe</h1>
+    <!-- Le logo est POSE ICI PAR generer.py depuis kit/logo-inline.svg (marque
+         ci-dessous). Variante « en ligne » et non <img> : son mot-symbole est en
+         currentColor, il suit donc l'encre claire de l'appli ; en <img> il
+         suivrait le theme du SYSTEME et deviendrait gris ardoise illisible sur
+         ce fond noir des qu'un visiteur est en theme clair. Le chapeau, lui,
+         porte son lisere blanc et se detache seul. -->
+    <div class="marque"><!--LOGO_VERDIER--></div>
   </div>
   <p class="sub">Fraise carbure — des points de départ, à affiner sur la machine.</p>
 
@@ -104,14 +116,14 @@
   </div>
 
   <div class="grid2">
-    <div><label class="lbl" for="rpmMin">Broche min (tr/min)</label><input id="rpmMin" inputmode="decimal" value="8000"></div>
+    <div><label class="lbl" for="rpmMin">Broche min (tr/min)</label><input id="rpmMin" inputmode="decimal" value="1000"></div>
     <div><label class="lbl" for="rpmMax">Broche max (tr/min)</label><input id="rpmMax" inputmode="decimal" value="24000"></div>
   </div>
   <div class="grid2">
     <div><label class="lbl" for="plunge">Plongée (% de Vf)</label><input id="plunge" inputmode="decimal" value="35"></div>
     <div>
       <label class="lbl" for="vfMax">Avance max (mm/min)</label>
-      <input id="vfMax" inputmode="decimal" value="" placeholder="sans limite">
+      <input id="vfMax" inputmode="decimal" value="1500" placeholder="sans limite">
       <span class="hint">ce que la machine tient vraiment</span>
     </div>
   </div>
@@ -190,6 +202,12 @@ var MAT = {
                 note:"S235. Exigeant pour un portique : passes fines, machine rigide, air ou arrosage."}
 };
 var K_TOOLS="fs_tools", K_PREFS="fs_prefs";
+// Version des reglages machine. Les valeurs par defaut ecrites dans le HTML
+// ne servent qu'a la premiere visite : ensuite ce sont les reglages
+// enregistres qui gagnent. Quand les defauts CHANGENT (v2 : broche mini a
+// 1 000, plafond d'avance a 1 500), il faut donc les imposer une fois, sinon
+// personne ne les verrait jamais.
+var PREFS_VERSION=2;
 var material="bois_tendre", tools=[];
 
 function $(id){return document.getElementById(id);}
@@ -211,11 +229,15 @@ function recoRpm(mat,d,lo,hi){
 function loadStore(){
   try{ var t=localStorage.getItem(K_TOOLS); if(t) tools=JSON.parse(t); }catch(e){}
   try{ var p=localStorage.getItem(K_PREFS); if(p){var s=JSON.parse(p);
+    // Reglages d'une version anterieure : on garde les nouveaux defauts du
+    // HTML et on les reenregistre, plutot que de resservir les anciens.
+    if(s.v!==PREFS_VERSION){ savePrefs(); return; }
     if(s.rpmMin)$("rpmMin").value=s.rpmMin; if(s.rpmMax)$("rpmMax").value=s.rpmMax;
     if(s.plunge)$("plunge").value=s.plunge; if(s.vfMax)$("vfMax").value=s.vfMax; } }catch(e){}
 }
 function savePrefs(){
-  try{ localStorage.setItem(K_PREFS, JSON.stringify({rpmMin:$("rpmMin").value,rpmMax:$("rpmMax").value,
+  try{ localStorage.setItem(K_PREFS, JSON.stringify({v:PREFS_VERSION,
+    rpmMin:$("rpmMin").value,rpmMax:$("rpmMax").value,
     plunge:$("plunge").value,vfMax:$("vfMax").value})); }catch(e){}
 }
 function saveTools(){ try{ localStorage.setItem(K_TOOLS, JSON.stringify(tools)); }catch(e){} }

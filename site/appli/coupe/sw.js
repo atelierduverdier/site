@@ -3,7 +3,7 @@
 // (coupe-v2 -> coupe-v3 ...) — sans quoi les visiteurs gardent l'ancienne
 // version, servie par leur propre cache. Le navigateur recompare ce fichier
 // à chaque visite : c'est lui qui déclenche le renouvellement.
-const CACHE = "coupe-v4";
+const CACHE = "coupe-v5";
 const ASSETS = [
   "./",
   "./index.html",
