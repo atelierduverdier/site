@@ -277,7 +277,23 @@ function compute(){
     if(rSugg>=lo){
       alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond machine "+fr(vfMax)+" mm/min : viser "+fr(clamp(rSugg,lo,hi))+" tr/min pour garder le copeau.");
     } else {
-      alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond machine "+fr(vfMax)+" mm/min, et même à "+fr(lo)+" tr/min le copeau s'amincit : monter le plafond ou changer d'outil.");
+      // La broche mini ne suffit plus : ce n'est plus la VITESSE qu'il faut
+      // baisser, c'est le NOMBRE DE DENTS. A la broche mini, une fraise de
+      // z' dents avance de lo*fz*z' — d'ou le nombre de dents tenable.
+      // C'est la raison d'etre des fraises 1 dent en bois et en plastique
+      // sur les petites machines : elles ne sont pas un compromis, elles
+      // sont l'outil des avances lentes.
+      var zMax=Math.floor(vfMax/(lo*fz));
+      if(zMax>=1 && zMax<z){
+        alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond "+fr(vfMax)+" mm/min, et même à "
+          +fr(lo)+" tr/min une fraise "+z+" dents va trop vite. Une fraise <b>"+zMax+" dent"
+          +(zMax>1?"s":"")+"</b> donnerait "+fr(rnd(lo*fz*zMax))+" mm/min à "+fr(lo)
+          +" tr/min : c'est l'outil de cette avance-là.");
+      } else {
+        alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond "+fr(vfMax)+" mm/min, et même une "
+          +"fraise 1 dent à "+fr(lo)+" tr/min dépasse : monter le plafond, ou prendre un plus "
+          +"petit diamètre (le copeau suit le Ø).");
+      }
     }
   }
   var w=$("warn");
