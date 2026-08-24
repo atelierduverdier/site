@@ -34,7 +34,7 @@ LARGEUR = 452        # un peu plus que le .wrap (460 - marges), sans vide latér
 # Jusqu'au bas de la carte des résultats, ALERTE COMPRISE : avec les réglages
 # par défaut (Ø6, plafond 1 500) l'appli avertit que l'avance dépasse ce que
 # la machine tient — c'est le garde-fou qui la distingue, il doit se voir.
-HAUTEUR = 1120
+HAUTEUR = 1210
 
 
 def _rogner_marges(image):

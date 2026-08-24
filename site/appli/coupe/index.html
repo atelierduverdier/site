@@ -61,7 +61,13 @@
   .reset{position:absolute; right:8px; top:9px; background:none; border:none; color:var(--dim2); font-size:15px; padding:4px 6px;}
   .reset:active{color:var(--orange);}
   .hint{font-size:10px; color:var(--dim2); margin-top:3px; display:block;}
-  .card{background:var(--panel); border:1px solid var(--panel2); border-radius:12px; padding:16px; margin-bottom:8px;}
+  /* Explication d'un reglage qui ne se devine pas — plus longue qu'un hint. */
+  .aide{font-size:11px; color:var(--dim); line-height:1.5; margin:8px 0 0;
+        padding-left:10px; border-left:2px solid var(--panel2);}
+  .aide b{color:var(--txt);}
+  /* La carte des resultats est CE QU'ON VIENT CHERCHER : elle porte le
+     cadre orange de la maison pour se distinguer des champs de saisie. */
+  .card{background:var(--panel); border:2px solid var(--orange); border-radius:12px; padding:16px; margin-bottom:8px;}
   .outs{display:grid; grid-template-columns:1fr 1fr; gap:16px 16px;}
   .ro .k{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim);}
   .ro .v{font-family:ui-monospace,Menlo,monospace; color:var(--orange); line-height:1.1;}
@@ -145,23 +151,30 @@
     <span class="hint" id="hintVf"></span>
   </div>
 
-  <div class="grid2">
-    <div>
-      <label class="lbl" for="ae">Passe radiale ae (mm)</label>
-      <input id="ae" inputmode="decimal" value="" placeholder="pleine largeur">
-      <span class="hint" id="hintAe"></span>
-    </div>
-    <div><label class="lbl" for="plunge">Plongée (% de Vf)</label><input id="plunge" inputmode="decimal" value="35"></div>
+  <div class="pleine">
+    <label class="lbl" for="ae">Passe radiale ae (mm)</label>
+    <input id="ae" inputmode="decimal" value="" placeholder="pleine largeur">
+    <span class="hint" id="hintAe"></span>
+    <p class="aide">
+      La largeur de matière que la fraise mord <b>sur le côté</b>. En
+      <b>finition</b>, on ne reprend souvent que <b>0,1 à 0,5 mm</b> : le copeau
+      devient alors bien plus fin que prévu et la fraise brûle au lieu de couper
+      — l'appli corrige l'avance en conséquence. Laissé vide, c'est une pleine
+      largeur (rainure) et il n'y a rien à corriger.
+    </p>
   </div>
 
   <div class="grid2">
     <div><label class="lbl" for="rpmMin">Broche min (tr/min)</label><input id="rpmMin" inputmode="decimal" value="1000"></div>
     <div><label class="lbl" for="rpmMax">Broche max (tr/min)</label><input id="rpmMax" inputmode="decimal" value="24000"></div>
   </div>
-  <div class="pleine">
-    <label class="lbl" for="vfMax">Avance max (mm/min)</label>
-    <input id="vfMax" inputmode="decimal" value="1500" placeholder="sans limite">
-    <span class="hint">ce que la machine tient vraiment</span>
+  <div class="grid2">
+    <div><label class="lbl" for="plunge">Plongée (% de Vf)</label><input id="plunge" inputmode="decimal" value="35"></div>
+    <div>
+      <label class="lbl" for="vfMax">Avance max (mm/min)</label>
+      <input id="vfMax" inputmode="decimal" value="1500" placeholder="sans limite">
+      <span class="hint">ce que la machine tient vraiment</span>
+    </div>
   </div>
 
   <div class="card">
@@ -433,8 +446,11 @@ function compute(){
   // Le « +0.5 » n'est pas une coquetterie : sans lui, une avance calculée à
   // 1 500,05 mm/min contre un plafond réglé à 1 500 alerte pour un
   // vingtième de millimètre par minute.
+  // Tous les calculs ci-dessous passent par `fz*k` — le copeau REELLEMENT
+  // programme. Avec fz seul, deux amincissements differents proposaient la
+  // meme broche, ce qui est impossible : c'est ce qui a trahi la faute.
   if(vfMax>0 && vf>vfMax+0.5 && fz>0 && z>0){
-    var rSugg=Math.floor(vfMax/(fz*z));
+    var rSugg=Math.floor(vfMax/(fz*k*z));
     if(rSugg>=lo){
       alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond machine "+fr(vfMax)+" mm/min : viser "+fr(clamp(rSugg,lo,hi))+" tr/min pour garder le copeau.");
     } else {
@@ -444,11 +460,11 @@ function compute(){
       // C'est la raison d'etre des fraises 1 dent en bois et en plastique
       // sur les petites machines : elles ne sont pas un compromis, elles
       // sont l'outil des avances lentes.
-      var zMax=Math.floor(vfMax/(lo*fz));
+      var zMax=Math.floor(vfMax/(lo*fz*k));
       if(zMax>=1 && zMax<z){
         alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond "+fr(vfMax)+" mm/min, et même à "
           +fr(lo)+" tr/min une fraise "+z+" dents va trop vite. Une fraise <b>"+zMax+" dent"
-          +(zMax>1?"s":"")+"</b> donnerait "+fr(rnd(lo*fz*zMax))+" mm/min à "+fr(lo)
+          +(zMax>1?"s":"")+"</b> donnerait "+fr(rnd(lo*fz*k*zMax))+" mm/min à "+fr(lo)
           +" tr/min : c'est l'outil de cette avance-là.");
       } else {
         alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond "+fr(vfMax)+" mm/min, et même une "
@@ -490,9 +506,10 @@ function compute(){
     : "l'avance que vous visez";
   var ae=num($("ae").value);
   $("hintAe").textContent = (k>1.005)
-    ? "copeau aminci — avance ×"+frd(k,2)
-    : (ae>0 ? "au-delà de la demi-fraise : pas d'amincissement"
-            : "largeur réellement engagée, si passe légère");
+    ? ("copeau aminci — avance ×"+frd(k,2)
+       + (k>2 ? " : très fort, la machine plafonnera avant" : ""))
+    : (ae>0 ? "au-delà de la demi-fraise : plus d'amincissement"
+            : "vide = pleine largeur, rien à corriger");
 }
 
 function currentTool(){
