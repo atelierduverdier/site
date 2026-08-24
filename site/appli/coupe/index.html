@@ -10,8 +10,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Coupe">
 <link rel="manifest" href="./manifest.webmanifest">
+<!-- Le favicon SVG suffit au bureau, mais l'ecran d'accueil d'un telephone
+     l'ignore : iOS ne prend QUE l'apple-touch-icon PNG, Android prend les
+     PNG du manifest. Sans ces lignes, l'appli epinglee n'a pas d'icone. -->
 <link rel="icon" type="image/svg+xml" href="./icon.svg">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='38' fill='%23ff8a00'/%3E%3Ccircle cx='90' cy='90' r='52' fill='none' stroke='%2309090b' stroke-width='10'/%3E%3Cline x1='90' y1='90' x2='122' y2='62' stroke='%2309090b' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-180.png">
 <title>Vitesses de coupe</title>
 <style>
   /* Appli d'établi : UN SEUL thème, sombre — elle se lit à côté de la
@@ -58,8 +62,10 @@
   summary::-webkit-details-marker{display:none;}
   .exp{padding:16px; background:var(--bg);}
   textarea{width:100%; background:var(--panel); border:1px solid var(--panel2); border-radius:8px; padding:8px; color:var(--dim); font-family:ui-monospace,Menlo,monospace; font-size:11px; resize:vertical;}
-  .cp{background:none; border:none; color:var(--dim); font-size:12px; display:inline-flex; align-items:center; gap:4px;}
+  .cp{background:none; border:none; color:var(--dim); font-size:12px; display:inline-flex; align-items:center; gap:4px; padding:4px 0 4px 14px;}
   .cp:active{color:var(--orange);}
+  /* Le telechargement est l'action principale sur ordinateur : il se voit. */
+  .cp.dl{color:var(--orange);}
   .exprow{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
   .fctb{border:1px solid var(--panel2); border-radius:8px; padding:11px; margin-bottom:14px;}
   .fctb .t{font-size:13px; color:var(--txt); font-weight:500; margin-bottom:8px;}
@@ -134,11 +140,16 @@
   <details id="expwrap" style="display:none">
     <summary>Exporter</summary>
     <div class="exp">
-      <div class="exprow"><span class="lbl" style="margin:0">JSON — bibliothèque</span><button class="cp" id="cpJson">Copier</button></div>
+      <div class="exprow"><span class="lbl" style="margin:0">JSON — bibliothèque</span>
+        <span><button class="cp" id="dlJson">Télécharger</button><button class="cp" id="cpJson">Copier</button></span></div>
+      <p class="note">Une sauvegarde de vos outils, à reprendre sur un autre appareil.</p>
       <textarea id="jsonBox" rows="5" readonly></textarea>
       <div style="height:16px"></div>
       <span class="lbl">FreeCAD — un .fctb par outil</span>
-      <p class="note">Le .fctb porte la géométrie. Les vitesses vont dans le Tool Controller du Job : SpindleSpeed, HorizFeed, VertFeed.</p>
+      <p class="note">« Télécharger » enregistre le fichier ; à déposer dans la bibliothèque
+        d'outils de l'atelier CAM de FreeCAD. Le .fctb porte la géométrie de la fraise ;
+        les vitesses, elles, se recopient dans le Tool Controller du Job (SpindleSpeed,
+        HorizFeed, VertFeed) — d'où le second bouton, plus bas, qui les met en presse-papier.</p>
       <div id="fctbList"></div>
     </div>
   </details>
@@ -330,10 +341,13 @@ function renderExport(){
     var box=document.createElement("div"); box.className="fctb";
     var fn=t.name.replace(/[^a-z0-9]+/gi,"_")+".fctb";
     box.innerHTML="<div class='t'>"+esc(t.name)+"</div>"
-      +"<div class='exprow'><span class='hint' style='margin:0'>"+fn+"</span><button class='cp'>Copier</button></div>"
+      +"<div class='exprow'><span class='hint' style='margin:0'>"+fn+"</span>"
+      +"<span><button class='cp dl'>Télécharger</button><button class='cp'>Copier</button></span></div>"
       +"<textarea rows='6' readonly>"+esc(fctb(t))+"</textarea>"
       +"<div class='exprow' style='margin-top:6px'><span class='tc'>RPM "+t.rpm+" &middot; Vf "+t.vf+" &middot; Vz "+t.plunge+"</span><button class='cp'>Copier</button></div>";
-    var btns=box.querySelectorAll(".cp");
+    var dl=box.querySelector(".dl");
+    dl.onclick=function(){ telecharger(fn, fctb(t)); var o=dl.textContent; dl.textContent="Enregistré"; setTimeout(function(){dl.textContent=o;},1200); };
+    var btns=box.querySelectorAll(".cp:not(.dl)");
     btns[0].onclick=function(){ copy(fctb(t), btns[0]); };
     btns[1].onclick=function(){ copy("SpindleSpeed="+t.rpm+"\nHorizFeed="+t.vf+" mm/min\nVertFeed="+t.plunge+" mm/min", btns[1]); };
     c.appendChild(box);
@@ -347,6 +361,16 @@ function copy(text,btn){
 function fallback(text){
   var ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select();
   try{document.execCommand("copy");}catch(e){} document.body.removeChild(ta);
+}
+// Vraie ecriture d'un fichier sur le disque (pas le presse-papier) : sur
+// ordinateur, c'est ce qu'on veut pour deposer le .fctb dans la
+// bibliotheque d'outils de FreeCAD sans le recreer a la main.
+function telecharger(nomFichier, contenu){
+  var blob=new Blob([contenu], {type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a"); a.href=url; a.download=nomFichier;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
 }
 
 // --- démarrage ---
@@ -375,6 +399,10 @@ $("save").onclick=function(){
   var b=$("save"), o=b.textContent; b.textContent="OK"; setTimeout(function(){b.textContent=o;},1200);
 };
 $("cpJson").onclick=function(){ copy($("jsonBox").value, $("cpJson")); };
+$("dlJson").onclick=function(){
+  telecharger("outils-vitesses-coupe.json", $("jsonBox").value);
+  var b=$("dlJson"), o=b.textContent; b.textContent="Enregistré"; setTimeout(function(){b.textContent=o;},1200);
+};
 
 compute();
 renderLib();

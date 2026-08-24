@@ -3,12 +3,15 @@
 // (coupe-v2 -> coupe-v3 ...) — sans quoi les visiteurs gardent l'ancienne
 // version, servie par leur propre cache. Le navigateur recompare ce fichier
 // à chaque visite : c'est lui qui déclenche le renouvellement.
-const CACHE = "coupe-v2";
+const CACHE = "coupe-v3";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./icon.svg"
+  "./icon.svg",
+  "./icon-180.png",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", function(e){
