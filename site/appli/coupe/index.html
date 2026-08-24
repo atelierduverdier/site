@@ -153,7 +153,10 @@
 
   <div class="pleine">
     <label class="lbl" for="ae">Passe radiale ae (mm) — la largeur, pas la profondeur</label>
-    <input id="ae" inputmode="decimal" value="0.5" placeholder="pleine largeur">
+    <!-- VIDE par defaut, et c'est le choix sur : le detourage pleine largeur
+         est le cas courant, et un 0,5 oublie dans ce champ donnerait une
+         avance 1,81 fois trop rapide sur une rainure. -->
+    <input id="ae" inputmode="decimal" value="" placeholder="pleine largeur">
     <span class="hint" id="hintAe"></span>
     <p class="aide">
       Ce que la fraise mord <b>sur le côté</b>, à plat, perpendiculairement à sa
