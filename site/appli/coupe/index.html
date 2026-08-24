@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#09090b">
+<meta name="description" content="Calculateur de vitesses de coupe pour le fraisage CNC : neuf matières du sapin à l'acier doux, bibliothèque d'outils, export FreeCAD. Fonctionne hors-ligne.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Coupe">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='38' fill='%23ff8a00'/%3E%3Ccircle cx='90' cy='90' r='52' fill='none' stroke='%2309090b' stroke-width='10'/%3E%3Cline x1='90' y1='90' x2='122' y2='62' stroke='%2309090b' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Vitesses de coupe</title>
+<style>
+  /* Appli d'établi : UN SEUL thème, sombre — elle se lit à côté de la
+     machine, souvent en plein soleil d'atelier, et le blanc éblouit. */
+  :root{ --bg:#09090b; --panel:#18181b; --panel2:#27272a; --line:#3f3f46; --txt:#e4e4e7; --dim:#71717a; --dim2:#52525b; --orange:#ff8a00; }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:env(safe-area-inset-top) 0 0;}
+  .wrap{max-width:460px; margin:0 auto; padding:22px 16px 48px;}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  h1{font-size:19px; font-weight:600; margin:0; letter-spacing:-.01em;}
+  .head{display:flex; align-items:center; gap:8px;}
+  .sub{font-size:12px; color:var(--dim); margin:2px 0 18px;}
+  .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); display:block; margin-bottom:5px;}
+  input{width:100%; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:11px 12px; color:var(--txt); font-size:16px; font-family:ui-monospace,Menlo,monospace;}
+  input:focus{outline:none; border-color:var(--orange);}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;}
+  .mats{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:20px;}
+  .mat{padding:11px 2px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--txt); font-size:13px; font-weight:500;}
+  .mat.on{background:var(--orange); border-color:var(--orange); color:#000;}
+  .fieldwrap{position:relative;}
+  .reset{position:absolute; right:8px; top:9px; background:none; border:none; color:var(--dim2); font-size:15px; padding:4px 6px;}
+  .reset:active{color:var(--orange);}
+  .hint{font-size:10px; color:var(--dim2); margin-top:3px; display:block;}
+  .card{background:var(--panel); border:1px solid var(--panel2); border-radius:12px; padding:16px; margin-bottom:8px;}
+  .outs{display:grid; grid-template-columns:1fr 1fr; gap:16px 16px;}
+  .ro .k{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim);}
+  .ro .v{font-family:ui-monospace,Menlo,monospace; color:var(--orange); line-height:1.1;}
+  .ro .v.big{font-size:34px;} .ro .v{font-size:22px;}
+  .ro .u{color:var(--dim); font-size:11px; margin-left:4px; font-family:-apple-system,sans-serif;}
+  .foot{margin-top:14px; padding-top:12px; border-top:1px solid var(--panel2); font-size:11px; color:var(--dim);}
+  .warn{margin-top:8px; font-size:11px; color:var(--orange); line-height:1.5;}
+  .saverow{display:flex; gap:8px; margin:20px 0 24px;}
+  .saverow input{flex:1;}
+  .btn{border:none; border-radius:9px; font-size:14px; font-weight:500; padding:0 16px;}
+  .btn.pri{background:var(--orange); color:#000;}
+  .seclbl{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); margin-bottom:10px;}
+  .tool{display:flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--panel2); border-radius:9px; padding:9px 12px; margin-bottom:8px;}
+  .tool .load{flex:1; text-align:left; background:none; border:none; color:var(--txt); padding:0;}
+  .tool .nm{font-size:14px;} .tool .meta{font-size:11px; color:var(--dim); font-family:ui-monospace,Menlo,monospace; margin-top:2px;}
+  .del{background:none; border:none; color:var(--dim2); font-size:18px; padding:4px 8px;}
+  .del:active{color:#f87171;}
+  details{border:1px solid var(--panel2); border-radius:12px; overflow:hidden; margin-top:4px;}
+  summary{list-style:none; padding:13px 16px; font-size:14px; color:var(--txt); background:var(--panel); cursor:pointer;}
+  summary::-webkit-details-marker{display:none;}
+  .exp{padding:16px; background:var(--bg);}
+  textarea{width:100%; background:var(--panel); border:1px solid var(--panel2); border-radius:8px; padding:8px; color:var(--dim); font-family:ui-monospace,Menlo,monospace; font-size:11px; resize:vertical;}
+  .cp{background:none; border:none; color:var(--dim); font-size:12px; display:inline-flex; align-items:center; gap:4px;}
+  .cp:active{color:var(--orange);}
+  .exprow{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+  .fctb{border:1px solid var(--panel2); border-radius:8px; padding:11px; margin-bottom:14px;}
+  .fctb .t{font-size:13px; color:var(--txt); font-weight:500; margin-bottom:8px;}
+  .tc{font-size:11px; color:var(--orange); font-family:ui-monospace,Menlo,monospace;}
+  .note{font-size:11px; color:var(--dim); line-height:1.5; margin:0 0 12px;}
+  .basdepage{margin-top:28px; font-size:11px; color:var(--dim2); text-align:center;}
+  .basdepage a{color:var(--dim); text-decoration:none; border-bottom:1px solid var(--panel2);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff8a00" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18l3 3 6.4-6.4a4 4 0 0 0 5.3-5.4l-2.6 2.6-2.1-2.1z"/></svg>
+    <h1>Vitesses de coupe</h1>
+  </div>
+  <p class="sub">Fraise carbure — des points de départ, à affiner sur la machine.</p>
+
+  <div class="mats" id="mats"></div>
+
+  <div class="grid2">
+    <div><label class="lbl" for="D">Diamètre (mm)</label><input id="D" inputmode="decimal" value="6"></div>
+    <div><label class="lbl" for="Z">Dents (Z)</label><input id="Z" inputmode="decimal" value="2"></div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <label class="lbl" for="rpm">Vitesse broche (tr/min)</label>
+      <div class="fieldwrap"><input id="rpm" inputmode="decimal" value="24000"><button class="reset" data-r="rpm" aria-label="Revenir à la broche conseillée">&#8635;</button></div>
+      <span class="hint" id="hintRpm"></span>
+    </div>
+    <div>
+      <label class="lbl" for="fz">fz (mm/dent)</label>
+      <div class="fieldwrap"><input id="fz" inputmode="decimal" value="0.15"><button class="reset" data-r="fz" aria-label="Revenir au fz conseillé">&#8635;</button></div>
+      <span class="hint" id="hintFz"></span>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div><label class="lbl" for="rpmMin">Broche min (tr/min)</label><input id="rpmMin" inputmode="decimal" value="8000"></div>
+    <div><label class="lbl" for="rpmMax">Broche max (tr/min)</label><input id="rpmMax" inputmode="decimal" value="24000"></div>
+  </div>
+  <div class="grid2">
+    <div><label class="lbl" for="plunge">Plongée (% de Vf)</label><input id="plunge" inputmode="decimal" value="35"></div>
+    <div>
+      <label class="lbl" for="vfMax">Avance max (mm/min)</label>
+      <input id="vfMax" inputmode="decimal" value="" placeholder="sans limite">
+      <span class="hint">ce que la machine tient vraiment</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="outs">
+      <div class="ro"><div class="k">Avance Vf</div><div class="v big"><span id="oVf">0</span><span class="u">mm/min</span></div></div>
+      <div class="ro"><div class="k">Plongée Vz</div><div class="v big"><span id="oVz">0</span><span class="u">mm/min</span></div></div>
+      <div class="ro"><div class="k">Broche</div><div class="v"><span id="oRpm">0</span><span class="u">tr/min</span></div></div>
+      <div class="ro"><div class="k">Avance/tour</div><div class="v"><span id="oFpr">0</span><span class="u">mm/tr</span></div></div>
+    </div>
+    <div class="foot" id="foot"></div>
+    <div class="warn" id="warn" style="display:none"></div>
+  </div>
+
+  <div class="saverow">
+    <input id="tname" placeholder="Nom de l'outil">
+    <button class="btn pri" id="save">Enregistrer</button>
+  </div>
+
+  <div id="libwrap" style="display:none">
+    <div class="seclbl" id="libttl"></div>
+    <div id="lib"></div>
+  </div>
+
+  <details id="expwrap" style="display:none">
+    <summary>Exporter</summary>
+    <div class="exp">
+      <div class="exprow"><span class="lbl" style="margin:0">JSON — bibliothèque</span><button class="cp" id="cpJson">Copier</button></div>
+      <textarea id="jsonBox" rows="5" readonly></textarea>
+      <div style="height:16px"></div>
+      <span class="lbl">FreeCAD — un .fctb par outil</span>
+      <p class="note">Le .fctb porte la géométrie. Les vitesses vont dans le Tool Controller du Job : SpindleSpeed, HorizFeed, VertFeed.</p>
+      <div id="fctbList"></div>
+    </div>
+  </details>
+
+  <p class="basdepage">
+    Vos outils restent dans ce navigateur, rien n'est envoyé.<br>
+    <a href="../logiciels/vitesses-coupe.html">D'où viennent ces valeurs</a> ·
+    <a href="https://atelierduverdier.fr/">Atelier du Verdier</a>
+  </p>
+</div>
+
+<script>
+"use strict";
+// Points de départ pour fraise CARBURE sur portique amateur, cohérents avec
+// les tables constructeur (Sorotec, Datron) pour cette classe de machine.
+// fzPerMm : charge par dent PROPORTIONNELLE au diamètre (fz = fzPerMm × Ø).
+// mode "rpm" : broche au max, c'est la charge/dent qui pilote (bois, MDF...).
+// mode "vc"  : broche calculée depuis la vitesse de coupe Vc (métaux, plastiques).
+// ap : profondeur de passe conseillée, en multiples du diamètre.
+var MAT = {
+  bois_tendre: {label:"Bois tendre", vcNum:null, fzPerMm:0.025,  mode:"rpm", apLow:0.5, apHigh:1.0,
+                note:"Pin, sapin, peuplier. Copeau franc : trop lent, ça chauffe et ça brûle."},
+  bois_dur:    {label:"Bois dur",    vcNum:null, fzPerMm:0.018,  mode:"rpm", apLow:0.4, apHigh:0.8,
+                note:"Chêne, hêtre, frêne. Un bois qui brûle est presque toujours fraisé trop lentement."},
+  cp:          {label:"Contreplaqué",vcNum:null, fzPerMm:0.017,  mode:"rpm", apLow:0.4, apHigh:0.8,
+                note:"Les colles usent le carbure plus vite que le bois lui-même."},
+  mdf:         {label:"MDF",         vcNum:null, fzPerMm:0.0217, mode:"rpm", apLow:0.5, apHigh:1.0,
+                note:"Poussière très fine : aspiration indispensable."},
+  pmma:        {label:"Plexi",       vcNum:250,  fzPerMm:0.011,  mode:"vc",  apLow:0.3, apHigh:0.5,
+                note:"PMMA. Une dent de préférence, gros copeau : un copeau trop fin fond au lieu de couper."},
+  pom:         {label:"POM",         vcNum:250,  fzPerMm:0.013,  mode:"vc",  apLow:0.3, apHigh:0.5,
+                note:"Delrin. S'usine remarquablement bien ; surveiller les copeaux longs."},
+  alu:         {label:"Alu",         vcNum:200,  fzPerMm:0.00833,mode:"vc",  apLow:0.3, apHigh:0.5,
+                note:"Lubrification conseillée, bonne évacuation des copeaux — sinon l'alu colle à la fraise."},
+  laiton:      {label:"Laiton",      vcNum:150,  fzPerMm:0.00667,mode:"vc",  apLow:0.3, apHigh:0.5,
+                note:"Laiton de décolletage : usinage facile."},
+  acier:       {label:"Acier doux",  vcNum:80,   fzPerMm:0.004,  mode:"vc",  apLow:0.1, apHigh:0.2,
+                note:"S235. Exigeant pour un portique : passes fines, machine rigide, air ou arrosage."}
+};
+var K_TOOLS="fs_tools", K_PREFS="fs_prefs";
+var material="bois_tendre", tools=[];
+
+function $(id){return document.getElementById(id);}
+function num(s){var v=parseFloat(String(s).replace(",",".")); return isFinite(v)?v:0;}
+function clamp(v,lo,hi){return Math.min(Math.max(v,lo),hi);}
+function rnd(v,d){d=d||0; var p=Math.pow(10,d); return Math.round(v*p)/p;}
+function fr(n){return n.toLocaleString("fr-FR");}
+// Pour l'AFFICHAGE seulement : virgule française. Les champs de saisie
+// gardent le point (num() accepte les deux à la lecture).
+function frd(n,d){return n.toLocaleString("fr-FR",{maximumFractionDigits:d});}
+
+function recoFz(mat,d){return rnd(MAT[mat].fzPerMm*d,3);}
+function recoRpm(mat,d,lo,hi){
+  if(MAT[mat].mode==="rpm") return hi;
+  return clamp(Math.round((MAT[mat].vcNum*1000)/(Math.PI*(d||1))),lo,hi);
+}
+
+// --- persistance (locale au navigateur, rien ne part) ---
+function loadStore(){
+  try{ var t=localStorage.getItem(K_TOOLS); if(t) tools=JSON.parse(t); }catch(e){}
+  try{ var p=localStorage.getItem(K_PREFS); if(p){var s=JSON.parse(p);
+    if(s.rpmMin)$("rpmMin").value=s.rpmMin; if(s.rpmMax)$("rpmMax").value=s.rpmMax;
+    if(s.plunge)$("plunge").value=s.plunge; if(s.vfMax)$("vfMax").value=s.vfMax; } }catch(e){}
+}
+function savePrefs(){
+  try{ localStorage.setItem(K_PREFS, JSON.stringify({rpmMin:$("rpmMin").value,rpmMax:$("rpmMax").value,
+    plunge:$("plunge").value,vfMax:$("vfMax").value})); }catch(e){}
+}
+function saveTools(){ try{ localStorage.setItem(K_TOOLS, JSON.stringify(tools)); }catch(e){} }
+
+// --- matières ---
+function buildMats(){
+  var m=$("mats"); m.innerHTML="";
+  Object.keys(MAT).forEach(function(k){
+    var b=document.createElement("button");
+    b.className="mat"+(k===material?" on":""); b.textContent=MAT[k].label;
+    b.onclick=function(){ applyMat(k); };
+    m.appendChild(b);
+  });
+}
+function applyMat(k){
+  material=k;
+  var d=num($("D").value), lo=num($("rpmMin").value), hi=num($("rpmMax").value);
+  $("fz").value=recoFz(k,d);
+  $("rpm").value=recoRpm(k,d,lo,hi);
+  buildMats(); compute();
+}
+function onDiam(){
+  var d=num($("D").value), lo=num($("rpmMin").value), hi=num($("rpmMax").value);
+  $("fz").value=recoFz(material,d);
+  $("rpm").value=recoRpm(material,d,lo,hi);
+  compute();
+}
+
+// --- calcul ---
+function compute(){
+  var d=num($("D").value), z=num($("Z").value), fz=num($("fz").value);
+  var lo=num($("rpmMin").value), hi=num($("rpmMax").value);
+  var rpmE=Math.round(num($("rpm").value));
+  var rpm=clamp(rpmE,lo,hi);
+  var vc=(Math.PI*d*rpm)/1000;
+  var vf=rpm*fz*z;
+  var vz=vf*(num($("plunge").value)/100);
+  var fpr=fz*z;
+  var vfMax=num($("vfMax").value);
+  $("oVf").textContent=fr(rnd(vf));
+  $("oVz").textContent=fr(rnd(vz));
+  $("oRpm").textContent=fr(rpm);
+  $("oFpr").textContent=frd(fpr,3);
+  $("foot").innerHTML="Passe conseillée (Ap) : "+frd(MAT[material].apLow*d,1)+"&ndash;"+frd(MAT[material].apHigh*d,1)+" mm &nbsp;&middot;&nbsp; Vc "+rnd(vc,0)+" m/min &nbsp;&middot;&nbsp; "+MAT[material].note;
+
+  var alertes=[];
+  if(rpmE!==rpm) alertes.push(fr(rpmE)+" tr/min hors limites broche, ramené à "+fr(rpm)+".");
+  // La broche mini peut FORCER la vitesse de coupe au-delà de la cible :
+  // acier ou laiton en petit diamètre. Le calcul clignote plutôt que de
+  // laisser croire que tout va bien — c'est l'arête qui paie, sinon.
+  if(MAT[material].mode==="vc" && MAT[material].vcNum && vc>MAT[material].vcNum*1.25){
+    alertes.push("Vc réelle "+rnd(vc,0)+" m/min, au-delà du point de départ ("+MAT[material].vcNum+") : la broche ne descend pas assez pour ce Ø — usure accélérée.");
+  }
+  // Une avance que la machine ne tient pas ne fait pas gagner de temps :
+  // le copeau réel s'amincit et la fraise frotte. On propose la broche qui
+  // garde la charge par dent SOUS le plafond.
+  if(vfMax>0 && vf>vfMax && fz>0 && z>0){
+    var rSugg=Math.floor(vfMax/(fz*z));
+    if(rSugg>=lo){
+      alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond machine "+fr(vfMax)+" mm/min : viser "+fr(clamp(rSugg,lo,hi))+" tr/min pour garder le copeau.");
+    } else {
+      alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond machine "+fr(vfMax)+" mm/min, et même à "+fr(lo)+" tr/min le copeau s'amincit : monter le plafond ou changer d'outil.");
+    }
+  }
+  var w=$("warn");
+  if(alertes.length){ w.style.display="block"; w.innerHTML=alertes.join("<br>"); }
+  else w.style.display="none";
+  // rappels sous les champs
+  $("hintRpm").textContent="conseillé : "+fr(recoRpm(material,d,lo,hi));
+  $("hintFz").textContent="conseillé : "+frd(recoFz(material,d),3);
+}
+
+function currentTool(){
+  var d=num($("D").value), z=num($("Z").value), fz=num($("fz").value);
+  var lo=num($("rpmMin").value), hi=num($("rpmMax").value);
+  var rpm=clamp(Math.round(num($("rpm").value)),lo,hi);
+  var vf=rpm*fz*z, vz=vf*(num($("plunge").value)/100);
+  var nm=$("tname").value.trim() || (MAT[material].label+" "+d+"mm Z"+z);
+  return {name:nm, material:material, matLabel:MAT[material].label, D:d, Z:z, fz:fz, rpm:rpm, vf:rnd(vf), plunge:rnd(vz)};
+}
+
+// --- bibliothèque ---
+function renderLib(){
+  var w=$("libwrap");
+  if(!tools.length){ w.style.display="none"; renderExport(); return; }
+  w.style.display="block";
+  $("libttl").textContent="Bibliothèque ("+tools.length+")";
+  var c=$("lib"); c.innerHTML="";
+  tools.forEach(function(t){
+    var row=document.createElement("div"); row.className="tool";
+    var b=document.createElement("button"); b.className="load";
+    b.innerHTML="<div class='nm'>"+esc(t.name)+"</div><div class='meta'>"+esc(t.matLabel)+" &middot; Ø"+t.D+" Z"+t.Z+" &middot; "+fr(t.rpm)+" tr/min &middot; "+t.vf+" mm/min</div>";
+    b.onclick=function(){ loadTool(t); };
+    var del=document.createElement("button"); del.className="del"; del.innerHTML="&#128465;";
+    del.setAttribute("aria-label","Supprimer "+t.name);
+    del.onclick=function(){ tools=tools.filter(function(x){return x.name!==t.name;}); saveTools(); renderLib(); };
+    row.appendChild(b); row.appendChild(del); c.appendChild(row);
+  });
+  renderExport();
+}
+function loadTool(t){
+  material=(t.material in MAT)?t.material:"bois_tendre";
+  $("D").value=t.D; $("Z").value=t.Z; $("fz").value=t.fz; $("rpm").value=t.rpm; $("tname").value=t.name;
+  buildMats(); compute();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+
+// --- export ---
+function fctb(t){
+  return JSON.stringify({version:2,name:t.name,shape:"endmill.fcstd",parameter:{
+    Diameter:t.D+" mm", Flutes:t.Z, Chipload:t.fz+" mm",
+    CuttingEdgeHeight:(t.D*3).toFixed(2)+" mm", Length:(t.D*8).toFixed(2)+" mm",
+    ShankDiameter:t.D+" mm", Material:"Carbide"}, attribute:{}}, null, 2);
+}
+function renderExport(){
+  var w=$("expwrap");
+  if(!tools.length){ w.style.display="none"; return; }
+  w.style.display="block";
+  $("jsonBox").value=JSON.stringify(tools,null,2);
+  var c=$("fctbList"); c.innerHTML="";
+  tools.forEach(function(t){
+    var box=document.createElement("div"); box.className="fctb";
+    var fn=t.name.replace(/[^a-z0-9]+/gi,"_")+".fctb";
+    box.innerHTML="<div class='t'>"+esc(t.name)+"</div>"
+      +"<div class='exprow'><span class='hint' style='margin:0'>"+fn+"</span><button class='cp'>Copier</button></div>"
+      +"<textarea rows='6' readonly>"+esc(fctb(t))+"</textarea>"
+      +"<div class='exprow' style='margin-top:6px'><span class='tc'>RPM "+t.rpm+" &middot; Vf "+t.vf+" &middot; Vz "+t.plunge+"</span><button class='cp'>Copier</button></div>";
+    var btns=box.querySelectorAll(".cp");
+    btns[0].onclick=function(){ copy(fctb(t), btns[0]); };
+    btns[1].onclick=function(){ copy("SpindleSpeed="+t.rpm+"\nHorizFeed="+t.vf+" mm/min\nVertFeed="+t.plunge+" mm/min", btns[1]); };
+    c.appendChild(box);
+  });
+}
+function copy(text,btn){
+  var done=function(){ var o=btn.textContent; btn.textContent="Copié"; setTimeout(function(){btn.textContent=o;},1200); };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done,function(){fallback(text);done();}); }
+  else { fallback(text); done(); }
+}
+function fallback(text){
+  var ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select();
+  try{document.execCommand("copy");}catch(e){} document.body.removeChild(ta);
+}
+
+// --- démarrage ---
+loadStore();
+buildMats();
+["D","Z","rpm","fz","rpmMin","rpmMax","plunge","vfMax","tname"].forEach(function(id){
+  $(id).addEventListener("input", function(){
+    if(id==="D"){ onDiam(); }
+    else { compute(); }
+    if(id==="rpmMin"||id==="rpmMax"||id==="plunge"||id==="vfMax") savePrefs();
+  });
+});
+document.querySelectorAll(".reset").forEach(function(b){
+  b.onclick=function(){
+    var d=num($("D").value), lo=num($("rpmMin").value), hi=num($("rpmMax").value);
+    if(b.dataset.r==="rpm") $("rpm").value=recoRpm(material,d,lo,hi);
+    else $("fz").value=recoFz(material,d);
+    compute();
+  };
+});
+$("save").onclick=function(){
+  var t=currentTool();
+  var i=-1; for(var k=0;k<tools.length;k++){ if(tools[k].name===t.name){i=k;break;} }
+  if(i>=0) tools[i]=t; else tools.push(t);
+  saveTools(); renderLib();
+  var b=$("save"), o=b.textContent; b.textContent="OK"; setTimeout(function(){b.textContent=o;},1200);
+};
+$("cpJson").onclick=function(){ copy($("jsonBox").value, $("cpJson")); };
+
+compute();
+renderLib();
+
+// Enregistrement du service worker : c'est lui qui rend l'appli disponible
+// hors-ligne une fois qu'elle a été ouverte une première fois.
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("./sw.js").catch(function(){});
+  });
+}
+</script>
+
+<!-- Fréquentation : même compteur GoatCounter que le reste du site, même
+     préfixe /portail que les pages du portail (voir kit/pied.html). Chargé
+     en dernier et asynchrone : hors-ligne, il échoue en silence et l'appli
+     ne s'en aperçoit pas. -->
+<script>
+  window.goatcounter = { path: function (p) { return '/portail' + p } };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

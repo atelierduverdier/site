@@ -12,6 +12,7 @@
 # y éditer à la main, tout part de contenu/ et de kit/.
 # =========================================================================
 
+import html
 import re
 import hashlib
 import shutil
@@ -138,6 +139,92 @@ def injecter_laser(corps: str, nom: str) -> str:
     return corps
 
 
+# L'appli « vitesses de coupe », servie TELLE QUELLE sur /coupe/.
+APPLI_COUPE = SITE / 'appli' / 'coupe'
+
+
+def matieres_coupe() -> list:
+    """Lit les matières DANS le code de l'appli — jamais recopiées.
+
+    Le tableau de la fiche sort du même `MAT` que les boutons de l'appli :
+    une valeur retouchée dans l'appli met la fiche à jour à la génération
+    suivante. C'est la règle VERSION, appliquée aux vitesses de coupe.
+    """
+    source = APPLI_COUPE / 'index.html'
+    if not source.exists():
+        sys.exit(f"generer : {source} introuvable — l'appli fait partie du site.")
+    texte = source.read_text(encoding='utf-8')
+    bloc = re.search(r'var MAT = \{(.*?)\n\};', texte, re.S)
+    if not bloc:
+        sys.exit("generer : bloc « var MAT = {...}; » introuvable dans l'appli coupe.")
+    motif = (r'\{label:"([^"]+)",\s*vcNum:(null|[\d.]+),\s*fzPerMm:([\d.]+),'
+             r'\s*mode:"(rpm|vc)",\s*apLow:([\d.]+),\s*apHigh:([\d.]+),'
+             r'\s*note:"([^"]*)"\}')
+    matieres = [
+        {'label': label,
+         'vc': None if vc == 'null' else float(vc),
+         'fz_par_mm': float(fz), 'mode': mode,
+         'ap_lo': float(ap_lo), 'ap_hi': float(ap_hi), 'note': note}
+        for label, vc, fz, mode, ap_lo, ap_hi, note
+        in re.findall(motif, bloc.group(1))
+    ]
+    if not matieres:
+        sys.exit("generer : aucune matière lue dans l'appli coupe — le motif "
+                 "ne colle plus à l'écriture de MAT.")
+    return matieres
+
+
+def _nombre_fr(x: float, dec: int) -> str:
+    """1.50 -> « 1,5 », 6.0 -> « 6 » : virgule française, zéros inutiles ôtés."""
+    s = f'{x:.{dec}f}'.rstrip('0').rstrip('.')
+    return (s or '0').replace('.', ',')
+
+
+def injecter_coupe(corps: str, nom: str) -> str:
+    """Remplace {{coupe.nb}} et {{coupe:table_matieres}} depuis l'appli.
+
+    Le tableau est donné pour une fraise de 6 mm — le diamètre par défaut de
+    l'appli — parce que fz et la passe y sont proportionnels au diamètre :
+    une seule colonne d'exemple suffit à situer les ordres de grandeur.
+    """
+    if '{{coupe' not in corps:
+        return corps
+    lignes = []
+    for m in matieres_coupe():
+        broche = ('au maximum' if m['mode'] == 'rpm'
+                  else f"Vc {_nombre_fr(m['vc'], 0)} m/min")
+        fz6 = _nombre_fr(m['fz_par_mm'] * 6, 3)
+        passe = f"{_nombre_fr(m['ap_lo'] * 6, 1)}–{_nombre_fr(m['ap_hi'] * 6, 1)}"
+        lignes.append(f'<tr><td>{html.escape(m["label"])}</td>'
+                      f'<td class="num">{broche}</td>'
+                      f'<td class="num">{fz6}</td>'
+                      f'<td class="num">{passe}</td>'
+                      f'<td>{html.escape(m["note"])}</td></tr>')
+    corps = corps.replace('{{coupe:table_matieres}}', '\n          '.join(lignes))
+    corps = corps.replace('{{coupe.nb}}', str(len(matieres_coupe())))
+    reste = re.findall(r'\{\{coupe[^}]*\}\}', corps)
+    if reste:
+        sys.exit(f"{nom} : marque coupe non résolue : {reste[0]}")
+    return corps
+
+
+def copier_appli_coupe() -> None:
+    """Recopie l'appli « vitesses de coupe » TELLE QUELLE dans public/coupe/.
+
+    Pas d'empreinte de contenu dans les noms, et c'est voulu : l'appli
+    embarque un service worker, et c'est LUI la politique de cache — la
+    constante CACHE de sw.js, à incrémenter à chaque retouche de l'appli.
+    Ses chemins (start_url du manifest, sw.js) doivent rester stables pour
+    que les téléphones qui l'ont installée la retrouvent.
+    """
+    if not APPLI_COUPE.is_dir():
+        sys.exit("generer : site/appli/coupe/ introuvable — l'appli fait "
+                 "partie du site.")
+    shutil.copytree(APPLI_COUPE, PUBLIC / 'coupe')
+    n = len(list((PUBLIC / 'coupe').iterdir()))
+    print(f"  appli coupe → coupe/ ({n} fichiers, cache géré par sw.js)")
+
+
 def compteur_prefixe() -> str:
     """Le bout de script qui préfixe les chemins remontés au compteur.
 
@@ -240,6 +327,19 @@ PAGES = [
         'sous_titre': 'pupitre Graphtec',
         'resume': "Pilotage du traceur de découpe Graphtec CE6000-60 sous Linux, sans "
                   "driver constructeur. Code public, GPL-3.0.",
+    },
+    {
+        'contenu': 'vitesses-coupe.html',
+        'sortie': 'logiciels/vitesses-coupe.html',
+        'partage': CONTENU / 'captures' / 'appli-coupe.png',
+        'titre': "Vitesses de coupe — l'abaque dans la poche",
+        'description': "Appli web de poche pour choisir broche et avance au pied de "
+                       "la fraiseuse : neuf matières du sapin à l'acier doux, "
+                       "bibliothèque d'outils locale, export FreeCAD. Hors-ligne "
+                       "une fois ouverte, rien n'est envoyé.",
+        'sous_titre': 'vitesses de coupe',
+        'resume': "Calculateur d'avances et de vitesses pour le fraisage CNC : "
+                  "neuf matières, hors-ligne, rien n'est envoyé.",
     },
     {
         'contenu': 'projets.html',
@@ -672,6 +772,7 @@ def main() -> None:
     logo = logo_en_ligne()
 
     empreintes = copier_ressources()
+    copier_appli_coupe()
     cartes = images_partage(PAGES)
 
     if DOMAINE:
@@ -690,6 +791,7 @@ def main() -> None:
         corps = injecter_valeurs_atc(corps, page['contenu'])
         corps = injecter_laser(corps, page['contenu'])
         corps = injecter_fcstd(corps, page['contenu'])
+        corps = injecter_coupe(corps, page['contenu'])
         corps = corps.replace('{{LOGO}}', logo)
         corps = corps.replace('{{RACINE}}', prefixe)
         corps = empreinter(corps, empreintes)

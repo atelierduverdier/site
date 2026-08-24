@@ -1,0 +1,216 @@
+<!-- Vitesses de coupe — la fiche de l'appli servie sur /coupe/.
+     LE TABLEAU DES MATIÈRES N'EST PAS ÉCRIT ICI : il est engendré en lisant
+     le MAT de site/appli/coupe/index.html ({{coupe:table_matieres}}), pour
+     la même raison que les cotes ATC — une valeur écrite deux fois finit
+     toujours par diverger. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">{{coupe.nb}} matières</span>
+          <span class="badge">hors-ligne</span>
+          <span class="badge">rien n'est envoyé</span>
+        </div>
+        <h1>L'abaque de coupe, dans la poche</h1>
+        <p class="lede">
+          Une appli web de poche pour choisir la broche et l'avance au pied de la
+          fraiseuse : on tape un diamètre, on touche une matière, et les quatre
+          nombres à reporter dans FreeCAD ou sur le pupitre sont là. Ouverte une
+          fois, elle fonctionne ensuite sans réseau — l'atelier n'en a pas toujours.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="{{RACINE}}coupe/">Ouvrir l'appli</a>
+          <a class="btn btn-ghost" href="#matieres">Les valeurs</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <svg style="font-size:10px" viewBox="0 0 340 250" role="img"
+             aria-label="L'appli sur un téléphone : matières, champs de saisie, et l'avance calculée en gros chiffres">
+          <g class="figure">
+            <rect x="115" y="15" width="115" height="220" rx="16" fill="var(--card)" stroke="var(--fg)" stroke-width="1.8"/>
+            <rect x="124" y="32" width="30" height="14" rx="4" fill="var(--bg-3)" stroke="var(--fg-3)" stroke-width="1"/>
+            <rect x="158" y="32" width="30" height="14" rx="4" fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.4"/>
+            <rect x="192" y="32" width="30" height="14" rx="4" fill="var(--bg-3)" stroke="var(--fg-3)" stroke-width="1"/>
+            <rect x="124" y="56" width="46" height="12" rx="3" fill="var(--bg-3)"/>
+            <rect x="176" y="56" width="46" height="12" rx="3" fill="var(--bg-3)"/>
+            <text x="172" y="108" text-anchor="middle" class="orange" style="font-size:24px;font-weight:700">7 200</text>
+            <text x="172" y="122" text-anchor="middle" class="petit">mm/min</text>
+            <circle cx="172" cy="168" r="27" fill="none" stroke="var(--fg)" stroke-width="1.8"/>
+            <line x1="172" y1="168" x2="190" y2="152" stroke="var(--orange)" stroke-width="2.4" stroke-linecap="round"/>
+            <line x1="172" y1="145" x2="172" y2="150" stroke="var(--fg-3)" stroke-width="1.4"/>
+            <line x1="149" y1="168" x2="154" y2="168" stroke="var(--fg-3)" stroke-width="1.4"/>
+            <line x1="190" y1="168" x2="195" y2="168" stroke="var(--fg-3)" stroke-width="1.4"/>
+            <rect x="124" y="208" width="98" height="14" rx="4" fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.2"/>
+            <line x1="60" y1="39" x2="120" y2="39" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="56" y="42" text-anchor="end" class="petit">les matières</text>
+            <line x1="285" y1="62" x2="226" y2="62" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="289" y="65" class="petit">Ø et dents</text>
+            <line x1="285" y1="103" x2="205" y2="103" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="289" y="106" class="orange">l'avance</text>
+            <line x1="60" y1="215" x2="120" y2="215" stroke="var(--fg-3)" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="56" y="218" text-anchor="end" class="petit">enregistrer</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Le principe</div>
+    <h2>Quatre nombres, une seule idée : le copeau</h2>
+    <p class="sec-lede">
+      Tout le calcul tient dans une grandeur : <b>fz</b>, l'épaisseur de matière que
+      chaque dent enlève à chaque tour. C'est le copeau. Trop gros, la fraise force ;
+      trop fin, elle ne coupe plus, elle <b>frotte</b> — et c'est le frottement qui
+      chauffe, brûle le bois et use l'arête.
+    </p>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Ce qu'on donne</h3>
+        <p>
+          Le diamètre de la fraise, son nombre de dents, et la matière. L'appli
+          propose une broche et un fz de départ ; les deux restent modifiables,
+          avec un rappel de la valeur conseillée sous chaque champ.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Ce qu'elle rend</h3>
+        <p>
+          L'avance <b>Vf&nbsp;=&nbsp;broche&nbsp;×&nbsp;fz&nbsp;×&nbsp;dents</b> en mm/min,
+          la vitesse de plongée (un pourcentage de Vf, réglable), l'avance par tour,
+          et la vitesse de coupe <b>Vc&nbsp;=&nbsp;π&nbsp;×&nbsp;Ø&nbsp;×&nbsp;broche</b> —
+          la vitesse à laquelle l'arête balaye la matière, en m/min. Avec, pour
+          chaque matière, une profondeur de passe conseillée.
+        </p>
+      </div>
+    </div>
+
+    <figure class="capture">
+      <img src="{{RACINE}}logiciels/captures/appli-coupe.webp"
+           alt="L'appli vitesses de coupe : neuf matières, champs diamètre et dents, et les quatre résultats — avance, plongée, broche, avance par tour"
+           data-agrandir>
+      <figcaption>
+        L'appli telle qu'elle s'ouvre : les matières en haut, les quatre résultats
+        dans la carte. Volontairement sombre et d'une seule colonne — elle se lit
+        sur un téléphone, debout devant la machine.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="matieres">
+  <div class="wrap">
+    <div class="sec-tag">Les valeurs</div>
+    <h2>Les {{coupe.nb}} matières, et d'où viennent leurs nombres</h2>
+    <p class="sec-lede">
+      Des points de départ pour fraise <b>carbure</b> sur un portique amateur,
+      cohérents avec les tables des fournisseurs d'outils pour cette classe de
+      machine. Pour le bois, la broche reste au maximum et c'est le copeau qui
+      pilote ; pour les métaux et les plastiques, c'est la vitesse de coupe Vc
+      qui fixe la broche, diamètre par diamètre.
+    </p>
+
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr><th>Matière</th><th class="num">broche</th><th class="num">fz à Ø6<br>(mm/dent)</th><th class="num">passe à Ø6<br>(mm)</th><th>remarque</th></tr>
+        </thead>
+        <tbody>
+          {{coupe:table_matieres}}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">
+      Le tableau est donné pour une fraise de 6 mm ; dans l'appli, le copeau et la
+      passe suivent le diamètre. Ce tableau est engendré depuis les valeurs de
+      l'appli elle-même — rien n'est recopié à la main.
+    </p>
+
+    <div class="callout warn">
+      <span class="ci">Des points de départ, pas des vérités</span>
+      <p>
+        Une table ne sait rien de votre fraise, de votre broche ni de votre bois.
+        Ces valeurs sont faites pour <b>démarrer sans casser</b>, puis s'affiner à
+        l'oreille et au copeau : un copeau qui fume ou une fraise qui siffle en
+        disent plus long que n'importe quel abaque.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Les garde-fous</div>
+    <h2>Deux pièges que l'appli refuse de taire</h2>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>L'avance que la machine ne tient pas</h3>
+        <p>
+          Dans le bois, le calcul donne vite plusieurs milliers de mm/min. Si la
+          machine ne les tient pas — la PrintNC de l'atelier décroche au-delà de
+          600 à 800 mm/min dans les courbes, son accélération est basse — le copeau
+          réel s'amincit et la fraise se met à frotter <em>précisément là où la
+          trajectoire ralentit</em>. Une case « avance max » optionnelle borne le
+          calcul : quand Vf la dépasse, l'appli propose la broche plus lente qui
+          <b>garde le copeau</b> sous le plafond.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>La broche qui ne descend pas assez</h3>
+        <p>
+          À l'inverse, l'acier et le laiton en petit diamètre demandent une broche
+          <em>lente</em> — plus lente, parfois, que le minimum du variateur. L'appli
+          ne fait pas semblant : quand la broche minimale force la vitesse de coupe
+          bien au-delà de la cible, elle l'écrit, parce que c'est l'arête de la
+          fraise qui paie la différence.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">À l'établi</div>
+    <h2>Sur le téléphone, à demeure</h2>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>L'installer</h3>
+        <p>
+          Ouvrir <a href="{{RACINE}}coupe/">atelierduverdier.fr/coupe</a> sur le
+          téléphone, puis « <b>Ajouter à l'écran d'accueil</b> » dans le menu du
+          navigateur. Elle s'ouvre ensuite comme une appli, plein écran, et
+          fonctionne <b>sans réseau</b> : une fois vue, elle reste en cache sur
+          l'appareil.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>La bibliothèque</h3>
+        <p>
+          Chaque réglage peut être enregistré sous le nom de l'outil — « Alu 6mm
+          Z2 » — et rappelé d'un geste. Tout reste <b>dans le navigateur du
+          téléphone</b> : rien n'est envoyé, il n'y a ni compte ni serveur. Le
+          seul appel réseau est le compteur de fréquentation commun au site.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Et vers FreeCAD</span>
+      <p>
+        Chaque outil enregistré s'exporte en <code>.fctb</code> — le format des
+        bibliothèques d'outils de l'atelier Path/CAM de FreeCAD — et en trois
+        lignes prêtes pour le Tool Controller du Job : <code>SpindleSpeed</code>,
+        <code>HorizFeed</code>, <code>VertFeed</code>. La géométrie voyage dans le
+        fichier, les vitesses se collent dans le contrôleur.
+      </p>
+    </div>
+  </div>
+</section>

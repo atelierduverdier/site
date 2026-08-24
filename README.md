@@ -1,9 +1,9 @@
 # atelierduverdier.fr — le portail et la charte commune
 
 Site statique engendré par un script Python maison, servi par GitHub Pages sur
-**<https://atelierduverdier.fr>**. Il porte l'accueil, les fiches des quatre
-logiciels de l'atelier, la rubrique projets — et **la charte que les autres
-sites recopient**.
+**<https://atelierduverdier.fr>**. Il porte l'accueil, les fiches des cinq
+logiciels de l'atelier, la rubrique projets, l'appli « vitesses de coupe »
+servie sur `/coupe/` — et **la charte que les autres sites recopient**.
 
 L'atelier a quatre sites. Celui-ci est la racine ; les autres gardent leur doc
 chez eux, sur leur sous-domaine :
@@ -42,6 +42,7 @@ fois finit toujours par diverger.
 | les cotes des projets FreeCAD | le **tableur** du `.FCStd`, pas le script |
 | les chiffres du magasin ATC | `note_calcul.valeurs()` du projet |
 | les planches et vues 3D | les modèles FreeCAD eux-mêmes |
+| le tableau des matières de la fiche coupe | le `MAT` de `site/appli/coupe/index.html` |
 
 Une clé absente **arrête** la génération. Rien d'à moitié engendré ne part en
 ligne.
