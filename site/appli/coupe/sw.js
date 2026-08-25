@@ -3,7 +3,8 @@
 // (coupe-v2 -> coupe-v3 ...) — sans quoi les visiteurs gardent l'ancienne
 // version, servie par leur propre cache. Le navigateur recompare ce fichier
 // à chaque visite : c'est lui qui déclenche le renouvellement.
-const CACHE = "coupe-v10";
+const CACHE = "coupe-v15";
+const PORTEE = new URL("./", self.location).pathname;
 const ASSETS = [
   "./",
   "./index.html",
@@ -41,6 +42,13 @@ self.addEventListener("fetch", function(e){
   // comparerait la version installée à elle-même et répondrait « à jour »
   // pour l'éternité — exactement le contraire de ce qu'on lui demande.
   if(url.pathname.endsWith("/version.json")) return;
+  // Ne garder QUE ce qui appartient a l'appli, et sans parametres. Sans ces
+  // deux lignes, le cache de l'appli avalait des pages du site entier
+  // (verifie le 24/08 : /, /logiciels/*, /projets/* s'y trouvaient) ainsi
+  // qu'une entree par adresse a rallonge — ?maj=..., ?utm=... Rien de tout
+  // cela n'a vocation a etre servi hors-ligne par l'appli.
+  if(!url.pathname.startsWith(PORTEE)) return;
+  if(url.search) return;
   e.respondWith(
     caches.match(e.request).then(function(hit){
       return hit || fetch(e.request).then(function(resp){

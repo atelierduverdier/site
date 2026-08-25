@@ -285,7 +285,10 @@ var mode="vf";
 var ETAT={d:6,z:2,rpm:24000,fz:0.15,vf:7200,vz:2520,vc:0};
 
 function $(id){return document.getElementById(id);}
-function num(s){var v=parseFloat(String(s).replace(",",".")); return isFinite(v)?v:0;}
+// Aucune de ces grandeurs n'est negative — un diametre, un nombre de dents,
+// une avance. Un signe moins saisi par megarde produisait pourtant une
+// avance NEGATIVE affichee en gros : on borne des la lecture.
+function num(s){var v=parseFloat(String(s).replace(",",".")); return (isFinite(v)&&v>0)?v:0;}
 function clamp(v,lo,hi){return Math.min(Math.max(v,lo),hi);}
 function rnd(v,d){d=d||0; var p=Math.pow(10,d); return Math.round(v*p)/p;}
 function fr(n){return n.toLocaleString("fr-FR");}
@@ -399,10 +402,14 @@ function compute(){
     // Avance voulue + copeau -> broche.
     fz=num($("fz").value); vfDemande=num($("vf").value);
     var rpmBrut=(fz*k*z>0)?(vfDemande/(fz*k*z)):0;
-    // Arrondi vers le BAS : a l'entier superieur, l'avance obtenue depasse
-    // d'un cheveu celle demandee — assez pour franchir un plafond regle
-    // pile a cette valeur et declencher une alerte pour rien.
-    var rpmIdeal=Math.floor(rpmBrut);
+    var rpmIdeal=Math.round(rpmBrut);
+    // Anti-derive. L'avance est arrondie a l'entier dans son champ ; en
+    // repartant de cette valeur arrondie, la broche retombe un tour plus
+    // bas (24 000 -> 23 999) et un simple aller-retour entre deux sens de
+    // calcul faisait glisser le reglage. Si la broche d'avant tient la
+    // meme avance au mm/min pres, c'est elle qu'on garde.
+    if(ETAT.rpm>0 && Math.abs(rpmIdeal-ETAT.rpm)<=1
+       && rnd(ETAT.rpm*fz*k*z)===rnd(vfDemande)) rpmIdeal=ETAT.rpm;
     rpm=clamp(rpmIdeal,lo,hi);
     vf=rpm*fz*k*z;                     // l'avance REELLE, apres bornage
     $("rpm").value=rpm;
@@ -428,7 +435,7 @@ function compute(){
   var vc=(Math.PI*d*rpm)/1000;
   var vz=vf*(num($("plunge").value)/100);
   var fpr=fz*k*z;                      // ce que la machine avance par tour
-  ETAT={d:d,z:z,rpm:rpm,fz:fz,vf:vf,vz:vz,vc:vc,k:k};
+  ETAT={d:d,z:z,rpm:rpm,fz:fz,vf:vf,vz:vz,vc:vc,k:k,ae:num($("ae").value)};
   $("oVf").textContent=fr(rnd(vf));
   $("oVz").textContent=fr(rnd(vz));
   $("oRpm").textContent=fr(rpm);
@@ -437,6 +444,13 @@ function compute(){
     +(k>1.005 ? "<br><span style='color:var(--orange)'>Copeau aminci par la passe étroite : avance multipliée par "+frd(k,2)+" pour garder "+frd(fz,3)+" mm/dent réels ("+frd(fz*k,3)+" mm/dent programmés).</span>" : "");
 
   var alertes=[];
+  // Bornes inversees : clamp() rend alors la borne HAUTE sans rien dire, et
+  // tous les calculs suivants portent sur une broche que l'on n'a pas
+  // choisie. Mieux vaut le dire que de calculer juste sur des bornes fausses.
+  if(lo>hi && hi>0){
+    alertes.push("Broche mini ("+fr(lo)+") au-dessus de la maxi ("+fr(hi)+") : "
+      +"les deux bornes sont inversees, le calcul retient "+fr(rpm)+" tr/min.");
+  }
   if(rpmE!==null){
     alertes.push(mode==="rpm"
       ? ("Il faudrait "+fr(rpmE)+" tr/min pour avancer à "+fr(rnd(vfDemande))+" mm/min avec ce copeau — hors des limites de la broche. Ramenée à "+fr(rpm)+" tr/min, soit "+fr(rnd(vf))+" mm/min réels.")
@@ -524,8 +538,14 @@ function currentTool(){
   // Les valeurs RESOLUES, jamais les champs bruts : selon le mode, l'un
   // d'eux est un resultat et pourrait etre en cours de saisie.
   var nm=$("tname").value.trim() || (MAT[material].label+" "+ETAT.d+"mm Z"+ETAT.z);
+  // `ae` fait partie de l'outil : sans lui, un outil enregistre en reprise
+  // de contour se rechargeait avec l'avance de la pleine largeur, pendant
+  // que la bibliotheque et l'export continuaient d'afficher l'ancienne.
+  // Deux chiffres contradictoires pour le meme outil, et c'est celui de
+  // l'export qu'on recopie dans la machine.
   return {name:nm, material:material, matLabel:MAT[material].label,
           D:ETAT.d, Z:ETAT.z, fz:rnd(ETAT.fz,4), rpm:Math.round(ETAT.rpm),
+          ae:(ETAT.ae>0?ETAT.ae:null),
           vf:rnd(ETAT.vf), plunge:rnd(ETAT.vz)};
 }
 
@@ -539,7 +559,7 @@ function renderLib(){
   tools.forEach(function(t){
     var row=document.createElement("div"); row.className="tool";
     var b=document.createElement("button"); b.className="load";
-    b.innerHTML="<div class='nm'>"+esc(t.name)+"</div><div class='meta'>"+esc(t.matLabel)+" &middot; Ø"+t.D+" Z"+t.Z+" &middot; "+fr(t.rpm)+" tr/min &middot; "+t.vf+" mm/min</div>";
+    b.innerHTML="<div class='nm'>"+esc(t.name)+"</div><div class='meta'>"+esc(t.matLabel)+" &middot; Ø"+t.D+" Z"+t.Z+" &middot; "+fr(t.rpm)+" tr/min &middot; "+vfDe(t)+" mm/min</div>";
     b.onclick=function(){ loadTool(t); };
     var del=document.createElement("button"); del.className="del"; del.innerHTML="&#128465;";
     del.setAttribute("aria-label","Supprimer "+t.name);
@@ -555,9 +575,17 @@ function loadTool(t){
   // soit le sens de calcul courant, le triplet est coherent, donc le champ
   // deduit retombera sur sa valeur.
   $("fz").value=t.fz; $("rpm").value=t.rpm;
-  if(t.vf) $("vf").value=t.vf;
+  $("ae").value=(t.ae>0?t.ae:"");     // pose AVANT compute : il en depend
+  $("vf").value=vfDe(t);      // recalcule si l'outil n'en portait pas
   buildMats(); compute();
   window.scrollTo({top:0,behavior:"smooth"});
+}
+// Un outil venu d'un JSON bricole a la main peut ne pas porter `vf` :
+// il affichait alors « undefined mm/min », y compris dans le texte qu'on
+// copie vers FreeCAD. On le recalcule plutot que de l'avouer.
+function vfDe(t){
+  if(t.vf!=null && isFinite(t.vf)) return t.vf;
+  return rnd(t.rpm*t.fz*facteurAminci(t.D, t.ae>0?t.ae:0)*t.Z);
 }
 function esc(s){return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
 
@@ -581,12 +609,12 @@ function renderExport(){
       +"<div class='exprow'><span class='hint' style='margin:0'>"+fn+"</span>"
       +"<span><button class='cp dl'>Télécharger</button><button class='cp'>Copier</button></span></div>"
       +"<textarea rows='6' readonly>"+esc(fctb(t))+"</textarea>"
-      +"<div class='exprow' style='margin-top:6px'><span class='tc'>RPM "+t.rpm+" &middot; Vf "+t.vf+" &middot; Vz "+t.plunge+"</span><button class='cp'>Copier</button></div>";
+      +"<div class='exprow' style='margin-top:6px'><span class='tc'>RPM "+t.rpm+" &middot; Vf "+vfDe(t)+" &middot; Vz "+t.plunge+"</span><button class='cp'>Copier</button></div>";
     var dl=box.querySelector(".dl");
     dl.onclick=function(){ telecharger(fn, fctb(t)); var o=dl.textContent; dl.textContent="Enregistré"; setTimeout(function(){dl.textContent=o;},1200); };
     var btns=box.querySelectorAll(".cp:not(.dl)");
     btns[0].onclick=function(){ copy(fctb(t), btns[0]); };
-    btns[1].onclick=function(){ copy("SpindleSpeed="+t.rpm+"\nHorizFeed="+t.vf+" mm/min\nVertFeed="+t.plunge+" mm/min", btns[1]); };
+    btns[1].onclick=function(){ copy("SpindleSpeed="+t.rpm+"\nHorizFeed="+vfDe(t)+" mm/min\nVertFeed="+t.plunge+" mm/min", btns[1]); };
     c.appendChild(box);
   });
 }
