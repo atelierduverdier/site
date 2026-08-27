@@ -40,6 +40,10 @@ PLANS_REPRIS = [
                          '08-gabarit-essai.svg']),
     # les cinq planches de la dust shoe, reliées : c'est ce qu'on imprime
     (chemins.DUST_SHOE_PLANS, ['dust-shoe-plans.pdf']),
+    # les volets : le recueil des planches A2, et les deux A4 d'atelier
+    (chemins.VOLETS_PLANS, ['Volets-A2-TechDraw.pdf',
+                            'Fiche-debit.pdf',
+                            'Feuille-de-suivi.pdf']),
 ]
 
 FICHIERS_KIT = ['verdier.css', 'verdier.js', 'chapeau.svg', 'logo.svg']
@@ -100,6 +104,7 @@ def injecter_fcstd(corps: str, nom: str) -> str:
         # qui les pilote, donc c'est lui qu'on lit.
         'dustshoe': chemins.DUST_SHOE_PARAMS,
         'dustshoe1': chemins.DUST_SHOE_PARAMS_V1,
+        'volets': chemins.VOLETS_FCSTD,
     }
 
     def remplacer(m):
@@ -530,6 +535,19 @@ PAGES = [
         'sous_titre': 'dust shoe',
         'resume': "Jupe d'aspiration paramétrique pour la broche G-PENNY Ø80 : "
                   "semelle à demeure, brosse amovible, adaptateur de tuyau Ø100.",
+    },
+    {
+        'contenu': 'volets-battants.html',
+        'sortie': 'projets/volets-battants.html',
+        'titre': "Volets battants — deux battants qui ne font pas la meme largeur",
+        'description': "Paire de volets battants en douglas, entierement "
+                       "parametrique : chaque battant recalcule ses lames, ses "
+                       "barres et son echarpe a partir de SA largeur. Rainure "
+                       "filante, languettes fraisees, chevilles rondes. Planches "
+                       "tracees a la plume sur un traceur de decoupe.",
+        'sous_titre': 'volets battants',
+        'resume': "Volets battants en douglas pour un tableau qui n'est pas "
+                  "d'aplomb : 500 et 490 mm de large, tout pilote par un tableur.",
     },
     {
         'contenu': 'magasin-atc.html',

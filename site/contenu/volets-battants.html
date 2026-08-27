@@ -1,0 +1,276 @@
+<!-- Les volets battants — rubrique projets.
+
+     Deux choses gouvernent ce texte. D'abord l'état : le modèle et les
+     planches existent, le bois n'est pas coupé. On ne présente pas un
+     dessin comme une menuiserie.
+
+     Ensuite les cotes : elles sont lues dans le tableur de Volets.FCStd,
+     jamais recopiées. Les cellules calculées par formule (Prof_Rainure,
+     par exemple) sont REFUSÉES par valeurs_fcstd — c'est voulu, et c'est
+     pourquoi le texte ne cite que des valeurs saisies.
+
+     Bases de police : 9,9 px pour le héros, 12 px pour un viewBox de 640. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">douglas</span>
+          <span class="badge">{{fcstd:volets:@Largeur_Battant_Gauche}} et {{fcstd:volets:@Largeur_Battant_Droit}} mm</span>
+          <span class="badge">pas encore fabriqués</span>
+        </div>
+        <h1>Deux battants qui ne font pas la même largeur</h1>
+        <p class="lede">
+          Une paire de volets pour un tableau qui n'est pas d'aplomb : l'un fait
+          <b>{{fcstd:volets:@Largeur_Battant_Gauche}} mm</b>, l'autre
+          <b>{{fcstd:volets:@Largeur_Battant_Droit}} mm</b>. Tout le reste en découle —
+          les lames, les barres, l'écharpe, jusqu'à la position des chevilles. On change
+          une cellule du tableur, et les deux battants se refont chacun avec ses cotes.
+        </p>
+      </div>
+      <div class="hero-art">
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="Les deux battants côte à côte, de largeurs différentes, avec leurs lames verticales et le renfort en Z">
+          <g class="figure">
+            <!-- battant gauche, le plus large -->
+            <rect x="26" y="26" width="132" height="196" rx="3"
+                  fill="var(--card)" stroke="var(--fg)" stroke-width="1.8"/>
+            <line x1="52" y1="26" x2="52" y2="222" class="cote"/>
+            <line x1="78" y1="26" x2="78" y2="222" class="cote"/>
+            <line x1="104" y1="26" x2="104" y2="222" class="cote"/>
+            <line x1="130" y1="26" x2="130" y2="222" class="cote"/>
+            <!-- le Z : deux barres et l'écharpe, en orange -->
+            <rect x="32" y="58" width="120" height="15" fill="var(--orange-soft)"
+                  stroke="var(--orange)" stroke-width="1.4"/>
+            <rect x="32" y="176" width="120" height="15" fill="var(--orange-soft)"
+                  stroke="var(--orange)" stroke-width="1.4"/>
+            <line x1="40" y1="176" x2="146" y2="73" stroke="var(--orange)"
+                  stroke-width="5" stroke-linecap="round"/>
+            <text x="92" y="240" text-anchor="middle" class="petit">gauche</text>
+
+            <!-- battant droit, plus étroit : c'est le propos -->
+            <rect x="176" y="26" width="126" height="196" rx="3"
+                  fill="var(--card)" stroke="var(--fg)" stroke-width="1.8"/>
+            <line x1="201" y1="26" x2="201" y2="222" class="cote"/>
+            <line x1="226" y1="26" x2="226" y2="222" class="cote"/>
+            <line x1="251" y1="26" x2="251" y2="222" class="cote"/>
+            <line x1="276" y1="26" x2="276" y2="222" class="cote"/>
+            <rect x="182" y="58" width="114" height="15" fill="var(--orange-soft)"
+                  stroke="var(--orange)" stroke-width="1.4"/>
+            <rect x="182" y="176" width="114" height="15" fill="var(--orange-soft)"
+                  stroke="var(--orange)" stroke-width="1.4"/>
+            <line x1="290" y1="176" x2="188" y2="73" stroke="var(--orange)"
+                  stroke-width="5" stroke-linecap="round"/>
+            <text x="239" y="240" text-anchor="middle" class="petit">droit</text>
+
+            <!-- le jour de battement, au milieu -->
+            <line x1="167" y1="20" x2="167" y2="228" class="cote"/>
+            <text x="167" y="14" text-anchor="middle" class="petit">le jour</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Le principe</div>
+    <h2>Un tableur, deux battants, aucune symétrie</h2>
+    <p class="sec-lede">
+      Un volet se dessine vite quand les deux vantaux sont identiques. Ici ils ne le
+      sont pas, et c'est toute la difficulté : rien ne peut être dessiné une fois puis
+      recopié en miroir.
+    </p>
+
+    <p>
+      Chaque battant recalcule ses propres <b>{{fcstd:volets:@Nb_Lames}} lames</b>, sa
+      traverse, ses deux barres et son écharpe à partir de <i>sa</i> largeur. Les lames
+      du gauche font une largeur, celles du droit une autre ; les barres du Z n'ont pas
+      la même longueur ; l'écharpe n'a pas la même pente. La feuille de débit et les
+      planches d'atelier listent donc les deux jeux séparément, code par code.
+    </p>
+
+    <div class="cartes">
+      <div class="carte">
+        <div class="head">
+          <span class="ci">📐</span>
+          <h3>Ce qui est saisi</h3>
+        </div>
+        <p>
+          Les deux largeurs, la hauteur <b>{{fcstd:volets:@Hauteur_Volet}} mm</b>, le
+          jour de battement de {{fcstd:volets:@Jeu_Entre_Battants}} mm, l'épaisseur des
+          lames <b>{{fcstd:volets:@Epaisseur_Lames}} mm</b>, celle du renfort
+          {{fcstd:volets:@Epaisseur_Z}} mm, la traverse haute de
+          {{fcstd:volets:@Hauteur_Traverse_Haute}} mm, les pentures de
+          {{fcstd:volets:@Penture_Longueur}} mm.
+        </p>
+      </div>
+      <div class="carte">
+        <div class="head">
+          <span class="ci">⚙️</span>
+          <h3>Ce qui en découle</h3>
+        </div>
+        <p>
+          La largeur de chaque lame, la position de chaque joint, la longueur des barres,
+          l'angle et la longueur de l'écharpe, l'implantation des vis et des chevilles,
+          les cotes de débit avec leurs surcotes — et les cinq planches cotées.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Trois décisions d'établi</div>
+    <h2>Ce que la main a imposé au modèle</h2>
+    <p class="sec-lede">
+      Les trois choix qui suivent ne viennent pas du dessin. Ils viennent de la
+      question « comment je le fais, à la toupie ? », et le modèle a dû s'y plier.
+    </p>
+
+    <h3>Une rainure filante plutôt que des mortaises</h3>
+    <p>
+      La traverse haute reçoit le haut des lames. La façon savante est de tailler une
+      mortaise par lame ; la façon rapide est de passer <b>une seule rainure</b> d'un
+      bout à l'autre. Un passage d'outil au lieu de cinq, le jeu été-hiver devient
+      naturel — et la rainure débouche aux deux rives, ce qui est assumé. Le modèle sait
+      faire les deux ; c'est la rainure qui est retenue.
+    </p>
+
+    <h3>Des languettes filantes, deux fraisages, aucune coupe latérale</h3>
+    <p>
+      Le haut de chaque lame n'est pas un tenon découpé aux ciseaux : c'est la lame
+      elle-même, <b>fraisée devant et derrière</b> sur {{fcstd:volets:@Long_Tenon}} mm,
+      ce qui laisse une languette de {{fcstd:volets:@Epaisseur_Tenon}} mm d'épaisseur.
+      Aucune coupe sur les côtés. Les languettes voisines sont écartées du
+      <b>jeu de dilatation de {{fcstd:volets:@Jeu_Dilatation_Lames}} mm</b> — le même
+      que celui laissé au fond des rainures de bouvetage.
+    </p>
+
+    <h3>Des chevilles rondes, pas d'oblongs</h3>
+    <p>
+      Le bardage travaille en largeur ; la façon classique de l'y autoriser est
+      d'ovaliser les trous de cheville en s'éloignant du centre. Ici les trous sont
+      <b>ronds</b>, diamètre {{fcstd:volets:@Diam_Cheville}} mm, et le débattement est
+      repris joint par joint par les {{fcstd:volets:@Jeu_Dilatation_Lames}} mm laissés
+      entre lames. C'est un perçage de moins à réfléchir à l'établi.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Ce qui se calcule tout seul</div>
+    <h2>Deux endroits où le modèle est plus patient que moi</h2>
+
+    <h3>Les joints de lames esquivent les vis de penture</h3>
+    <p>
+      Une penture se visse à travers les lames. Si une vis tombe en face d'un joint,
+      elle traverse la rainure et <b>épingle la languette de la lame voisine</b>, qui ne
+      peut plus travailler — la fente arrive au premier été. Le modèle repère donc les
+      joints menacés et les déplace, puis relâche chacun à son tour pour réégaliser les
+      largeurs autant que possible. C'est pour cela que les lames d'un même battant ne
+      font pas toutes la même largeur : c'est <b>voulu</b>, et la planche des lames le
+      dit.
+    </p>
+
+    <h3>La pente de l'écharpe est résolue, pas choisie</h3>
+    <p>
+      L'écharpe entre dans une encoche taillée dans chaque barre — un embrèvement, le
+      seul assemblage qui reprenne vraiment la poussée. Pour que ses deux appuis tombent
+      pile là où il reste assez de bois derrière l'about, la <b>pente est la solution
+      d'une équation</b>, pas une valeur tapée. Si les cotes ne permettent pas
+      l'embrèvement, le modèle se replie sur une pose en applique et le signale, plutôt
+      que de sortir une pièce impossible.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Le contrôle qui attrape ce qu'un dessin cache</span>
+      <p>
+        Après chaque recalcul, chaque pièce est <b>mesurée sur le solide</b> et
+        confrontée à la feuille, puis toutes les paires sont testées en interférence, et
+        les perçages vérifiés — deux trous trop proches font éclater le bois, un perçage
+        qui débouche à l'extérieur prend l'eau. C'est ce contrôle qui a trouvé, en
+        passant à quatre lames, deux avant-trous séparés par <b>0,3 mm de bois</b>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="plans">
+  <div class="wrap">
+    <div class="sec-tag">Les plans</div>
+    <h2>Cinq planches, et une feuille qu'on coche</h2>
+    <p class="sec-lede">
+      Les planches ne sont pas dessinées : elles sont projetées depuis le modèle. Quatre
+      A2 — l'ensemble, les lames, le renfort en Z, la traverse et la quincaillerie — plus
+      une vue arrière de la paire en A4.
+    </p>
+
+    <p>
+      Deux A4 les accompagnent, et ce sont eux qui servent le plus. La <b>fiche de
+      débit</b> se lit chez le marchand : elle regroupe les pièces par section, propose
+      des longueurs commerciales et annonce la chute, trait de scie compris. La
+      <b>feuille de suivi</b> reste à l'établi : une ligne par pièce, ses cotes finies,
+      cinq cases à cocher — débité, corroyé, usiné, poncé, traité — et surtout un
+      <b>code court à reporter au crayon sur le bois</b> dès le débit. GL1 à GL5 pour les
+      lames du battant gauche, GT pour sa traverse, DL1 pour la première lame du droit.
+      Dix-neuf pièces, dix-neuf codes.
+    </p>
+
+    <div class="liens">
+      <a href="{{RACINE}}projets/plans/Volets-A2-TechDraw.pdf" target="_blank" rel="noopener">
+        Les planches, en un PDF
+      </a>
+      <a href="{{RACINE}}projets/plans/Fiche-debit.pdf" target="_blank" rel="noopener">
+        La fiche de débit (A4)
+      </a>
+      <a href="{{RACINE}}projets/plans/Feuille-de-suivi.pdf" target="_blank" rel="noopener">
+        La feuille de suivi (A4)
+      </a>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Ces planches se tracent à la plume</span>
+      <p>
+        Elles ne sortent pas d'une imprimante mais d'un <b>traceur de découpe</b>, un
+        Graphtec CE6000-60 muni d'un stylo, sur des feuilles de 50 × 70. Ce qui suppose
+        deux choses qu'un PDF n'a pas besoin de savoir : que les textes soient des
+        <b>traits</b> et non des contours — sinon la plume dessine chaque lettre en
+        double —, et que les traits interrompus soient de <b>vrais segments</b>, parce
+        qu'un pointillé de style n'est qu'une consigne d'affichage, invisible pour une
+        machine qui ne lit que de la géométrie.
+      </p>
+      <p>
+        Le dessin doit aussi tenir dans ce que la machine laisse : les galets
+        d'entraînement et les marges mangent de la place, et la perte n'est pas la même
+        selon la largeur du média. Sur la feuille employée ici, la zone utile mesure
+        <b>610,6 × 440,7 mm</b> — mesurée sur la machine, jamais déduite.
+      </p>
+      <div class="liens">
+        <a href="{{RACINE}}logiciels/pupitre-graphtec.html">Le pupitre qui pilote le traceur</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Où ça en est</div>
+    <h2>Le bois n'est pas encore coupé</h2>
+    <p>
+      Le modèle est complet et vérifié, les cinq planches sortent, la fiche de débit et
+      la feuille de suivi sont prêtes. <b>Rien n'est fabriqué</b> : les volets existent
+      en cotes et en traits, pas en douglas. Ce qui reste à faire commence chez le
+      marchand, et la première case à cocher s'appelle « débité ».
+    </p>
+    <p>
+      Le douglas est venu remplacer un premier choix en sapin avec traverse en bois dur :
+      une seule essence, deux épaisseurs, une seule commande. C'est le genre de décision
+      qui simplifie la feuille de débit autant que l'établi.
+    </p>
+  </div>
+</section>

@@ -50,6 +50,11 @@ DUST_SHOE_PARAMS = DUST_SHOE / 'fcstd' / 'ParametresV2.FCStd'   # le tableur v2
 # le Ø de l'emboîture (99), qui en découle mais ne le dit pas.
 DUST_SHOE_PARAMS_V1 = DUST_SHOE / 'fcstd' / 'Parametres.FCStd'
 DUST_SHOE_PLANS = DUST_SHOE / 'plans'                           # les 5 planches A3
+# Les volets battants : le modele vit ici, l'atelier FreeCAD qui l'engendre
+# vit dans Mod/AtelierVolets — le site ne montre que les SORTIES.
+VOLETS = PROJETS / 'realisations' / 'volets-battants'
+VOLETS_FCSTD = VOLETS / 'Volets.FCStd'
+VOLETS_PLANS = VOLETS / 'plans'
 
 # Un gros fichier d'atelier, pour montrer le visualiseur en charge.
 PAQUERETTE = (PROJETS / 'archives' / 'Conception' / 'FreeCAD' / 'Penderie'
@@ -71,6 +76,7 @@ TOUT = {
     'modèle tonnelle': TONNELLE_FCSTD,
     'modèle meuble à balais': MEUBLE_FCSTD,
     'dossier dust shoe': DUST_SHOE,
+    'modele volets battants': VOLETS_FCSTD,
     'tableur dust shoe v2': DUST_SHOE_PARAMS,
     'tableur dust shoe v1': DUST_SHOE_PARAMS_V1,
     'planches dust shoe': DUST_SHOE_PLANS,
