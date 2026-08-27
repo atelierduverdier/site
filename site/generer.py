@@ -525,8 +525,16 @@ PAGES = [
                        "à jasmin : la page a changé d'adresse.",
         'sous_titre': 'tonnelle',
         'resume': "Cette adresse a déménagé vers projets/tonnelle-jasmin.html.",
-        'entete_sup': '<meta http-equiv="refresh" content="0; url=tonnelle-jasmin.html">\n'
-                      '<link rel="canonical" href="https://atelierduverdier.fr/projets/tonnelle-jasmin.html">',
+        # La canonique passe par `canonique`, PAS par `entete_sup` : ecrite
+        # a la main dans l'en-tete supplementaire, elle s'AJOUTAIT a celle
+        # que le gabarit pose deja, et la page se retrouvait avec DEUX
+        # canoniques contradictoires — l'une vers elle-meme, l'autre vers
+        # jasmin. Des canoniques qui se contredisent sont ignorees : la
+        # redirection ne protegeait donc rien, elle laissait cette page
+        # concourir avec la vraie. Trouve le 27/08/2026 en verifiant les
+        # pages projets.
+        'canonique': 'https://atelierduverdier.fr/projets/tonnelle-jasmin.html',
+        'entete_sup': '<meta http-equiv="refresh" content="0; url=tonnelle-jasmin.html">',
     },
     {
         'contenu': 'dust-shoe.html',
@@ -956,8 +964,13 @@ def main() -> None:
                 'SOUS_TITRE': page['sous_titre'],
                 'NAV': nav(prefixe),
                 'LOCAL_CSS': page.get('entete_sup', ''),
-                'OG_URL': f"https://{DOMAINE}/{page['sortie']}".replace(
-                    '/index.html', '/'),
+                # `canonique` : l'adresse que cette page DECLARE etre la
+                # sienne, quand ce n'est pas la ou elle est servie. Le cas
+                # est celui d'une page de redirection : elle doit designer
+                # sa destination, sinon elle CONCOURT avec elle.
+                'OG_URL': page.get('canonique') or
+                          f"https://{DOMAINE}/{page['sortie']}".replace(
+                              '/index.html', '/'),
                 'OG_IMAGE': f"https://{DOMAINE}/partage/{cartes[page['sortie']]}",
                 'OG_ALT': page['sous_titre'] or 'Atelier du Verdier',
             }, 'entete.html')
