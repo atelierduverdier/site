@@ -40,8 +40,13 @@ PLANS_REPRIS = [
                          '08-gabarit-essai.svg']),
     # les cinq planches de la dust shoe, reliées : c'est ce qu'on imprime
     (chemins.DUST_SHOE_PLANS, ['dust-shoe-plans.pdf']),
-    # les volets : le recueil des planches A2, et les deux A4 d'atelier
-    (chemins.VOLETS_PLANS, ['Volets-A2-TechDraw.pdf',
+    # Les volets : les CINQ PLANCHES EXPORTEES A LA MAIN par Christophe,
+    # une par une, apres les avoir retouchees dans TechDraw. On ne publie
+    # surtout pas le recueil PDF engendre par le lot : il est anterieur a
+    # ces retouches, et c'est la version corrigee qui fait foi. Plus les
+    # deux A4 d'atelier, qui ne se retouchent pas.
+    (chemins.VOLETS_PLANS, ['Planche1.svg', 'Planche2.svg', 'Planche3.svg',
+                            'Planche4.svg', 'Planche5.svg',
                             'Fiche-debit.pdf',
                             'Feuille-de-suivi.pdf']),
 ]
