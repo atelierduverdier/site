@@ -106,6 +106,58 @@ window.verdierMouvement.rescanner(element)
 en fondu des résultats que le visiteur vient de demander, c'est le faire attendre pour
 ce qu'il a déjà demandé.
 
+### Le décalage se calcule à l'entrée, pas au marquage
+
+Le ruissellement d'une rangée de cartes vient du fait qu'elles **entrent ensemble** —
+pas du fait d'être voisines dans le balisage. L'observateur livre justement par paquets :
+ce qui a franchi la ligne dans la même image. Chaque paquet est trié de haut en bas, et
+le retard est l'indice dans le paquet (60 ms, plafonné à 5).
+
+La première version prenait le rang parmi les **frères**. Mesuré sur le récit du journal
+PrintNC — quarante paragraphes tous frères, rangs `[0,1,2,3,4,5,5,5,5,5]` : à partir du
+sixième, chaque paragraphe traînait **300 ms** de retard sur le moment juste. Un
+paragraphe qu'on atteint en lisant doit paraître maintenant.
+
+### Pas de bloc marqué dans un bloc candidat
+
+Deux raisons, et la seconde mord fort. La visible : une carte qui monte pendant que sa
+rangée de liens monte à son tour, ce sont deux mouvements pour une seule chose.
+
+L'autre : `.js-reveal` pose un `transform`, et **un élément transformé devient le bloc
+conteneur** de ses descendants positionnés en absolu. Le recouvrement qui rend la carte
+cliquable se repliait alors sur la seule rangée de liens — 319 × 74 au lieu de
+365 × 376. Le test porte sur les **candidats**, pas sur les marqués : les premières
+cartes d'une page sont au-dessus du pli, donc écartées, mais leur rangée de liens tombe
+dessous et se ferait marquer.
+
+## La carte entière emmène au lien
+
+Une carte qui se soulève au survol annonce qu'on peut cliquer dessus : elle doit l'être.
+`verdier.js` **désigne** le premier lien de chaque `.carte` (`carte-cible`) et pousse les
+suivants au-dessus (`carte-dessus`) ; la feuille étire le `::after` du premier sur toute
+la carte.
+
+Un vrai lien, pas un gestionnaire de clic : le clic du milieu, « ouvrir dans un nouvel
+onglet », l'adresse dans la barre d'état et la tabulation continuent de marcher. Les
+autres liens de la carte — documentation, manuel, dépôt — gardent leur clic propre.
+
+Ce que ça coûte : **on ne peut plus sélectionner le texte de la carte à la souris**.
+C'est le prix connu de ce motif.
+
+Ne sont pas touchées : une carte qui est déjà un `<a>` ou un `<button>` (le journal
+PrintNC fait ses quatre cartes d'accueil en boutons), et une carte sans lien.
+
+## Le soulignement se tire
+
+`a:hover{text-decoration:underline}` allumait un trait d'un coup. Il se dessine
+maintenant de gauche à droite — un dégradé en fond, parce que `text-decoration` ne
+s'interpole pas. Le trait prend `currentColor`, donc il suit le lien sur les deux thèmes
+sans qu'on ait à le redire.
+
+Boutons, marque et onglets de navigation en sont exclus : ils ont déjà leur réponse au
+survol. Et sous `prefers-reduced-motion`, le trait franc **revient** — ce qu'on retire,
+c'est le mouvement, pas l'information.
+
 ### Les deux règles qui protègent le contenu
 
 Ce dispositif n'a qu'un mauvais dénouement possible : un bloc marqué `opacity:0` que
