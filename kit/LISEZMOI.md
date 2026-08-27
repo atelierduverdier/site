@@ -130,12 +130,19 @@ cliquable se repliait alors sur la seule rangée de liens — 319 × 74 au lieu 
 cartes d'une page sont au-dessus du pli, donc écartées, mais leur rangée de liens tombe
 dessous et se ferait marquer.
 
-## La carte entière emmène au lien
+## La carte entière emmène au lien — et seul ce qui mène quelque part bouge
 
 Une carte qui se soulève au survol annonce qu'on peut cliquer dessus : elle doit l'être.
-`verdier.js` **désigne** le premier lien de chaque `.carte` (`carte-cible`) et pousse les
-suivants au-dessus (`carte-dessus`) ; la feuille étire le `::after` du premier sur toute
-la carte.
+`verdier.js` **désigne** le premier lien de chaque `.carte` ou `.panel` (`carte-cible`) et
+pousse les suivants au-dessus (`carte-dessus`) ; la feuille étire le `::after` du premier
+sur tout le bloc.
+
+**Le soulèvement suit `.carte-cliquable`, pas `.carte`.** C'était `.carte:hover,.panel:hover`,
+et ça mentait : sur ce site, **21 des 25 panneaux n'ont aucun lien** et se soulevaient
+quand même. Un bloc qui bouge sous le curseur annonce un clic ; s'il n'en a pas, il ment.
+Un bloc déjà cliquable de lui-même (`<a>`, `<button>`, `[onclick]` — les quatre cartes
+d'accueil du journal PrintNC) est marqué lui aussi, sans recouvrement : il mène bien
+quelque part, il a droit à sa réponse au survol.
 
 Un vrai lien, pas un gestionnaire de clic : le clic du milieu, « ouvrir dans un nouvel
 onglet », l'adresse dans la barre d'état et la tabulation continuent de marcher. Les
