@@ -5,7 +5,8 @@
    Ne pas l'éditer dans une copie : elle sera écrasée.
    Source : atelierduverdier/site — kit/verdier.js
 
-   Deux choses seulement : la bascule de thème, et la visionneuse d'images.
+   Trois choses seulement : la bascule de thème, la visionneuse d'images,
+   et l'apparition au défilement.
    Tout est défensif — chaque site ne contient pas forcément les deux, et
    un kit partagé qui plante sur une page sans bouton casserait TOUTES les
    pages qui suivent dans le même fichier.
@@ -131,4 +132,61 @@
   lb.addEventListener('click', fermer);
   if (close) close.addEventListener('click', function(e){ e.stopPropagation(); fermer(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fermer(); });
+})();
+
+
+/* ---------- Apparition au défilement -------------------------------------
+   Les blocs montent doucement en entrant dans le champ, au lieu d'être
+   tous là d'emblée.
+
+   LE POINT QUI COMPTE : la classe qui rend un bloc invisible est posée
+   ICI, par le script, et seulement après avoir vérifié que le navigateur
+   sait l'animer. Écrite dans le HTML, elle aurait laissé une page BLANCHE
+   à qui bloque le JavaScript — c'est le piège classique de ce genre
+   d'effet, et il ne pardonne pas sur un site de documentation.
+
+   Rien n'est observé au-dessus de la ligne de flottaison : un bloc déjà
+   visible au chargement doit l'être tout de suite, pas se mettre à bouger
+   sous les yeux du visiteur.
+
+   Le décalage entre voisins (60 ms) donne le petit ruissellement d'une
+   rangée de cartes. Au-delà de six, on arrête de décaler : sur une longue
+   liste, l'attente se verrait. */
+
+(function(){
+  if (!('IntersectionObserver' in window)) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var SELECTEUR = [
+    'section .sec-tag', 'section > .wrap > h2', 'section > .wrap > .sec-lede',
+    'section > .wrap > p', 'section > .wrap > h3',
+    '.carte', '.panel', '.figure', '.plan', '.capture',
+    '.callout', '.step', '.cols > *', '.liens'
+  ].join(',');
+
+  var blocs = [].slice.call(document.querySelectorAll(SELECTEUR));
+  if (!blocs.length) return;
+
+  var haut = window.innerHeight || 800;
+  var obs = new IntersectionObserver(function(entrees){
+    for (var i = 0; i < entrees.length; i++){
+      if (!entrees[i].isIntersecting) continue;
+      var el = entrees[i].target;
+      var rang = +el.getAttribute('data-rang') || 0;
+      el.style.transitionDelay = (rang * 60) + 'ms';
+      el.classList.add('vu');
+      obs.unobserve(el);                     // une fois vu, on n'y revient pas
+    }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+
+  var precedent = null, rang = 0;
+  for (var i = 0; i < blocs.length; i++){
+    var el = blocs[i];
+    if (el.getBoundingClientRect().top < haut * 0.9) continue;   // déjà à l'écran
+    rang = (el.parentNode === precedent) ? Math.min(rang + 1, 5) : 0;
+    precedent = el.parentNode;
+    el.setAttribute('data-rang', rang);
+    el.classList.add('js-reveal');
+    obs.observe(el);
+  }
 })();
