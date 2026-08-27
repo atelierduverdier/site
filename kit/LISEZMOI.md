@@ -18,7 +18,10 @@ commencé : le site laser et le journal PrintNC n'ont plus la même charte.
 | Fichier | Rôle |
 |---|---|
 | `verdier.css` | Jetons de couleur (clair + sombre), base typographique, composants partagés |
-| `verdier.js` | Bascule de thème, menu en étroit, visionneuse d'images. Défensif : ne plante pas sur une page qui n'a rien de tout ça |
+| `verdier.js` | Bascule de thème, menu en étroit, visionneuse d'images, **entrée des blocs dans le champ**. Défensif : ne plante pas sur une page qui n'a rien de tout ça |
+| `verdier-jetons.css` | **Engendré** par `extraire_jetons.py` : les seuls jetons, pour un satellite qui garde sa mise en page |
+| `verdier-entete.css` | **Engendré** par `extraire_entete.py` : la barre du haut seule, pour les mêmes |
+| `verdier-mouvement.css` | **Engendré** par `extraire_mouvement.py` : la part portable du mouvement (section 13bis-a), pour les mêmes |
 | `entete.html` | Du `<!DOCTYPE>` à `</header>` : méta, anti-clignotement, barre du haut |
 | `pied.html` | Pied de page, visionneuse, scripts, `</body></html>` |
 | `chapeau.svg` | La marque seule, copiée **verbatim** depuis `graphtec-ce6000/resources/icons/` |
@@ -61,6 +64,61 @@ celle du kit :
 - journal PrintNC : les quatre couleurs de phase (méca, élec, LinuxCNC, laser).
 
 Le kit sert à arrêter la divergence, pas à tout uniformiser.
+
+## Le mouvement, et pourquoi il est coupé en deux
+
+La section **13bis** de `verdier.css` donne au site son temps : les blocs montent
+doucement en entrant dans le champ, les cartes se soulèvent, le héros porte un halo.
+Elle est coupée en deux parts, et cette coupure est ce qui permet d'en donner un
+morceau aux satellites :
+
+- **13bis-a, portable** — ne nomme que ce que le kit écrit lui-même (`.js-reveal`,
+  posé par `verdier.js`). Aucune collision possible avec la feuille d'un hôte.
+  `extraire_mouvement.py` en tire `verdier-mouvement.css`.
+- **13bis-b, maison** — s'appuie sur `.carte`, `.hero`, `.btn`. Reste au portail et
+  au site laser, qui chargent `verdier.css` en entier. La donner à un site qui a sa
+  propre mise en page, c'est rejouer les **258 px** du 12/08/2026.
+
+Deux garde-fous mordent dans `extraire_mouvement.py` : les bornes de la section, et
+une liste de classes **interdites** dans la part portable. Vérifiés par sabotage.
+
+### Un satellite qui veut le mouvement sur SES blocs
+
+Le kit ne connaît que ses propres noms de classes. Un hôte se déclare :
+
+```html
+<meta name="verdier-mouvement" content=".doc-section, .recit-p">
+```
+
+Ce qu'il déclare **s'ajoute** à la liste du kit.
+
+### Une page qui construit sa vue après le chargement
+
+`verdier.js` balaie une fois, au chargement. Le journal PrintNC, lui, garde ses 112
+blocs de récit derrière quatre cartes : au balayage, **aucun n'est rendu**. Il rappelle
+donc le kit quand la vue existe :
+
+```js
+window.verdierMouvement.rescanner(element)
+```
+
+**Là où il ne faut pas l'appeler : sur un filtre ou une recherche.** Faire apparaître
+en fondu des résultats que le visiteur vient de demander, c'est le faire attendre pour
+ce qu'il a déjà demandé.
+
+### Les deux règles qui protègent le contenu
+
+Ce dispositif n'a qu'un mauvais dénouement possible : un bloc marqué `opacity:0` que
+rien ne révèle — du **contenu invisible, sans message**. Deux choses l'empêchent :
+
+1. **Un bloc non rendu n'est jamais marqué.** Un élément derrière un filtre
+   (`display:none`) mesure 0 : il est écarté. Sinon, le jour où le filtre le rouvre,
+   il serait invisible pour toujours.
+2. **Le filet.** Si l'observateur ne tire pas — onglet d'arrière-plan, retour de
+   bfcache, navigateur qui throttle — un passage retardé montre ce qui est dans le
+   champ. Mesuré le 27/08/2026 dans un onglet non affiché : Chrome cesse de délivrer
+   les intersections, onze blocs restaient à zéro. Le filet se retire dès qu'il n'y
+   a plus rien à couvrir.
 
 ## Le chapeau
 

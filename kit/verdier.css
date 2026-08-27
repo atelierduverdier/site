@@ -472,25 +472,28 @@ footer{padding:44px 0 60px; color:var(--fg-2)}
   color:rgba(255,255,255,.6); font-size:.82rem}
 
 /* ---------- 13bis. Mouvement et profondeur ------------------------------
-   Ce que le site n'avait pas : du temps. Tout y apparaissait d'un bloc,
-   rien ne reagissait sous le curseur. Les regles qui suivent ajoutent le
-   MINIMUM qui donne cette impression — une montee douce a l'entree dans
-   le champ, un souleve au survol, une courbe d'attenuation qui decelere
-   longuement au lieu de s'arreter net.
+   Le site etait juste, mais il n'avait pas de TEMPS : tout y apparaissait
+   d'un bloc et rien ne repondait sous le curseur. Cette section lui en
+   donne, sous trois disciplines :
 
-   Trois disciplines, sans quoi ce genre d'ajout nuit plus qu'il n'aide :
-
-   1. RIEN NE DEPEND DU JAVASCRIPT POUR ETRE LU. La classe `.js-reveal`
-      n'est jamais ecrite dans le HTML : c'est verdier.js qui la pose, et
-      seulement s'il sait l'animer. Script en panne, script bloque, vieux
-      navigateur : la page s'affiche entiere, comme avant.
-   2. LE MOUVEMENT SE COUPE SUR DEMANDE. `prefers-reduced-motion` n'est pas
-      une politesse : une animation qui defile donne la nausee a qui y est
-      sensible. Tout est neutralise en bloc a la fin de la section.
+   1. LA CLASSE QUI CACHE N'EST JAMAIS DANS LE HTML. C'est verdier.js qui
+      pose `.js-reveal`, et seulement s'il sait ensuite l'animer. Script
+      bloque, vieux navigateur, lecteur d'ecran : la page s'affiche
+      entiere. Ecrire `class="js-reveal"` a la main rendrait le contenu
+      invisible chez qui n'execute pas le script — ne jamais le faire.
+   2. `prefers-reduced-motion` COUPE TOUT, ici et dans le script. Ce n'est
+      pas une politesse : une animation qui defile donne la nausee a qui y
+      est sensible. Chaque part se neutralise elle-meme, en bloc.
    3. RIEN NE BOUGE DE PLUS DE QUELQUES PIXELS. Un site d'atelier n'est pas
       une demo : le mouvement doit se sentir, pas se voir.
 
-   La courbe est la meme partout — une sortie longue, sans rebond. */
+   La courbe est la meme partout — une sortie longue, sans rebond.
+
+   LA SECTION EST COUPEE EN DEUX, et cette coupure est la seule chose qui
+   permet d'en donner un morceau aux satellites : `13bis-a` ne nomme que
+   des classes que le kit ecrit lui-meme, `13bis-b` s'appuie sur toute la
+   mise en page du kit. Voir le bandeau de 13bis-b pour ce que couterait
+   de les confondre. */
 
 :root{
   --sortie:cubic-bezier(.16,1,.3,1);        /* decelere longuement */
@@ -502,10 +505,64 @@ footer{padding:44px 0 60px; color:var(--fg-2)}
 :root[data-theme="dark"]{ --leve:0 2px 6px rgba(0,0,0,.35),0 16px 44px rgba(0,0,0,.45) }
 :root[data-theme="light"]{ --leve:0 2px 4px rgba(20,25,35,.05),0 14px 40px rgba(20,25,35,.10) }
 
-/* --- L'entree dans le champ. Posee par verdier.js, jamais par le HTML. */
+
+/* ---------- 13bis-a. Portable -------------------------------------------
+   CE QUI SUIT NE SUPPOSE AUCUNE MISE EN PAGE. Les seuls noms cites sont
+   ecrits par le kit lui-meme — `.js-reveal` par verdier.js, `data-agrandir`
+   par la visionneuse — ou sont des elements bruts. Rien ici ne peut entrer
+   en collision avec la feuille d'un site hote.
+
+   C'est pour cela que kit/extraire_mouvement.py en tire
+   verdier-mouvement.css, pose chez les satellites qui gardent leur propre
+   mise en page. Les bornes de cette part sont ses reperes : ne pas
+   renommer ces deux bandeaux sans corriger l'extracteur (il s'arrete au
+   lieu de produire un fichier vide, mais autant ne pas le declencher).
+
+   AJOUTER UNE REGLE ICI, C'EST L'ENVOYER SUR QUATRE SITES. Une regle qui
+   nomme `.carte`, `.hero`, `.btn` ou tout autre classe de mise en page va
+   dans 13bis-b, pas ici. */
+
+/* L'entree dans le champ. Posee par verdier.js, jamais par le HTML. */
 .js-reveal{ opacity:0; transform:translateY(16px);
   transition:opacity .75s var(--sortie), transform .75s var(--sortie) }
 .js-reveal.vu{ opacity:1; transform:none }
+
+/* Une planche qu'on peut agrandir doit le DIRE avant le clic. */
+[data-agrandir]{ cursor:zoom-in }
+
+/* Une ancre ne doit pas se garer SOUS la barre collante. `scroll-margin`
+   plutot qu'un decalage bricole : le navigateur s'en charge, y compris au
+   clavier et depuis un lien externe.
+
+   84 px = la barre du kit (60) et de quoi respirer. MAIS LE CHIFFRE EST
+   UNE VARIABLE, et ce n'est pas de la coquetterie : chez un hote, les
+   barres collantes n'ont pas cette hauteur-la. Le journal PrintNC empile
+   la barre de l'atelier et sa rangee d'onglets, mesure le total a chaque
+   bascule de vue et le publie dans `--marge-ancre` — 128 px releves le
+   27/08/2026. En lisant cette variable, la regle prend le bon chiffre chez
+   qui le connait, et garde 84 chez qui ne dit rien. */
+html{ scroll-behavior:smooth }
+section[id],h2[id],h3[id]{ scroll-margin-top:var(--marge-ancre, 84px) }
+
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto }
+  .js-reveal,.js-reveal.vu{ opacity:1; transform:none; transition:none }
+}
+
+
+/* ---------- 13bis-b. Maison ---------------------------------------------
+   CE QUI SUIT S'APPUIE SUR LES CLASSES DU KIT et ne part PAS chez un site
+   qui a sa propre mise en page.
+
+   Ce n'est pas de la prudence en l'air, c'est la lecon des 258 px : en
+   posant le kit entier sous le journal PrintNC le 12/08/2026, sa page
+   s'allongeait de 258 px parce que `.hero h1` du kit est plus specifique
+   que son `.hero-titre`. Dix-sept selecteurs se croisent, et la
+   specificite en cree d'autres qui ne se voient pas au nom.
+
+   Le halo du heros ci-dessous est le pire cas : il force `overflow:hidden`
+   sur `.hero`. Chez un hote dont le heros deborde exprès, cela ROGNE son
+   dessin — sans rien dire. */
 
 /* --- Le souleve au survol. La carte gagnait deja un liseré orange ; elle
    se detache maintenant du fond, ce qui rend le liseré lisible au lieu de
@@ -516,13 +573,11 @@ footer{padding:44px 0 60px; color:var(--fg-2)}
 .carte:hover,.panel:hover{ transform:translateY(-3px); box-shadow:var(--leve) }
 .figure:hover,.plan:hover,.capture:hover{ box-shadow:var(--leve) }
 
-/* --- Une planche qu'on peut agrandir doit le DIRE avant le clic : elle
-   respire legerement sous le curseur, et le curseur devient une loupe.
-   Le cadre garde ses coins, d'ou l'overflow. */
+/* --- La planche respire legerement sous le curseur. Le cadre garde ses
+   coins, d'ou l'overflow. */
 .plan,.capture,.figure{ overflow:hidden }
 .plan img,.capture img{ transition:transform .55s var(--sortie) }
 .plan:hover img,.capture:hover img{ transform:scale(1.012) }
-[data-agrandir]{ cursor:zoom-in }
 
 /* --- Les boutons repondent a l'appui. Un bouton qui ne bouge pas laisse
    douter du clic sur les liaisons lentes. */
@@ -550,22 +605,13 @@ footer{padding:44px 0 60px; color:var(--fg-2)}
              color-mix(in srgb,var(--orange) 16%, transparent), transparent 62%);
   z-index:-1; pointer-events:none; filter:blur(18px) }
 
-/* --- Une ancre ne doit pas se garer SOUS la barre collante. `scroll-margin`
-   plutot qu'un decalage bricole : le navigateur s'en charge, y compris au
-   clavier et depuis un lien externe. */
-html{ scroll-behavior:smooth }
-section[id],h2[id],h3[id]{ scroll-margin-top:84px }
-
-/* --- La coupure, en bloc. Tout ce qui precede redevient statique. */
+/* --- La coupure, en bloc, pour la part maison. */
 @media (prefers-reduced-motion:reduce){
-  html{ scroll-behavior:auto }
-  .js-reveal,.js-reveal.vu{ opacity:1; transform:none; transition:none }
   .carte,.panel,.figure,.plan,.capture,.btn,.plan img,.capture img{
     transition:none }
   .carte:hover,.panel:hover,.btn:hover,.btn:active{ transform:none }
   .plan:hover img,.capture:hover img{ transform:none }
 }
-
 /* ---------- 14. Impression ---------------------------------------------
    Le manuel laser part en PDF par WeasyPrint ; autant que le kit ne
    sabote pas l'impression des autres pages. */

@@ -63,8 +63,16 @@ FICHIERS = {
 # `.hero h1` du kit est plus spécifique que le `.hero-titre` du journal.
 # Dix-sept sélecteurs se croisent, et la spécificité en crée d'autres qui
 # ne se voient pas au nom : on ne pose donc que ce qui est demandé.
+# `verdier-mouvement.css` accompagne les jetons depuis le 27/08/2026 : le
+# satellite recevait déjà `verdier.js`, donc la classe `.js-reveal` lui
+# était bien POSÉE sur les blocs — mais sans règle en face elle ne faisait
+# rien. Il avait la mécanique sans l'effet. C'est la part 13bis-a de la
+# charte, celle qui ne nomme que ce que le kit écrit lui-même : aucune
+# collision possible avec la mise en page de l'hôte (voir
+# kit/extraire_mouvement.py).
 JETONS_SEULS = {
     'verdier-jetons.css': 'verdier-jetons.css',
+    'verdier-mouvement.css': 'verdier-mouvement.css',
     'verdier.js': 'verdier.js',
     'chapeau.svg': 'verdier-chapeau.svg',
     'logo.svg': 'verdier-logo.svg',
