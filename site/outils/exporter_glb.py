@@ -52,7 +52,12 @@ FLECHE = 0.25
 ANGLE = 0.35
 TRIANGLES_MAX = 40000            # au-delà, on le dit : la page serait lourde
 
-# (clé, modèle FreeCAD, ce que la page en dit, page du site)
+# (clé, modèle FreeCAD, ce que la page en dit, page du site, pièces choisies)
+#
+# La cinquième entrée ne sert qu'aux documents dont l'état d'affichage
+# enregistré n'est pas un bon guide. Le sabot est dans ce cas : son Quai, son
+# Adaptateur et sa Brosse y dorment INVISIBLES, et c'est le Quai — la moitié
+# du produit — qui manquait au premier export.
 #
 # Un modèle dont le document s'ouvre avec des dizaines d'objets visibles qui
 # ne composent rien ne donne pas un GLB montrable : le magasin ATC est dans
@@ -62,19 +67,20 @@ MODELES = [
     ('attache-gouttiere',
      Path.home() / 'Projets/realisations/attache-gouttiere/AttacheGouttiere80.FCStd',
      "Collier de descente Ø 80, deux pièces imprimées et un insert récupéré.",
-     'projets/attache-gouttiere.html'),
+     'projets/attache-gouttiere.html', None),
     ('dust-shoe',
      Path.home() / 'Projets/machine/dust-shoe/fcstd/sabot_v2.FCStd',
      "Le sabot d'aspiration de la PrintNC, semelle et quai aimanté.",
-     'projets/dust-shoe.html'),
+     'projets/dust-shoe.html',
+     ['Semelle', 'Quai', 'Adaptateur', 'Brosse']),
     ('tonnelle-jasmin',
      Path.home() / 'Projets/realisations/tonnelle-jasmin/Tonnelle.FCStd',
      "La tonnelle montée : poteaux, sablières, chevrons et plots.",
-     'projets/tonnelle-jasmin.html'),
+     'projets/tonnelle-jasmin.html', None),
     ('meuble-balais',
      Path.home() / 'Projets/realisations/meuble-balais/MeubleABalais.FCStd',
      "L'armoire de jardin, bardage et toit.",
-     'projets/meuble-balais.html'),
+     'projets/meuble-balais.html', None),
 ]
 
 _lignes = []
@@ -86,24 +92,83 @@ def dire(texte):
     JOURNAL.write_text("\n".join(_lignes) + "\n", encoding='utf-8')
 
 
-def solides_visibles(doc):
-    """Les solides de tête effectivement affichés, avec leur couleur.
+def _porte_une_couleur(o):
+    """Un objet qui a une ShapeColor est une PIÈCE ; un groupe n'en a pas.
 
-    « De tête » = que rien d'autre ne consomme : sans ce filtre on exporte
-    aussi les étapes intermédiaires d'un PartDesign, et le GLB pèse trois
-    fois trop lourd pour la même image."""
-    retenus = []
-    for o in doc.Objects:
-        forme = getattr(o, 'Shape', None)
-        if forme is None or not forme.Solids:
-            continue
-        if [p for p in o.InList if hasattr(p, 'Shape')]:
-            continue
+    C'est le discriminant, et il est net : mesuré le 28/08/2026, les cinq
+    groupes du meuble à balais (Ossature, Bardage, Amenagement, Toiture,
+    Porte) n'ont ni ShapeColor ni Transparency, là où chacune de leurs pièces
+    en a une. Sans ce test on exportait les groupes, tous retombaient sur le
+    gris par défaut, et le cabanon sortait TOUT BLANC."""
+    vo = getattr(o, 'ViewObject', None)
+    return vo is not None and hasattr(vo, 'ShapeColor')
+
+
+def _enfants_solides(o):
+    return [c for c in o.OutList
+            if getattr(c, 'Shape', None) is not None and c.Shape.Solids]
+
+
+def solides_a_exporter(doc, choisis=None):
+    """Ce qu'on met dans le GLB, avec la couleur du document.
+
+    TROIS RÈGLES, chacune payée par un défaut visible :
+
+    1. On saute ce qui est TRANSPARENT. Une pièce translucide est un repère
+       de construction, pas l'objet : le tronçon de tube et le fragment de
+       mur du collier, le fantôme du laser du sabot. Dans un visualiseur ils
+       ne font que voiler la pièce.
+    2. Un GROUPE n'a pas de couleur. Soit on descend dans ses pièces, soit
+       on garde sa forme et on lui prend la couleur de la première — le test
+       est le VOLUME : si la somme des enfants vaut celle du groupe, c'est un
+       assemblage et on descend ; sinon c'est une répétition (Draft Array),
+       dont les enfants ne valent qu'un exemplaire, et on garde le groupe.
+    3. `choisis` permet de nommer les pièces à la main. Le sabot en a besoin :
+       son Quai, son Adaptateur et sa Brosse sont enregistrés INVISIBLES,
+       et c'est le Quai qui manquait à l'appel.
+    """
+    def couleur_de(o):
         vo = getattr(o, 'ViewObject', None)
-        if vo is None or not getattr(vo, 'Visibility', False):
+        return tuple(getattr(vo, 'ShapeColor', (0.72, 0.72, 0.74))[:3])
+
+    def transparent(o):
+        vo = getattr(o, 'ViewObject', None)
+        return bool(getattr(vo, 'Transparency', 0))
+
+    if choisis:
+        retenus = []
+        for nom in choisis:
+            o = doc.getObject(nom) or next(
+                (x for x in doc.Objects if x.Label == nom), None)
+            if o is None:
+                print(f"      (pièce « {nom} » introuvable)")
+                continue
+            retenus.append((o, couleur_de(o)))
+        return retenus
+
+    tetes = [o for o in doc.Objects
+             if getattr(o, 'Shape', None) is not None and o.Shape.Solids
+             and not [p for p in o.InList if hasattr(p, 'Shape')]
+             and getattr(getattr(o, 'ViewObject', None), 'Visibility', False)]
+
+    retenus = []
+    for o in tetes:
+        if _porte_une_couleur(o):
+            if not transparent(o):
+                retenus.append((o, couleur_de(o)))
             continue
-        couleur = tuple(getattr(vo, 'ShapeColor', (0.72, 0.72, 0.74))[:3])
-        retenus.append((o, couleur, getattr(vo, 'Transparency', 0)))
+        # un groupe : assemblage ou répétition ?
+        enfants = [c for c in _enfants_solides(o) if _porte_une_couleur(c)]
+        if not enfants:
+            continue
+        somme = sum(c.Shape.Volume for c in enfants)
+        assemblage = abs(somme - o.Shape.Volume) <= 0.02 * max(o.Shape.Volume, 1.0)
+        if assemblage:
+            for c in enfants:
+                if not transparent(c):
+                    retenus.append((c, couleur_de(c)))
+        else:
+            retenus.append((o, couleur_de(enfants[0])))
     return retenus
 
 
@@ -161,7 +226,7 @@ print("GLB ecrit :", sortie)
 '''
 
 
-def exporter(cle, modele, bac):
+def exporter(cle, modele, bac, choisis=None):
     import FreeCAD
     import MeshPart
 
@@ -175,7 +240,7 @@ def exporter(cle, modele, bac):
     pieces, triangles = [], 0
     dossier = bac / cle
     dossier.mkdir(parents=True, exist_ok=True)
-    for o, couleur, transp in solides_visibles(doc):
+    for o, couleur in solides_a_exporter(doc, choisis):
         try:
             m = MeshPart.meshFromShape(Shape=o.Shape, LinearDeflection=FLECHE,
                                        AngularDeflection=ANGLE, Relative=False)
@@ -187,8 +252,7 @@ def exporter(cle, modele, bac):
         m.write(str(stl))
         triangles += m.CountFacets
         pieces.append({'nom': o.Label or o.Name, 'stl': str(stl),
-                       'couleur': list(couleur),
-                       'opacite': 1.0 - transp / 100.0})
+                       'couleur': list(couleur), 'opacite': 1.0})
     FreeCAD.closeDocument(doc.Name)
 
     if not pieces:
@@ -224,9 +288,9 @@ def main():
     bac = Path(tempfile.mkdtemp(prefix='exporter_glb_'))
     soucis, faits = [], []
     try:
-        for cle, modele, _resume, _page in MODELES:
+        for cle, modele, _resume, _page, choisis in MODELES:
             try:
-                s, info = exporter(cle, modele, bac)
+                s, info = exporter(cle, modele, bac, choisis)
             except Exception:
                 s, info = (f"{cle} : "
                            f"{traceback.format_exc().strip().splitlines()[-1]}"), None
