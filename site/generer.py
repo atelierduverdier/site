@@ -22,6 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import chemins
 import valeurs_atc
+import valeurs_attache
 import valeurs_fcstd
 
 RACINE = Path(__file__).resolve().parent.parent
@@ -47,6 +48,10 @@ PLANS_REPRIS = [
     # surtout pas le recueil PDF engendre par le lot : il est anterieur a
     # ces retouches, et c'est la version corrigee qui fait foi. Plus les
     # deux A4 d'atelier, qui ne se retouchent pas.
+    # L'attache de descente : la planche couleur, et les trois pièces à
+    # imprimer. Ce sont des fichiers qu'on emporte, pas des images.
+    (chemins.ATTACHE_RENDU, ['planche_collier.pdf', 'planche_collier.png']),
+    (chemins.ATTACHE_STL, ['corps.stl', 'bride.stl', 'cale_point_fixe.stl']),
     (chemins.VOLETS_PLANS, ['Planche1.svg', 'Planche2.svg', 'Planche3.svg',
                             'Planche4.svg', 'Planche5.svg',
                             'Fiche-debit.pdf',
@@ -481,6 +486,19 @@ PAGES = [
                   "neuf matières, hors-ligne, rien n'est envoyé.",
     },
     {
+        'contenu': 'attache-gouttiere.html',
+        'sortie': 'projets/attache-gouttiere.html',
+        'partage': chemins.ATTACHE_RENDU / 'planche_collier.png',
+        'titre': "Attache de descente Ø 80 — un collier qui ne serre pas",
+        'description': "Collier de descente de gouttière Ø 80 imprimé en PETG, "
+                       "monté sur un insert récupéré des attaches cassées. Ses "
+                       "oreilles viennent en butée : l'alésage reste à Ø 81 et le "
+                       "tube coulisse pour se dilater.",
+        'sous_titre': 'attache de descente',
+        'resume': "Collier de descente Ø 80 imprimé, non serrant, sur insert "
+                  "récupéré. Modèle FreeCAD paramétrique.",
+    },
+    {
         'contenu': 'modeles-3d.html',
         'sortie': 'modeles-3d.html',
         'titre': "Les objets en 3D — Atelier du Verdier",
@@ -880,6 +898,47 @@ def copier_modeles() -> dict:
     return empreintes
 
 
+def injecter_attache(corps: str, nom: str) -> str:
+    """Remplace `{{attache.cle}}` par la valeur écrite par le modèle.
+
+    `{{attache.alesage}}`      -> 81
+    `{{attache.prise_filet}}`  -> 4,7
+    `{{attache.hors_tout}}`    -> 71 × 120,5 × 22
+    `{{attache.jeu_insert|2}}` -> 0,60
+    """
+    if '{{attache.' not in corps:
+        return corps
+    for brut in sorted(set(re.findall(r'\{\{attache\.([\w.|]+)\}\}', corps))):
+        cle, _, dec = brut.partition('|')
+        valeur = valeurs_attache.valeur(cle, int(dec) if dec else 1)
+        corps = corps.replace('{{attache.' + brut + '}}', valeur)
+    return corps
+
+
+def injecter_compte(corps: str, nom: str) -> str:
+    """Remplace `{{cartes}}` par le nombre de cartes de la page, en toutes lettres.
+
+    Le titre du sommaire des projets disait « Cinq projets » pendant que la
+    page en portait SIX — la carte de l'attache de descente venait d'arriver.
+    C'est la faute des nombres recopiés à la main, déjà payée sur la VERSION
+    de LaserAtelier restée 44 versions en retard : un compte écrit ailleurs
+    que là où on compte finit toujours par mentir.
+
+    On ne compte donc pas ici non plus : on compte les `class="carte"` de la
+    page elle-même, au moment de l'écrire.
+    """
+    if '{{cartes}}' not in corps:
+        return corps
+    n = corps.count('class="carte"')
+    lettres = {1: 'Un', 2: 'Deux', 3: 'Trois', 4: 'Quatre', 5: 'Cinq',
+               6: 'Six', 7: 'Sept', 8: 'Huit', 9: 'Neuf', 10: 'Dix',
+               11: 'Onze', 12: 'Douze'}
+    if n not in lettres:
+        sys.exit(f"generer : {nom} porte {n} carte(s) — au-delà de douze, "
+                 f"écrire le titre autrement que par un nombre en lettres.")
+    return corps.replace('{{cartes}}', lettres[n])
+
+
 def injecter_modeles(corps: str, nom: str, empreintes: dict) -> str:
     """Remplace `{{modele:clé}}` par le nom de fichier empreint.
 
@@ -1037,6 +1096,8 @@ def main() -> None:
         corps = injecter_fcstd(corps, page['contenu'])
         corps = injecter_coupe(corps, page['contenu'])
         corps = injecter_modeles(corps, page['contenu'], modeles)
+        corps = injecter_attache(corps, page['contenu'])
+        corps = injecter_compte(corps, page['contenu'])
         corps = corps.replace('{{LOGO}}', logo)
         corps = corps.replace('{{RACINE}}', prefixe)
         corps = empreinter(corps, empreintes)

@@ -1,0 +1,206 @@
+<!-- Attache de descente Ø 80. TOUS les nombres sortent de valeurs.json, que
+     `construire_attache.py` écrit à chaque construction — voir
+     valeurs_attache.py pour pourquoi ce modèle-là n'a pas de tableur. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">descente Ø {{attache.d_tube}} mm</span>
+          <span class="badge">PETG, {{attache.corps_g}} g + {{attache.bride_g}} g</span>
+          <span class="badge">insert récupéré</span>
+          <span class="badge">modèle prêt, rien d’imprimé</span>
+        </div>
+        <h1>Un collier qui ne serre pas</h1>
+        <p class="lede">
+          Les attaches d'origine ont cassé. Celles-ci les remplacent, sur
+          <b>l'insert récupéré dans les anciennes</b> — et elles ne serrent pas
+          la descente : c'est exprès.
+        </p>
+      </div>
+      <div class="hero-art">
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="Le collier vu de dessus : les deux oreilles viennent en butée">
+          <g class="figure">
+            <circle cx="180" cy="120" r="72" fill="var(--bg-3)" stroke="var(--fg-3)"
+                    stroke-width="1.2" stroke-dasharray="5 4"/>
+            <path d="M180 44 A76 76 0 0 0 180 196" fill="none" stroke="var(--fg)"
+                  stroke-width="9" stroke-linecap="butt"/>
+            <path d="M180 44 A76 76 0 0 1 180 196" fill="none" stroke="var(--orange)"
+                  stroke-width="9" stroke-linecap="butt"/>
+            <rect x="150" y="188" width="28" height="15" fill="var(--fg)"/>
+            <rect x="182" y="188" width="28" height="15" fill="var(--orange)"/>
+            <line x1="180" y1="182" x2="180" y2="212" stroke="var(--orange-d)"
+                  stroke-width="1.6"/>
+            <text x="216" y="200" class="orange">butée</text>
+            <rect x="60" y="104" width="16" height="32" fill="var(--fg)"/>
+            <line x1="40" y1="90" x2="40" y2="150" stroke="var(--fg-3)" stroke-width="4"/>
+            <text x="46" y="86" class="petit">mur</text>
+            <text x="180" y="124" text-anchor="middle" class="petit">Ø {{attache.alesage}}</text>
+            <text x="180" y="238" text-anchor="middle" class="petit">jeu {{attache.jeu_guidage}} mm au diamètre — le tube coulisse</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>Pourquoi il ne serre pas</h2>
+    <p>
+      Le PVC se dilate de <b>0,7 mm par mètre et par 10 degrés</b>. Sur une
+      descente de six mètres, entre le gel du matin et le plein soleil, cela
+      fait <b>vingt-trois millimètres</b> de course. Un collier serré ne
+      l'empêche pas : il fait travailler les emboîtures jusqu'à ce qu'elles
+      fuient ou se déboîtent. Le fabricant le dit d'ailleurs lui-même —
+      <i>« sauf cas particuliers, les colliers ne doivent pas être serrant afin
+      de permettre le glissement de la canalisation lors des dilatations »</i>.
+    </p>
+    <p>
+      D'où le parti pris : les <b>deux oreilles de serrage viennent en butée
+      franche</b> l'une contre l'autre. On peut serrer la vis à fond, l'alésage
+      reste à Ø {{attache.alesage}} — soit
+      {{attache.jeu_guidage}} mm de jeu au diamètre autour du tube Ø
+      {{attache.d_tube}}. Le réglage n'est plus dans le poignet du poseur, il
+      est dans la géométrie.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">{{attache.alesage}}</span><span class="l">alésage,<br>Ø en mm</span></div>
+      <div class="chiffre"><span class="v">{{attache.ecart_mur}}</span><span class="l">écart au mur,<br>en mm</span></div>
+      <div class="chiffre"><span class="v">{{attache.h_bande}}</span><span class="l">bandeau,<br>hauteur</span></div>
+      <div class="chiffre"><span class="v">{{attache.ep_bande}}</span><span class="l">bandeau,<br>épaisseur</span></div>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Ce qui retient la descente, c'est l'emboîture</span>
+      <p>
+        Un collier tous les deux mètres au plus, et <b>un sous chaque
+        emboîture</b> : l'emboîture, plus grosse que le tube, repose sur le
+        collier et la descente ne peut plus glisser. Là où il n'y en a pas à
+        portée, une cale de 0,8 mm se clipse sur le tube et le collier se
+        referme dessus avec <b>{{attache.serrage_cale}} mm de serrage</b> —
+        une valeur figée par la butée, pas estimée.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>L'insert vient des attaches cassées</h2>
+    <p>
+      Il ne s'achète pas : il se dévisse des anciennes. Base carrée
+      {{attache.carre_insert}} × {{attache.carre_insert}} × {{attache.ep_carre}},
+      surmontée d'un bossage fileté Ø {{attache.d_bossage}} ×
+      {{attache.h_bossage}}, au pas 7 × 150 — le standard couverture français.
+      Ce sont donc <b>ses cotes qui commandent</b> tout le dessin de l'embase,
+      et pas l'inverse. On ne peut pas en commander d'autres.
+    </p>
+    <p>
+      La patte à vis n'offre que <b>{{attache.tige_utile}} mm de filet</b>
+      au-delà de sa collerette. Il faut donc que le taraudage attaque tout de
+      suite : l'insert est monté <b>bossage vers le mur</b>, ce qui en prend
+      <b>{{attache.prise_filet}} mm sur {{attache.tige_utile}}</b>. Monté dans
+      l'autre sens, on n'en prendrait qu'un peu plus d'un millimètre.
+    </p>
+    <p>
+      Il se glisse par le côté, en retrait, et c'est la vis qui l'amène
+      ensuite en butée toute seule — dans un assemblage boulonné, l'écrou est
+      tiré vers la tête, pas poussé. Deux lèvres de {{attache.levre|2}} mm
+      l'empêchent de retomber pendant qu'on prépare les colliers à l'établi.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Imprimé sans aucun support</h2>
+    <p>
+      Deux formes ont été corrigées pour ça, et chacune après mesure. La
+      charnière est passée de trois nœuds à <b>deux</b> : à trois, le nœud
+      supérieur du corps démarrait en l'air, à quinze millimètres du plateau,
+      et son support se retrouvait coincé dans l'articulation. Et le dessous
+      de l'oreille de serrage, qui accusait 56 mm² de surplomb au-delà de 45°,
+      se raccorde maintenant par deux pans à 45° tangents au bossage.
+    </p>
+    <p>
+      Reste 279 mm² au-delà de 45° sur les trois pièces, et ce sont tous des
+      <b>ponts</b> — un pont FDM passe sans support jusqu'à une dizaine de
+      millimètres. Le corps et la cale se posent à plat, la bride
+      <b>retournée</b> ; les fichiers sortent déjà orientés, il n'y a rien à
+      tourner.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">{{attache.corps_g}}</span><span class="l">corps,<br>en grammes</span></div>
+      <div class="chiffre"><span class="v">{{attache.bride_g}}</span><span class="l">bride,<br>en grammes</span></div>
+      <div class="chiffre"><span class="v">{{attache.prise_filet}}</span><span class="l">prise de filet,<br>en mm</span></div>
+      <div class="chiffre"><span class="v">{{attache.jeu_insert|2}}</span><span class="l">jeu de l'insert,<br>en mm</span></div>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Le jeu de l'insert absorbe l'affaissement du pont</span>
+      <p>
+        Le plafond du logement de l'insert est un pont de 6,5 mm, et un pont
+        PETG s'affaisse couramment de 0,1 à 0,3 mm — affaissement qui se
+        retranche <b>directement</b> du jeu de l'insert. À 0,40 mm il n'en
+        restait que 0,10 dans le pire cas, intenable sur une cote imprimée.
+        Le jeu est donc à <b>{{attache.jeu_insert|2}} mm</b>, et les lèvres
+        épaissies d'autant pour que le clipsage ne change pas.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>La planche et les fichiers</h2>
+    <figure class="plan">
+      <img src="{{RACINE}}projets/plans/planche_collier.png"
+           alt="Planche A3 de l'attache de descente : rendu, éclaté numéroté, vue de dessus cotée"
+           loading="lazy" data-agrandir>
+      <figcaption>
+        A3, engendrée par le modèle : rendu ombré, éclaté numéroté, schéma de
+        pose et vue de dessus cotée. Hors tout {{attache.hors_tout}} mm.
+      </figcaption>
+    </figure>
+
+    <div class="cta">
+      <a class="btn btn-primary" href="{{RACINE}}projets/plans/planche_collier.pdf"
+         target="_blank" rel="noopener">La planche en PDF</a>
+      <a class="btn btn-ghost" href="{{RACINE}}modeles-3d.html">Le tourner en 3D</a>
+    </div>
+
+    <p class="muted" style="margin-top:14px">
+      Les trois pièces à imprimer, déjà orientées comme elles se posent sur le
+      plateau — rien à retourner :
+      <a href="{{RACINE}}projets/plans/corps.stl">corps.stl</a>,
+      <a href="{{RACINE}}projets/plans/bride.stl">bride.stl</a>,
+      <a href="{{RACINE}}projets/plans/cale_point_fixe.stl">cale_point_fixe.stl</a>.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Rien n'est encore imprimé</span>
+      <p>
+        Tout est vérifié en géométrie — 48 contrôles mesurés sur les solides —
+        et rien ne l'est sur la pièce. Quatre cotes ne se jugeront qu'à
+        l'établi : le diamètre du lamage de collerette, le clipsage de
+        l'insert, le taraudage direct de la vis d'axe dans le PETG, et le
+        serrage réel de la cale.
+      </p>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Ce qu'il faut en plus</span>
+      <p>
+        Une patte à vis à collerette avec sa cheville, l'insert récupéré, et
+        deux vis inox M5 × 25 avec un écrou — l'une sert d'axe de charnière et
+        se taraude dans le corps, l'autre serre. Axe retenu :
+        {{attache.axe}}, avec {{attache.prise_axe}} mm de prise dans chaque nœud.
+      </p>
+    </div>
+  </div>
+</section>

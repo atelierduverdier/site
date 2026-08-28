@@ -56,6 +56,14 @@ VOLETS = PROJETS / 'realisations' / 'volets-battants'
 VOLETS_FCSTD = VOLETS / 'Volets.FCStd'
 VOLETS_PLANS = VOLETS / 'plans'
 
+# L'attache de descente : modèle piloté par son script, pas par un tableur.
+# C'est donc lui qui écrit `valeurs.json` à la construction — voir
+# valeurs_attache.py pour pourquoi on ne lit pas le .py directement.
+ATTACHE = PROJETS / 'realisations' / 'attache-gouttiere'
+ATTACHE_VALEURS = ATTACHE / 'valeurs.json'
+ATTACHE_RENDU = ATTACHE / 'rendu'                  # la planche couleur
+ATTACHE_STL = ATTACHE / 'stl'                      # les trois pièces à imprimer
+
 # Un gros fichier d'atelier, pour montrer le visualiseur en charge.
 PAQUERETTE = (PROJETS / 'archives' / 'Conception' / 'FreeCAD' / 'Penderie'
               / 'paquerette2.ngc')
@@ -80,6 +88,10 @@ TOUT = {
     'tableur dust shoe v2': DUST_SHOE_PARAMS,
     'tableur dust shoe v1': DUST_SHOE_PARAMS_V1,
     'planches dust shoe': DUST_SHOE_PLANS,
+    'dépôt attache de descente': ATTACHE,
+    'valeurs de l\'attache': ATTACHE_VALEURS,
+    'planche de l\'attache': ATTACHE_RENDU,
+    'STL de l\'attache': ATTACHE_STL,
 }
 
 
