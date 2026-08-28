@@ -112,6 +112,7 @@ navigateur en le faisant, qu'aucune relecture n'aurait données :
 | `site/publier.py` | régénère et pousse sur `gh-pages` |
 | `site/outils/rendre_3d.py` | vues 3D des projets, prises dans FreeCAD sans écran |
 | `site/outils/exporter_glb.py` | les MÊMES modèles, mais manipulables : `.glb` pour la page 3D |
+| `site/vendu/` | les bibliothèques tierces servies d'ici — `<model-viewer>` pour la page 3D |
 | `site/outils/reprendre_plans.py` | planches TechDraw des projets, en image |
 | `site/outils/capturer_*.py` | captures des logiciels, application lancée hors écran |
 | `outils/diffuser_kit.py` | recopie la charte chez les satellites |

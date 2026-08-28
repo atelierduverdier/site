@@ -291,6 +291,18 @@
       var pere = el.parentElement;
       if (pere && (pere.closest('.js-reveal') || pere.closest('.carte,.panel'))) continue;
 
+      /* 3. PAS UN BLOC QUI PORTE UNE VUE 3D. C'est le MEME piege que le
+            recouvrement cliquable ci-dessus, par l'autre bout : `.js-reveal`
+            pose un `transform`, l'element transforme devient le referentiel
+            de ses descendants en position absolue, et <model-viewer> y place
+            justement son canvas WebGL partage. Resultat : le modele
+            s'affiche, mais il ne repond plus a la souris.
+            Mesure du 28/08/2026 sur la page des modeles 3D : cinq cartes sur
+            six etaient mortes, et la seule qui tournait encore etait la
+            premiere — au-dessus du pli, donc ecartee par le test ci-dessus.
+            Le symptome designait la cause. */
+      if (el.querySelector && el.querySelector('model-viewer')) continue;
+
       el.classList.add('js-reveal');
       obs.observe(el);
       poses++;

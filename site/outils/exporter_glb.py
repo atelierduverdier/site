@@ -67,10 +67,6 @@ MODELES = [
      Path.home() / 'Projets/machine/dust-shoe/fcstd/sabot_v2.FCStd',
      "Le sabot d'aspiration de la PrintNC, semelle et quai aimanté.",
      'projets/dust-shoe.html'),
-    ('porte-manteau',
-     Path.home() / 'Projets/realisations/porte-manteau/porte-manteau.FCStd',
-     "Un porte-manteau massif, tourillonné.",
-     'projets/porte-manteau.html'),
     ('tonnelle-jasmin',
      Path.home() / 'Projets/realisations/tonnelle-jasmin/Tonnelle.FCStd',
      "La tonnelle montée : poteaux, sablières, chevrons et plots.",
@@ -79,10 +75,6 @@ MODELES = [
      Path.home() / 'Projets/realisations/meuble-balais/MeubleABalais.FCStd',
      "L'armoire de jardin, bardage et toit.",
      'projets/meuble-balais.html'),
-    ('porte-hammam',
-     Path.home() / 'Projets/realisations/porte-hammam/PorteHammam.FCStd',
-     "Porte de hammam en douglas, panneaux en lames libres et hublot bois.",
-     'projets/porte-hammam.html'),
 ]
 
 _lignes = []
