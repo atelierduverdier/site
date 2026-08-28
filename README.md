@@ -1,9 +1,11 @@
 # atelierduverdier.fr — le portail et la charte commune
 
 Site statique engendré par un script Python maison, servi par GitHub Pages sur
-**<https://atelierduverdier.fr>**. Il porte l'accueil, les fiches des cinq
-logiciels de l'atelier, la rubrique projets, l'appli « vitesses de coupe »
-servie sur `/coupe/` — et **la charte que les autres sites recopient**.
+**<https://atelierduverdier.fr>**. Il porte l'accueil, une fiche pour quatre des
+cinq logiciels de l'atelier — la config PrintNC, le cinquième, renvoie à son
+propre journal —, la rubrique projets et ses cinq réalisations, l'appli
+« vitesses de coupe » servie sur `/coupe/` — et **la charte que les autres
+sites recopient**.
 
 L'atelier a quatre sites. Celui-ci est la racine ; les autres gardent leur doc
 chez eux, sur leur sous-domaine :
