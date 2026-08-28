@@ -10,13 +10,13 @@
           <span class="badge">descente Ø {{attache.d_tube}} mm</span>
           <span class="badge">PETG, {{attache.corps_g}} g + {{attache.bride_g}} g</span>
           <span class="badge">insert récupéré</span>
-          <span class="badge">modèle prêt, rien d’imprimé</span>
+          <span class="badge">{{etat-mot:attache}}</span>
         </div>
         <h1>Un collier qui ne serre pas</h1>
         <p class="lede">
           Les attaches d'origine ont cassé. Celles-ci les remplacent, sur
           <b>l'insert récupéré dans les anciennes</b> — et elles ne serrent pas
-          la descente : c'est exprès.
+          la descente : c'est exprès. Elles sont posées, et le tube coulisse.
         </p>
       </div>
       <div class="hero-art">
@@ -182,14 +182,25 @@
       <a href="{{RACINE}}projets/plans/cale_point_fixe.stl">cale_point_fixe.stl</a>.
     </p>
 
-    <div class="callout note">
-      <span class="ci">Rien n'est encore imprimé</span>
+    <div class="callout tip">
+      <span class="ci">Ce que la pose a dit</span>
       <p>
-        Tout est vérifié en géométrie — 48 contrôles mesurés sur les solides —
-        et rien ne l'est sur la pièce. Quatre cotes ne se jugeront qu'à
-        l'établi : le diamètre du lamage de collerette, le clipsage de
-        l'insert, le taraudage direct de la vis d'axe dans le PETG, et le
-        serrage réel de la cale.
+        Imprimé le 28 août 2026, et <b>toute la descente en est équipée</b>.
+        Les trois paris du dessin ont tenu du premier coup : le tube
+        <b>coulisse</b> dans l'alésage à Ø {{attache.alesage}} une fois les
+        oreilles en butée franche — c'est toute la thèse du collier —,
+        l'insert récupéré <b>clipse et tient</b> dans ses
+        {{attache.jeu_insert|2}} mm de jeu, et la vis M5 inox <b>taille son
+        filet</b> dans le PETG sur {{attache.prise_axe}} mm de prise, sans
+        écrou ni insert laiton.
+      </p>
+      <p>
+        Ce sont des verdicts d'usage, pas des relevés. Les
+        {{attache.controles}} contrôles de <code>verifier.py</code> mesurent
+        les solides ; la pose, elle, n'a rien mesuré. Restent donc sans
+        chiffre le Ø du lamage de collerette — il reçoit bien la patte à vis,
+        puisque les colliers sont au mur — et le serrage réel de la cale, qui
+        attend la première descente sans emboîture à portée.
       </p>
     </div>
 

@@ -915,6 +915,47 @@ def injecter_attache(corps: str, nom: str) -> str:
     return corps
 
 
+# L'ETAT D'UN PROJET S'ECRIT UNE FOIS, ET PAS UNE DE PLUS.
+#
+# « modèle prêt, rien d'imprimé » était saisi A LA MAIN dans deux fichiers
+# sans lien : le badge du héros de la page du projet, et la pastille de sa
+# carte sur le sommaire. Le 28/08/2026 Christophe a écrit « c'est imprimé et
+# c'est bien » — et il fallait corriger les deux, sous peine de laisser les
+# deux pages du site se contredire.
+#
+# C'est exactement la faute que ce dépôt combat partout ailleurs : les cotes
+# viennent de `valeurs.json`, le nombre de projets se compte, la VERSION de
+# LaserAtelier se lit dans son source. L'état du projet était le dernier
+# rescapé du régime de la recopie.
+#
+# La couleur de la pastille est PORTEE PAR L'ETAT, pas choisie à l'usage :
+# `public` (vert) est réservé à ce qui a rencontré le réel.
+ETATS = {
+    'attache': ('public', 'posé sur la descente'),
+}
+
+
+def injecter_etat(corps: str, nom: str) -> str:
+    """Remplace `{{etat:cle}}` et `{{etat-mot:cle}}`.
+
+    `{{etat:attache}}`     -> <span class="etat public">posé sur la descente</span>
+    `{{etat-mot:attache}}` -> posé sur la descente
+
+    Une clé inconnue ARRETE la génération : une carte de projet sans état
+    n'est pas une carte dégradée, c'est une carte qui ment par omission.
+    """
+    for marque, cle in sorted(set(re.findall(r'\{\{(etat|etat-mot):([\w-]+)\}\}',
+                                            corps))):
+        if cle not in ETATS:
+            sys.exit(f"generer : {nom} demande l'état « {cle} », absent "
+                     f"d'ETATS dans generer.py.")
+        classe, mot = ETATS[cle]
+        remplacement = (mot if marque == 'etat-mot'
+                        else f'<span class="etat {classe}">{mot}</span>')
+        corps = corps.replace('{{' + marque + ':' + cle + '}}', remplacement)
+    return corps
+
+
 def injecter_compte(corps: str, nom: str) -> str:
     """Remplace `{{cartes}}` par le nombre de cartes de la page, en toutes lettres.
 
@@ -1098,6 +1139,7 @@ def main() -> None:
         corps = injecter_modeles(corps, page['contenu'], modeles)
         corps = injecter_attache(corps, page['contenu'])
         corps = injecter_compte(corps, page['contenu'])
+        corps = injecter_etat(corps, page['contenu'])
         corps = corps.replace('{{LOGO}}', logo)
         corps = corps.replace('{{RACINE}}', prefixe)
         corps = empreinter(corps, empreintes)
