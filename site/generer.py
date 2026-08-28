@@ -29,6 +29,8 @@ KIT = RACINE / 'kit'
 SITE = RACINE / 'site'
 CONTENU = SITE / 'contenu'
 PUBLIC = SITE / 'public'
+MODELES_3D = CONTENU / 'modeles'      # les .glb engendrés par outils/exporter_glb.py
+VENDU = SITE / 'vendu'                # les bibliothèques tierces, servies d'ici
 
 # Planches reprises TELLES QUELLES depuis les projets, pour être servies
 # en fichier — pas en image. Elles ne sont PAS régénérées ici : le modèle
@@ -479,6 +481,32 @@ PAGES = [
                   "neuf matières, hors-ligne, rien n'est envoyé.",
     },
     {
+        'contenu': 'modeles-3d.html',
+        'sortie': 'modeles-3d.html',
+        'titre': "Les objets en 3D — Atelier du Verdier",
+        'description': "Les modèles FreeCAD de l'atelier, manipulables dans le "
+                       "navigateur : collier de gouttière, sabot d'aspiration, "
+                       "tonnelle, armoire de jardin, porte de hammam. Les mêmes "
+                       "fichiers que ceux qui servent à usiner et à débiter.",
+        'sous_titre': 'modèles 3D',
+        'resume': "Les modèles FreeCAD de l'atelier, à faire tourner dans le "
+                  "navigateur.",
+        # Le visualiseur n'est chargé QUE par cette page : c'est toute la
+        # raison d'avoir rassemblé les modèles ici plutôt que de les
+        # disperser sur les pages projets.
+        'entete_sup': '<style>\n'
+                      '.cartes-3d model-viewer{width:100%;height:260px;display:block;\n'
+                      '  margin:-4px 0 14px;border-radius:10px;background:var(--bg-3);\n'
+                      '  --poster-color:transparent}\n'
+                      '.cartes-3d .carte{padding:14px 16px 18px}\n'
+                      '</style>',
+        # Chemin ECRIT EN DUR, sans {{RACINE}} : `remplir` substitue RACINE
+        # AVANT d'insérer LOCAL_JS, un {{RACINE}} placé ici ressortirait tel
+        # quel. Cette page est à la racine, le chemin relatif suffit.
+        'js_local': '<script type="module" '
+                    'src="modeles/model-viewer.min.js"></script>',
+    },
+    {
         'contenu': 'projets.html',
         'sortie': 'projets/index.html',
         'titre': "Projets d'atelier — Atelier du Verdier",
@@ -591,6 +619,7 @@ def nav(prefixe: str) -> str:
         (prefixe + 'index.html#logiciels', 'Logiciels'),
         (prefixe + 'index.html#atelier', "L'atelier"),
         (prefixe + 'projets/', 'Projets'),
+        (prefixe + 'modeles-3d.html', 'Modèles 3D'),
     ]
     return '\n      '.join(f'<a href="{u}">{t}</a>' for u, t in entrees)
 
@@ -814,6 +843,61 @@ def copier_ressources() -> dict:
     return convertir_captures()
 
 
+def copier_modeles() -> dict:
+    """Publie les modèles 3D et le visualiseur dans public/modeles/.
+
+    MÊME RÈGLE QUE LES CAPTURES : une empreinte du contenu dans le nom. Un
+    modèle re-exporté depuis FreeCAD change de contenu sans changer de nom,
+    et le navigateur continuerait de montrer l'ancien — le pire des bogues,
+    parce qu'il est invisible depuis le serveur.
+
+    Le visualiseur, lui, garde son nom : c'est une bibliothèque figée, et son
+    adresse stable la fait mettre en cache d'une visite à l'autre.
+
+    Rend {clé: nom de fichier empreint}, pour `{{modele:clé}}`.
+    """
+    if not MODELES_3D.is_dir():
+        return {}
+    cible = PUBLIC / 'modeles'
+    cible.mkdir(parents=True, exist_ok=True)
+
+    empreintes, total = {}, 0
+    for glb in sorted(MODELES_3D.glob('*.glb')):
+        octets = glb.read_bytes()
+        empreinte = hashlib.sha256(octets).hexdigest()[:10]
+        nom = f'{glb.stem}.{empreinte}.glb'
+        (cible / nom).write_bytes(octets)
+        empreintes[glb.stem] = nom
+        total += len(octets)
+
+    visualiseur = VENDU / 'model-viewer.min.js'
+    if visualiseur.is_file():
+        shutil.copy2(visualiseur, cible / visualiseur.name)
+        total += visualiseur.stat().st_size
+
+    print(f"  modèles 3D → modeles/ ({len(empreintes)} modèle(s), "
+          f"{total // 1024} Ko avec le visualiseur)")
+    return empreintes
+
+
+def injecter_modeles(corps: str, nom: str, empreintes: dict) -> str:
+    """Remplace `{{modele:clé}}` par le nom de fichier empreint.
+
+    Une clé inconnue ARRÊTE la génération : une page de modèles 3D dont un
+    modèle manque n'est pas une page dégradée, c'est une page fausse — le
+    visualiseur y afficherait un cadre vide sans rien dire.
+    """
+    if '{{modele:' not in corps:
+        return corps
+    for cle in sorted(set(re.findall(r'\{\{modele:([\w-]+)\}\}', corps))):
+        if cle not in empreintes:
+            sys.exit(f"generer : {nom} demande le modèle « {cle} », absent de "
+                     f"contenu/modeles/. Le produire avec "
+                     f"outils/exporter_glb.py, ou retirer le bloc.")
+        corps = corps.replace('{{modele:' + cle + '}}', empreintes[cle])
+    return corps
+
+
 def empreinter(corps: str, empreintes: dict) -> str:
     """Remplace `captures/x.webp` par `captures/x.<empreinte>.webp`.
 
@@ -930,6 +1014,7 @@ def main() -> None:
     logo = logo_en_ligne()
 
     empreintes = copier_ressources()
+    modeles = copier_modeles()
     copier_appli_coupe()
     partage_appli_coupe()
     cartes = images_partage(PAGES)
@@ -951,6 +1036,7 @@ def main() -> None:
         corps = injecter_laser(corps, page['contenu'])
         corps = injecter_fcstd(corps, page['contenu'])
         corps = injecter_coupe(corps, page['contenu'])
+        corps = injecter_modeles(corps, page['contenu'], modeles)
         corps = corps.replace('{{LOGO}}', logo)
         corps = corps.replace('{{RACINE}}', prefixe)
         corps = empreinter(corps, empreintes)
@@ -983,7 +1069,7 @@ def main() -> None:
                 'RESUME': page['resume'],
                 'LIENS': liens_pied(),
                 'ANNEE': ANNEE,
-                'LOCAL_JS': '',
+                'LOCAL_JS': page.get('js_local', ''),
             }, 'pied.html')
         )
 

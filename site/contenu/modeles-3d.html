@@ -1,0 +1,112 @@
+<!-- Les modèles 3D, RASSEMBLÉS SUR UNE SEULE PAGE et pas dispersés sur les
+     pages projets. C'est un choix de poids : le visualiseur pèse 250 Ko
+     servis en gzip, et le visiteur qui vient lire une page projet n'a pas à
+     les payer. Ici, il sait où il va.
+
+     Chaque .glb est engendré depuis le MODÈLE FreeCAD par
+     outils/exporter_glb.py — rien n'est modelé ici, et les couleurs sont
+     celles que porte le document, pas des couleurs réinventées. -->
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Les objets, en trois dimensions</h1>
+    <p class="lede">
+      Les mêmes modèles FreeCAD que ceux qui servent à usiner, imprimer et
+      débiter — pas des maquettes refaites pour la vitrine. Faites-les
+      tourner&nbsp;: glisser pour pivoter, molette pour zoomer.
+    </p>
+    <div class="badges">
+      <span class="badge">6 modèles</span>
+      <span class="badge">947 Ko en tout</span>
+      <span class="badge">chargés au fil du défilement</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="cartes cartes-3d">
+
+    <div class="carte">
+      <model-viewer src="{{RACINE}}modeles/{{modele:attache-gouttiere}}"
+        alt="Collier de descente de gouttière Ø 80" camera-controls touch-action="pan-y"
+        shadow-intensity="0.9" exposure="1.05" environment-image="neutral"
+        camera-orbit="-38deg 68deg auto" interaction-prompt="none"></model-viewer>
+      <div class="head"><span class="ci">🌧️</span><h3>Attache de descente Ø 80</h3></div>
+      <p>
+        Collier de guidage en deux pièces imprimées, sur un insert carré
+        <b>récupéré sur les attaches cassées</b>. Il ne serre pas&nbsp;: ses
+        oreilles viennent en butée, et le tube coulisse pour se dilater.
+      </p>
+    </div>
+
+    <div class="carte">
+      <model-viewer src="{{RACINE}}modeles/{{modele:dust-shoe}}"
+        alt="Sabot d'aspiration de la fraiseuse PrintNC" camera-controls touch-action="pan-y"
+        shadow-intensity="0.9" exposure="1.05" environment-image="neutral"
+        camera-orbit="-40deg 66deg auto" interaction-prompt="none"></model-viewer>
+      <div class="head"><span class="ci">🌀</span><h3>Sabot d'aspiration</h3></div>
+      <p>
+        La semelle et son quai aimanté, pour la PrintNC. Le quai se détache
+        d'une main pour changer d'outil, et se repose à l'aveugle&nbsp;: des
+        entonnoirs rattrapent trois millimètres de décalage.
+      </p>
+      <div class="liens"><a href="{{RACINE}}projets/dust-shoe.html">La page du projet</a></div>
+    </div>
+
+    <div class="carte">
+      <model-viewer src="{{RACINE}}modeles/{{modele:tonnelle-jasmin}}"
+        alt="Tonnelle en bois pour jasmin" camera-controls touch-action="pan-y"
+        shadow-intensity="0.9" exposure="1.05" environment-image="neutral"
+        camera-orbit="-35deg 72deg auto" interaction-prompt="none"></model-viewer>
+      <div class="head"><span class="ci">🌿</span><h3>Tonnelle à jasmin</h3></div>
+      <p>
+        Poteaux, sablières, chevrons et plots. Le modèle porte le débit&nbsp;:
+        changer une section change la feuille de coupe.
+      </p>
+      <div class="liens"><a href="{{RACINE}}projets/tonnelle-jasmin.html">La page du projet</a></div>
+    </div>
+
+    <div class="carte">
+      <model-viewer src="{{RACINE}}modeles/{{modele:meuble-balais}}"
+        alt="Armoire de jardin à balais" camera-controls touch-action="pan-y"
+        shadow-intensity="0.9" exposure="1.05" environment-image="neutral"
+        camera-orbit="-42deg 70deg auto" interaction-prompt="none"></model-viewer>
+      <div class="head"><span class="ci">🧹</span><h3>Armoire de jardin</h3></div>
+      <p>
+        Toit monopente, pieds formés par les montants d'angle, porte sur la
+        face latérale gauche. Cent vingt paramètres dans un tableur tiennent
+        le modèle, les plans et le débit.
+      </p>
+      <div class="liens"><a href="{{RACINE}}projets/meuble-balais.html">La page du projet</a></div>
+    </div>
+
+    <div class="carte">
+      <model-viewer src="{{RACINE}}modeles/{{modele:porte-hammam}}"
+        alt="Porte de hammam en douglas" camera-controls touch-action="pan-y"
+        shadow-intensity="0.9" exposure="1.05" environment-image="neutral"
+        camera-orbit="-30deg 74deg auto" interaction-prompt="none"></model-viewer>
+      <div class="head"><span class="ci">♨️</span><h3>Porte de hammam</h3></div>
+      <p>
+        Douglas purgé d'aubier, panneaux en lames libres pour encaisser
+        l'humidité, et un hublot de surveillance en bois. Les jeux de
+        dilatation sont dans le modèle.
+      </p>
+    </div>
+
+    <div class="carte">
+      <model-viewer src="{{RACINE}}modeles/{{modele:porte-manteau}}"
+        alt="Porte-manteau massif" camera-controls touch-action="pan-y"
+        shadow-intensity="0.9" exposure="1.05" environment-image="neutral"
+        camera-orbit="-45deg 68deg auto" interaction-prompt="none"></model-viewer>
+      <div class="head"><span class="ci">🧥</span><h3>Porte-manteau</h3></div>
+      <p>Massif, tourillonné, sans quincaillerie apparente.</p>
+    </div>
+
+  </div>
+
+  <p class="muted" style="margin-top:26px">
+    Le magasin ATC n'est pas ici&nbsp;: son document s'ouvre avec deux cent
+    seize objets visibles sur cinq cent seize, et ce qui reste allumé ne
+    compose rien. Sa page porte trois planches TechDraw, qui en disent plus.
+  </p>
+</div>

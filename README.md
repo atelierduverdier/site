@@ -111,6 +111,7 @@ navigateur en le faisant, qu'aucune relecture n'aurait données :
 | `site/generer.py` | assemble les pages, convertit les captures en WebP |
 | `site/publier.py` | régénère et pousse sur `gh-pages` |
 | `site/outils/rendre_3d.py` | vues 3D des projets, prises dans FreeCAD sans écran |
+| `site/outils/exporter_glb.py` | les MÊMES modèles, mais manipulables : `.glb` pour la page 3D |
 | `site/outils/reprendre_plans.py` | planches TechDraw des projets, en image |
 | `site/outils/capturer_*.py` | captures des logiciels, application lancée hors écran |
 | `outils/diffuser_kit.py` | recopie la charte chez les satellites |
@@ -120,6 +121,7 @@ Ceux qui touchent à FreeCAD se lancent avec le python de l'AppImage :
 
 ```bash
 QT_QPA_PLATFORM=offscreen ~/Applications/FreeCAD_*.appimage --console site/outils/rendre_3d.py
+xvfb-run -a freecad --console site/outils/exporter_glb.py
 ```
 
 Ces fichiers-là n'ont **pas** de garde `if __name__ == "__main__":` : la console
