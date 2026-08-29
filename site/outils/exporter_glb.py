@@ -18,8 +18,15 @@
 #  2. Il faut `FreeCADGui.showMainWindow()` : sans elle, pas de ViewObject,
 #     donc pas de couleurs.
 #  3. On travaille sur une COPIE.
-#  4. L'export glTF de FreeCAD ne sert à rien : `Import.export` produit bien
-#     un `.glb`, mais VIDE — 320 octets, buffer binaire à zéro (28/08/2026).
+#  4. L'export glTF de FreeCAD marche, contrairement à ce qui était écrit
+#     ici. Démenti par Christophe le 29/08/2026, son porte-manteau exporté
+#     depuis le MENU : .gltf + .bin, géométrie complète, et sa vraie couleur.
+#     Remesuré : `Import.export` rend 1,1 Mo pour l'assemblage du sabot.
+#     CE QUI JUSTIFIE ENCORE BLENDER : appelé depuis un SCRIPT, cet export ne
+#     pose AUCUN matériau — mesuré sur quatre documents aux ShapeColor bien
+#     posées, `materiaux = 0` partout. L'écart entre le menu et le script
+#     n'est pas explique ; Blender, lui, reçoit les couleurs par manifeste et
+#     ne dépend d'aucun des deux.
 #  5. Blender prend la Base Color en LINÉAIRE. Donner les valeurs sRGB de la
 #     charte telles quelles faisait sortir l'orange #ff8a00 en #ffc100 —
 #     mesuré dans le navigateur en relisant les baseColorFactor du GLB.

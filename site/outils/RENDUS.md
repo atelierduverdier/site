@@ -103,9 +103,25 @@ sphère englobante, puis distance pour qu'elle tienne dans le champ.
 brûle un collier de 8 cm et laisse un cabanon de 2 m dans le noir. Le script
 la met à l'échelle ; à la main, souviens-t'en.
 
-**6. L'export glTF de FreeCAD ne marche pas.** `Import.export` produit bien
-un `.glb`… de 320 octets, buffer binaire à zéro. C'est la raison d'être de
-l'étape Blender dans `exporter_glb.py`.
+**6. L'export glTF de FreeCAD marche — mais pas depuis un script.** Ce
+fichier a d'abord affirmé le contraire, et Christophe l'a démenti le
+29/08/2026 en exportant son porte-manteau : un `.gltf` de 15 Ko avec son
+`.bin` de 46 Ko, engendré par OCCT 7.9, **et sa vraie couleur bois**
+(0,571 0,342 0,133 — pas un gris d'usine).
+
+Remesuré aussitôt : `Import.export` sort bien 1,1 Mo pour l'assemblage du
+sabot, six maillages. La phrase « 320 octets, buffer à zéro » était fausse.
+
+**Ce qui reste vrai, et qui est la raison de l'étape Blender :** appelé
+DEPUIS UN SCRIPT, cet export ne pose **aucun matériau**. Mesuré sur quatre
+documents — l'assemblage du sabot, l'attache et ses quatre pièces, un corps
+PartDesign seul, trois corps du cabanon — tous avec des `ShapeColor` bien
+posées : `materiaux = 0` à chaque fois. L'export de Christophe, lui, est
+passé par le MENU de l'interface.
+
+La différence entre les deux chemins n'est pas encore expliquée. Tant qu'elle
+ne l'est pas, la chaîne garde Blender, qui reçoit les couleurs par un
+manifeste et ne dépend d'aucun de ces deux comportements.
 
 ---
 
