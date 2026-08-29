@@ -11,8 +11,15 @@
        #doc-… #gloss-…  les sections de la documentation et du glossaire
        #all #doc #gloss #maj #recit   les onglets
        #2026-01 … #2026-08            les onglets de mois (AAAA-MM)
-     Les ancres PROPRES au portail (#logiciels, #atelier, #projets, #qui)
-     ne matchent aucun de ces motifs : elles restent ici.
+     Les ancres PROPRES au portail (#logiciels, #atelier, #qui) ne matchent
+     aucun de ces motifs : elles restent ici.
+
+     #projets est un cas a part depuis le 28/08/2026. La page portait une
+     SECTION « projets » en bas, pendant que le menu menait a la PAGE
+     /projets/ : deux commandes du meme nom, deux destinations. La section a
+     ete retiree (elle ne montrait qu'un projet sur cinq, et son unique autre
+     carte doublait deux liens de « Les machines »), donc l'ancre n'a plus de
+     cible ici — on l'envoie ou elle voulait aller.
 
      Placé en TÊTE du corps, pour partir avant que la page ne se peigne.
      `location.replace` et non une affectation : pas d'entrée d'historique,
@@ -24,7 +31,8 @@
   var journal = /^(v-|doc-|gloss-)/.test(h)
              || /^(all|doc|gloss|maj|recit)$/.test(h)
              || /^\d{4}-\d{2}$/.test(h);
-  if (journal) location.replace('https://printnc.atelierduverdier.fr/#' + h);
+  if (journal) return location.replace('https://printnc.atelierduverdier.fr/#' + h);
+  if (h === 'projets') location.replace('projets/');
 })();
 </script>
 
@@ -53,7 +61,7 @@
         <div class="cta">
           <a class="btn btn-primary" href="#logiciels">Les logiciels</a>
           <a class="btn btn-ghost" href="#atelier">L'atelier</a>
-          <a class="btn btn-ghost" href="#projets">Les projets</a>
+          <a class="btn btn-ghost" href="{{RACINE}}projets/">Les projets</a>
           <!-- Même bouton que le héros du site laser : .btn-kofi est déjà
                dans kit/verdier.css, il n'y avait que le portail à ne pas
                s'en servir — et à ne citer ko-fi nulle part. -->
@@ -236,52 +244,6 @@
           <a href="{{RACINE}}projets/magasin-atc.html">La note de calcul de la bille →</a>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<section id="projets">
-  <div class="wrap">
-    <div class="sec-tag">Projets</div>
-    <h2>Ce qui sort de l'atelier</h2>
-    <p class="sec-lede">
-      Les pièces et les montages, avec les calculs et les erreurs qui vont avec.
-    </p>
-
-    <div class="cartes">
-      <div class="carte">
-        <div class="head">
-          <span class="ci">🔩</span>
-          <h3>Magasin ATC ER20</h3>
-          <span class="etat chantier">en cours</span>
-        </div>
-        <p>
-          Changeur d'outil automatique à billes pour broche ER20. La note de calcul
-          détaille pourquoi la saillie des billes vaut 1,20 mm et pas autre chose —
-          et pourquoi la contrainte la plus serrée du projet est restée invisible
-          jusqu'à ce qu'on mesure un chanfrein de 1,5 mm.
-        </p>
-        <div class="liens">
-          <a href="{{RACINE}}projets/magasin-atc.html">Lire la note de calcul</a>
-          <a href="{{RACINE}}projets/">Tous les projets</a>
-        </div>
-      </div>
-
-      <div class="carte">
-        <div class="head">
-          <span class="ci">📓</span>
-          <h3>Journal de construction</h3>
-          <span class="etat public">en ligne</span>
-        </div>
-        <p>
-          Le montage de la PrintNC en vidéo, mois par mois : mécanique, électronique,
-          LinuxCNC, puis laser.
-        </p>
-        <div class="liens">
-          <a href="https://printnc.atelierduverdier.fr">Voir le journal</a>
-        </div>
-      </div>
-
     </div>
   </div>
 </section>
