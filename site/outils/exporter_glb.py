@@ -53,7 +53,7 @@ ANGLE = 0.35
 TRIANGLES_MAX = 40000            # au-delà, on le dit : la page serait lourde
 
 # (clé, modèle FreeCAD, ce que la page en dit, page du site, pièces choisies,
-#  pièces écartées)
+#  pièces écartées, réglages de la feuille)
 #
 # « écartées » et pas « choisies » pour cacher une pièce, et la nuance est
 # mesurée : nommer les quatre groupes du cabanon dans « choisies » les ferait
@@ -82,7 +82,7 @@ MODELES = [
      # publié serait resté celui d'AVANT l'inversion vis/écrou. Ce sont
      # exactement les cinq pièces que portait le GLB précédent.
      'projets/attache-gouttiere.html',
-     ['Corps', 'Bride', 'Axe', 'Insert', 'PatteAVis'], None),
+     ['Corps', 'Bride', 'Axe', 'Insert', 'PatteAVis'], None, None),
     # L'ASSEMBLAGE PARQUÉ, ET PAS LES PIÈCES EN VRAC. `sabot_v2.FCStd` est le
     # modèle de travail : ses pièces y sont posées à l'origine, côte à côte,
     # sans rapport entre elles — on voyait quatre objets flotter, et le Quai y
@@ -94,23 +94,23 @@ MODELES = [
      Path.home() / 'Projets/machine/dust-shoe/fcstd/AssemblageQuaiV2.FCStd',
      "Le sabot d'aspiration parqué : la brosse reste dans son quai, la "
      "machine repart avec sa semelle.",
-     'projets/dust-shoe.html', None, None),
+     'projets/dust-shoe.html', None, None, None),
     ('tonnelle-jasmin',
      Path.home() / 'Projets/realisations/tonnelle-jasmin/Tonnelle.FCStd',
      "La tonnelle montée : poteaux, sablières, chevrons et plots.",
-     'projets/tonnelle-jasmin.html', None, None),
-    # LA PORTE EST RETIRÉE POUR QU'ON VOIE DEDANS (demande de Christophe,
-    # 29/08/2026). Fermé, le cabanon est une boîte : ses paramètres tiennent
-    # des étagères, une cloison EN TRAVERS et un compartiment à balais pleine
-    # hauteur que personne ne voyait. La porte est sur la face latérale GAUCHE
-    # — on regarde donc par son ouverture, comme devant le meuble ouvert. La
-    # légende de la page le dit : une pièce absente sans un mot serait un
-    # mensonge.
+     'projets/tonnelle-jasmin.html', None, None, None),
+    # LA PORTE S'OUVRE, ELLE NE DISPARAÎT PAS. Première réponse à « il serait
+    # bien de voir l'intérieur » : l'écarter de l'export. Elle montrait le
+    # dedans et mentait sur le meuble — Christophe l'a vu du premier coup
+    # d'œil. Le MODÈLE porte désormais l'angle (`AnglePorte`, 0 par défaut,
+    # pour que les planches et le débit ne bougent pas d'un trait) ; le site
+    # se contente de CHOISIR une valeur sur sa copie. On ne place rien à la
+    # main : on renseigne un paramètre que le modèle expose.
     ('meuble-balais',
      Path.home() / 'Projets/realisations/meuble-balais/MeubleABalais.FCStd',
      "L'armoire de jardin, porte ôtée : la cloison en travers et les "
      "étagères du fond.",
-     'projets/meuble-balais.html', None, ['Porte']),
+     'projets/meuble-balais.html', None, None, {'AnglePorte': 120}),
 ]
 
 _lignes = []
@@ -286,7 +286,7 @@ print("GLB ecrit :", sortie)
 '''
 
 
-def exporter(cle, modele, bac, choisis=None, exclus=None):
+def exporter(cle, modele, bac, choisis=None, exclus=None, reglages=None):
     import FreeCAD
     import MeshPart
 
@@ -302,6 +302,27 @@ def exporter(cle, modele, bac, choisis=None, exclus=None):
     for voisin in sorted(modele.parent.glob('*.FCStd')):
         shutil.copy2(voisin, bac / voisin.name)
     doc = FreeCAD.openDocument(str(bac / modele.name))
+
+    # ON RÈGLE, ON NE MODÈLE PAS. Le meuble expose `AnglePorte` dans sa
+    # feuille ; le site lui donne une valeur sur SA copie, et le modèle fait
+    # le reste. La nuance est tout ce qui sépare « le site choisit une vue »
+    # de « le site invente une géométrie ». Un alias inconnu ARRÊTE l'export :
+    # une porte restée fermée sans un mot, c'est le défaut qu'on répare.
+    if reglages:
+        feuilles = [o for o in doc.Objects if o.TypeId == 'Spreadsheet::Sheet']
+        for alias, valeur in reglages.items():
+            pose = False
+            for sh in feuilles:
+                try:
+                    sh.set(alias, str(valeur))
+                    pose = True
+                except Exception:
+                    continue
+            if not pose:
+                raise RuntimeError(
+                    f"réglage « {alias} » refusé par les {len(feuilles)} "
+                    f"feuille(s) de {modele.name}")
+        doc.recompute()
 
     pieces, triangles = [], 0
     dossier = bac / cle
@@ -354,9 +375,10 @@ def main():
     bac = Path(tempfile.mkdtemp(prefix='exporter_glb_'))
     soucis, faits = [], []
     try:
-        for cle, modele, _resume, _page, choisis, exclus in MODELES:
+        for cle, modele, _resume, _page, choisis, exclus, reglages in MODELES:
             try:
-                s, info = exporter(cle, modele, bac, choisis, exclus)
+                s, info = exporter(cle, modele, bac, choisis, exclus,
+                                   reglages)
             except Exception:
                 s, info = (f"{cle} : "
                            f"{traceback.format_exc().strip().splitlines()[-1]}"), None
