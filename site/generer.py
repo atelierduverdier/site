@@ -1253,7 +1253,16 @@ def faits_modeles(corps: str, transmis: dict, nom: str) -> dict:
         if not titre or not fichier:
             sys.exit(f"generer : {nom} porte une carte 3D sans titre ou sans "
                      f"modèle lisible — le compte serait faux.")
-        noms.append(titre.group(1).strip())
+        nom_carte = titre.group(1).strip()
+        # UNE VIRGULE DANS UN TITRE CASSE L'ÉNUMÉRATION. « Sabot d'aspiration,
+        # parqué » donnait « … sabot d'aspiration, parqué, tonnelle à jasmin
+        # et armoire de jardin » : quatre objets annoncés comme cinq, dans la
+        # phrase même que Google affiche. Relevé le 29/08/2026 en la lisant.
+        if ',' in nom_carte:
+            sys.exit(f"generer : le titre « {nom_carte} » de {nom} porte une "
+                     f"virgule — elle se confondrait avec les séparateurs de "
+                     f"la description de partage. Le renommer sans.")
+        noms.append(nom_carte)
         octets += transmis.get(fichier.group(1), 0)
 
     # Minuscule à l'initiale : ces noms s'enfilent dans une phrase.
