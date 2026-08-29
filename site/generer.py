@@ -49,10 +49,10 @@ PLANS_REPRIS = [
     # surtout pas le recueil PDF engendre par le lot : il est anterieur a
     # ces retouches, et c'est la version corrigee qui fait foi. Plus les
     # deux A4 d'atelier, qui ne se retouchent pas.
-    # L'attache de descente : la planche couleur, et les trois pièces à
-    # imprimer. Ce sont des fichiers qu'on emporte, pas des images.
+    # L'attache de descente : la planche couleur. Les STL, eux, passent par
+    # `copier_stl_attache` : ils existent en plusieurs VARIANTES qui portent
+    # toutes les mêmes trois noms de fichier, et se seraient écrasées ici.
     (chemins.ATTACHE_RENDU, ['planche_collier.pdf', 'planche_collier.png']),
-    (chemins.ATTACHE_STL, ['corps.stl', 'bride.stl', 'cale_point_fixe.stl']),
     (chemins.VOLETS_PLANS, ['Planche1.svg', 'Planche2.svg', 'Planche3.svg',
                             'Planche4.svg', 'Planche5.svg',
                             'Fiche-debit.pdf',
@@ -1074,6 +1074,91 @@ def injecter_modeles(corps: str, nom: str, empreintes: dict) -> str:
 
 
 
+# Les fixations connues, et leur nom en français. Une inconnue ARRÊTE la
+# génération : mieux vaut pas de page qu'un bouton dont personne ne sait ce
+# qu'il télécharge.
+FIXATIONS = {'insert recupere': 'insert récupéré', 'vis 6x70': 'vis 6 × 70'}
+
+
+def copier_stl_attache() -> list:
+    """Publie les STL de CHAQUE variante de l'attache, et dit lesquelles.
+
+    Le dépôt engendre une variante par diamètre et par mode de fixation. Les
+    trois pièces portent les MÊMES noms dans toutes — `corps.stl`,
+    `bride.stl`, `cale_point_fixe.stl` — donc une recopie à plat les aurait
+    écrasées les unes sur les autres, en silence, et la page aurait proposé
+    trois liens qui pointent tous sur la dernière variante recopiée. Chacune
+    a donc son sous-dossier.
+
+    LA VARIANTE PRINCIPALE NE PORTE PAS SON NOM SUR LE DISQUE : ses fichiers
+    sont à la racine de `stl/`. On le déduit de `valeurs.json` (diamètre et
+    fixation) plutôt que d'écrire « 80-insert_recupere » ici — ce nom-là
+    changerait le jour où Christophe changerait de variante par défaut.
+
+    Rend la liste de ce qui a VRAIMENT été copié, pour que la page ne puisse
+    ni annoncer une variante absente ni en oublier une.
+    """
+    racine = chemins.ATTACHE_STL
+    if not racine.is_dir():
+        print(f"  ! STL de l'attache introuvables ({racine})")
+        return []
+    PIECES = ('corps.stl', 'bride.stl', 'cale_point_fixe.stl')
+    principale = valeurs_attache.toutes()
+    dossiers = [(f"{int(principale['d_tube'])}-"
+                 f"{principale['fixation'].replace(' ', '_')}", racine)]
+    dossiers += [(d.name, d) for d in sorted(racine.iterdir()) if d.is_dir()]
+
+    cible = PUBLIC / 'projets' / 'stl'
+    variantes = []
+    for nom, dossier in dossiers:
+        diametre, _, fixation = nom.partition('-')
+        fixation = fixation.replace('_', ' ')
+        if fixation not in FIXATIONS:
+            sys.exit(f"generer : fixation « {fixation} » inconnue pour la "
+                     f"variante {nom} — l'ajouter à FIXATIONS.")
+        fichiers = []
+        for piece in PIECES:
+            src = dossier / piece
+            if not src.is_file():
+                sys.exit(f"generer : {src} manque — la variante {nom} serait "
+                         f"proposée incomplète.")
+            (cible / nom).mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, cible / nom / piece)
+            fichiers.append((piece, src.stat().st_size))
+        variantes.append({'cle': nom, 'diametre': int(diametre),
+                          'fixation': FIXATIONS[fixation], 'fichiers': fichiers})
+
+    # Rangées par diamètre croissant, pas par nom de dossier : « 100 » se
+    # classe avant « 63 » en alphabétique, et un tableau de tailles qui monte
+    # puis redescend se lit mal.
+    variantes.sort(key=lambda v: (v['diametre'], v['fixation']))
+    poids = sum(t for v in variantes for _, t in v['fichiers'])
+    print(f"  STL de l'attache → projets/stl/ ({len(variantes)} variante(s), "
+          f"{len(variantes) * len(PIECES)} fichiers, {poids // 1024} Ko)")
+    return variantes
+
+
+def injecter_stl_attache(corps: str, nom: str, variantes: list) -> str:
+    """Remplace `{{attache-stl}}` par le tableau des variantes téléchargeables."""
+    if '{{attache-stl}}' not in corps:
+        return corps
+    if not variantes:
+        sys.exit(f"generer : {nom} demande les STL de l'attache, mais aucune "
+                 f"variante n'a été publiée.")
+    lignes = []
+    for v in variantes:
+        liens = ' · '.join(
+            f'<a href="{{{{RACINE}}}}projets/stl/{v["cle"]}/{p}">{p[:-4]}</a>'
+            f' <span class="muted">{t // 1024}&nbsp;Ko</span>'
+            for p, t in v['fichiers'])
+        lignes.append(f'<tr><td><b>Ø&nbsp;{v["diametre"]}</b></td>'
+                      f'<td>{v["fixation"]}</td><td>{liens}</td></tr>')
+    table = ('<div class="twrap"><table>\n'
+             '<thead><tr><th>descente</th><th>fixation</th>'
+             '<th>les trois pièces</th></tr></thead>\n<tbody>\n'
+             + '\n'.join(lignes) + '\n</tbody></table></div>')
+    return corps.replace('{{attache-stl}}', table)
+
 def faits_modeles(corps: str, transmis: dict, nom: str) -> dict:
     """Ce que la page de modèles 3D montre VRAIMENT : compte, poids, noms.
 
@@ -1263,6 +1348,7 @@ def main() -> None:
 
     empreintes = copier_ressources()
     modeles, poids_modeles = copier_modeles()
+    stl_attache = copier_stl_attache()
     copier_appli_coupe()
     partage_appli_coupe()
     cartes = images_partage(PAGES)
@@ -1286,6 +1372,7 @@ def main() -> None:
         corps = injecter_coupe(corps, page['contenu'])
         corps = injecter_modeles(corps, page['contenu'], modeles)
         corps = injecter_attache(corps, page['contenu'])
+        corps = injecter_stl_attache(corps, page['contenu'], stl_attache)
         corps = injecter_compte(corps, page['contenu'])
         corps = injecter_etat(corps, page['contenu'])
         # Les faits se comptent SUR LA PAGE, une fois les modèles injectés :

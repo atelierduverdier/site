@@ -83,6 +83,42 @@
 
 <section>
   <div class="wrap">
+    <h2>La pose a trouvé ce qu'aucun contrôle ne cherchait</h2>
+    <p>
+      Christophe, la descente équipée&nbsp;: «&nbsp;l'écrou est du mauvais côté,
+      car j'ai dû visser la vis qui était contre le mur et c'était pas
+      évident&nbsp;». L'empreinte hexagonale était creusée dans la face
+      <em>extérieure</em> de la bride, donc la tête de vis venait porter sur la
+      face <em>murale</em> de l'oreille. Pour serrer, il fallait glisser le
+      tournevis entre le collier et le mur — à l'aveugle, à bout de bras, sur
+      une échelle. Les deux sont intervertis&nbsp;: <b>l'écrou côté mur</b>, où
+      il n'a jamais besoin qu'on le tourne, <b>la tête dehors</b>.
+    </p>
+    <div class="callout warn">
+      <span class="ci">Rien dans la géométrie ne pouvait le dire</span>
+      <p>
+        Les deux oreilles sont symétriques, l'assemblage se refermait à
+        <b>0,000 mm</b> de jeu, aucune interpénétration, et les
+        <b>51 contrôles</b> passaient. Le défaut n'était pas dans la pièce, il
+        était dans le <b>geste</b> — et un geste ne se mesure pas sur un
+        solide. Il se contrôle une fois qu'on sait le nommer&nbsp;: on sonde un
+        point entre l'axe de la vis et un plat de l'écrou, qui doit être
+        <b>vide côté mur</b> et <b>plein dehors</b>. Éprouvé à rebours sur une
+        copie portant l'ancienne disposition&nbsp;: les deux lignes rougissent.
+      </p>
+    </div>
+    <p>
+      <b>Les colliers des photos ci-dessus portent l'ancienne disposition</b>,
+      et les fichiers publiés plus bas ne sont donc plus ceux qui sont sur le
+      mur. Rien à reprendre sur la descente&nbsp;: ils tiennent, ils sont
+      seulement pénibles à serrer. Le corps perd 198,6&nbsp;mm³ dans
+      l'échange, la bride en gagne 161,8.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <h2>Pourquoi il ne serre pas</h2>
     <p>
       Le PVC se dilate de <b>0,7 mm par mètre et par 10 degrés</b>. Sur une
@@ -132,7 +168,9 @@
       surmontée d'un bossage fileté Ø {{attache.d_bossage}} ×
       {{attache.h_bossage}}, au pas 7 × 150 — le standard couverture français.
       Ce sont donc <b>ses cotes qui commandent</b> tout le dessin de l'embase,
-      et pas l'inverse. On ne peut pas en commander d'autres.
+      et pas l'inverse&nbsp;: on n'en commande pas, on les récupère. Qui n'en a
+      pas — ou dont les inserts ont cassé eux aussi — prendra la variante à
+      <b>vis ordinaire</b>, plus bas.
     </p>
     <p>
       La patte à vis n'offre que <b>{{attache.tige_utile}} mm de filet</b>
@@ -212,6 +250,43 @@
 
 <section>
   <div class="wrap">
+    <h2>Trois diamètres, et une version sans insert</h2>
+    <p>
+      Le modèle se pilote par <b>deux valeurs, et rien d'autre</b>&nbsp;: le
+      diamètre de la descente et le mode de fixation. Il est engendré en
+      <b>{{attache.diametres}}</b>, et au choix sur l'<b>insert récupéré</b> ou
+      sur une <b>vis ordinaire de {{attache.vis_ordinaire}}</b> — pour qui n'a
+      pas d'anciennes attaches à dévisser, ou dont les inserts sont cassés eux
+      aussi.
+    </p>
+    <div class="callout tip">
+      <span class="ci">« Valide » ne veut pas dire « bon »</span>
+      <p>
+        Mesure faite avant d'écrire quoi que ce soit&nbsp;: le modèle
+        construisait <b>déjà</b> des solides valides de Ø 40 à Ø 125, sans
+        jamais lever d'erreur. Cinq grandeurs y étaient pourtant écrites en
+        millimètres alors qu'elles expriment des <b>rapports</b> — à bandeau
+        figé à 5&nbsp;mm, le Ø 63 est <b>1,86 fois plus raide</b> et le Ø 100
+        1,82 fois plus mou&nbsp;; l'oreille passait <b>0,337 mm sous le
+        bandeau</b> à Ø 63, si bien que la pièce se serait imprimée en
+        équilibre sur une génératrice&nbsp;; et à petit évasement le couloir de
+        l'insert se bouchait <b>sans qu'aucun contrôle le voie</b>. Elles se
+        dérivent désormais du diamètre.
+      </p>
+    </div>
+    <p>
+      <b>Le Ø 80 à insert sort inchangé</b>, et c'est vérifié plutôt
+      qu'espéré&nbsp;: sur les trois pièces, deux fichiers sont identiques
+      <b>octet pour octet</b> avant et après, et le troisième a les mêmes
+      1&nbsp;462 sommets et 2&nbsp;930 facettes rigoureusement identiques sur
+      2&nbsp;932 — les deux restantes étant un même quadrilatère plat
+      retriangulé sur l'autre diagonale.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <h2>La planche et les fichiers</h2>
     <figure class="plan">
       <img src="{{RACINE}}projets/plans/planche_collier.png"
@@ -229,12 +304,20 @@
       <a class="btn btn-ghost" href="{{RACINE}}modeles-3d.html">Le tourner en 3D</a>
     </div>
 
+    <h3>Les pièces à imprimer</h3>
+    <p>
+      Trois pièces par collier, <b>déjà orientées comme elles se posent sur le
+      plateau</b> — rien à retourner, et aucun support. Le tableau donne les
+      {{attache.nb_diametres}} diamètres et les deux fixations&nbsp;; prenez la
+      ligne qui correspond à votre descente.
+    </p>
+
+    {{attache-stl}}
+
     <p class="muted" style="margin-top:14px">
-      Les trois pièces à imprimer, déjà orientées comme elles se posent sur le
-      plateau — rien à retourner :
-      <a href="{{RACINE}}projets/plans/corps.stl">corps.stl</a>,
-      <a href="{{RACINE}}projets/plans/bride.stl">bride.stl</a>,
-      <a href="{{RACINE}}projets/plans/cale_point_fixe.stl">cale_point_fixe.stl</a>.
+      La <b>cale</b> ne se pose qu'à un seul collier de la descente, celui qui
+      fait point fixe&nbsp;: c'est elle qui empêche le tube de descendre tout
+      seul. Les autres le laissent coulisser, et c'est le but.
     </p>
 
     <div class="callout tip">

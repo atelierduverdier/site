@@ -20,6 +20,7 @@
 # =========================================================================
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -37,7 +38,42 @@ def _charger() -> dict:
         sys.exit(f"valeurs_attache : {source} introuvable — le produire avec "
                  f"`python3 construire_attache.py` dans le dépôt de l'attache.")
     _cache.update(json.loads(source.read_text(encoding='utf-8')))
+    _cache.update(_variantes())
     return _cache
+
+
+def _variantes() -> dict:
+    """Les autres tailles engendrées à côté de la principale.
+
+    Le dépôt écrit un `valeurs-<diamètre>-<fixation>.json` par variante
+    construite. ON LES COMPTE PLUTÔT QUE DE LES ÉCRIRE : « Ø 63, Ø 80 et
+    Ø 100 » tapé dans la page serait faux le jour où une taille s'ajoute, et
+    personne ne rouvrirait la phrase pour vérifier. C'est la règle de la
+    maison appliquée à une liste au lieu d'un nombre.
+
+    Rend `diametres` (« Ø 63, Ø 80 et Ø 100 ») et `vis_ordinaire` (« 6 × 70 »,
+    lu dans le nom de fixation de la variante à vis).
+    """
+    fichiers = sorted(chemins.ATTACHE.glob('valeurs-*.json'))
+    if not fichiers:
+        return {}
+    diams, vis = {_cache.get('d_tube')}, set()
+    for f in fichiers:
+        d = json.loads(f.read_text(encoding='utf-8'))
+        diams.add(d.get('d_tube'))
+        m = re.match(r'vis (\d+)x(\d+)$', str(d.get('fixation', '')))
+        if m:
+            vis.add('%s × %s' % m.groups())
+    diams = [int(x) for x in sorted(d for d in diams if d)]
+    if len(diams) > 1:
+        liste = ('Ø ' + ', Ø '.join(str(x) for x in diams[:-1])
+                 + ' et Ø ' + str(diams[-1]))
+    else:
+        liste = 'Ø ' + str(diams[0])
+    dehors = {'diametres': liste, 'nb_diametres': len(diams)}
+    if len(vis) == 1:
+        dehors['vis_ordinaire'] = vis.pop()
+    return dehors
 
 
 def valeur(cle: str, decimales: int = 1) -> str:
