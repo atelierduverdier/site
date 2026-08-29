@@ -1177,9 +1177,18 @@ def convertir_captures() -> dict:
     cible = PUBLIC / 'logiciels' / 'captures'
     cible.mkdir(parents=True, exist_ok=True)
 
-    avant = apres = 0
+    avant = apres = n = 0
     sans_perte = 0
-    for src in sorted(captures.glob('*.png')):
+    # PNG **ET** JPEG COMME ORIGINAUX. Les captures d'interface sont des PNG,
+    # et c'est juste : ce sont des aplats, une compression sans perte les rend
+    # exactement. Une PHOTO d'appareil, elle, arrive déjà en JPEG : en garder
+    # un « original » PNG ne serait pas un original, ce serait une copie SANS
+    # PERTE D'UNE PERTE — dix fois plus lourde dans le dépôt pour pas un pixel
+    # de mieux. Les photos de l'attache posée, arrivées le 29/08/2026, sont le
+    # premier cas. Le reste de la chaîne ne change pas : Pillow ouvre les deux,
+    # et c'est le WebP servi qui porte l'empreinte.
+    for src in sorted(list(captures.glob('*.png')) + list(captures.glob('*.jpg')),
+                      key=lambda c: c.stem):
         image = Image.open(src).convert('RGB')
         dest = cible / (src.stem + '.webp')
 
@@ -1201,6 +1210,7 @@ def convertir_captures() -> dict:
 
         avant += src.stat().st_size
         apres += final.stat().st_size
+        n += 1
 
     # LES VIDÉOS NE SE CONVERTISSENT PAS, elles se recopient — mais avec
     # la même empreinte de contenu dans le nom. Un fichier qui change sous
@@ -1217,7 +1227,11 @@ def convertir_captures() -> dict:
         print(f"  {len(list(captures.glob('*.mp4')))} vidéo(s) recopiée(s) — "
               f"{poids_video // 1024} Ko, nommées par empreinte")
 
-    n = len(list(captures.glob('*.png')))
+    # COMPTÉ DANS LA BOUCLE, pas re-deviné après coup. Ce compteur refaisait
+    # son propre `glob('*.png')` : le jour où les JPEG sont entrés, la boucle
+    # en traitait 34 et la ligne en annonçait 30. Un nombre dérivé deux fois
+    # finit toujours par diverger — c'est la règle de la maison, prise en
+    # défaut chez elle.
     if n:
         print(f"  {n} capture(s) en WebP — {avant // 1024} Ko → {apres // 1024} Ko "
               f"({100 - 100 * apres // avant} % de moins, {sans_perte} sans perte, "
