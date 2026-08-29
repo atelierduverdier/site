@@ -68,7 +68,10 @@ FICHIERS_KIT = ['verdier.css', 'verdier.js', 'chapeau.svg', 'logo.svg']
 PARTAGE_L, PARTAGE_H = 1200, 630
 PARTAGE_FOND = (246, 247, 249)      # --bg-2 clair : les rendus 3D s'y fondent
 PARTAGE_ENCRE = (35, 39, 46)        # --fg
-PARTAGE_ORANGE = (230, 122, 0)      # --orange-d
+PARTAGE_ORANGE = (172, 91, 0)       # --orange-encre : 4,61:1 sur PARTAGE_FOND.
+                                    # L'orange de marque n'y donnait que 2,8 —
+                                    # et c'est le texte que voit tout le monde,
+                                    # puisque c'est la vignette d'un lien partagé.
 PARTAGE_GRIS = (90, 98, 110)        # --fg-2
 POLICE = '/usr/share/fonts/TTF/DejaVuSans%s.ttf'
 
