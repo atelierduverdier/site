@@ -521,11 +521,17 @@ PAGES = [
         # disperser sur les pages projets.
         # DEUX COLONNES, PAS QUATRE. À 260 px de haut dans une grille qui en
         # fait trois ou quatre au large, chaque objet tenait dans un timbre.
-        # `minmax(420px,1fr)` en donne deux à 1180 px et une seule sous 900 ;
+        # Le minimum de 420 px en donne deux à 1180 px et une seule sous 900 ;
         # la hauteur suit la fenêtre, bornée pour ne pas manger l'écran d'un
         # portable. Le bouton « plein écran » fait le reste.
+        #
+        # `min(420px,100%)` ET PAS `420px` : écrit sec, ce minimum s'impose
+        # même dans un conteneur plus étroit, et la page entière se met à
+        # défiler de gauche à droite. Mesuré le 29/08/2026, c'est-à-dire
+        # trouvé par Christophe sur son téléphone deux heures après que je
+        # l'ai introduit : 52 px de débordement à 390 px de large.
         'entete_sup': '<style>\n'
-                      '.cartes-3d{grid-template-columns:repeat(auto-fit,minmax(420px,1fr))}\n'
+                      '.cartes-3d{grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr))}\n'
                       '.cartes-3d model-viewer{width:100%;height:clamp(320px,46vh,540px);\n'
                       '  display:block;margin:-4px 0 10px;border-radius:10px;\n'
                       '  background:var(--bg-3);--poster-color:transparent}\n'
