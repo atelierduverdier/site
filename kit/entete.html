@@ -5,13 +5,20 @@
      Ne pas l'éditer dans une copie : elle sera écrasée.
      Source : atelierduverdier/site — kit/entete.html
 
-     Marques à remplacer par le générateur :
-       {{TITRE}}        titre de l'onglet
-       {{DESCRIPTION}}  méta description (une phrase, pour les moteurs)
-       {{RACINE}}       préfixe vers le kit depuis la page : "" ou "../"
-       {{SOUS_TITRE}}   « Atelier Laser », « Journal PrintNC »… vide pour le portail
-       {{NAV}}          les <a> de navigation
-       {{LOCAL_CSS}}    <link> vers la feuille propre au site, ou vide
+     Marques à remplacer par le générateur — NOMMÉES SANS LEURS ACCOLADES,
+     et ce n'est pas une coquetterie : `remplir` fait un remplacement de
+     texte sur tout le fichier, commentaire compris. Écrites en toutes
+     lettres ici, ces sept marques étaient donc REMPLIES elles aussi, et
+     chaque page servait 1 918 octets de commentaire portant son propre
+     titre, sa description et ses cinq liens de menu — un bloc de
+     documentation qui s'effaçait en expliquant, sur les dix-sept documents
+     des quatre sites. Relevé le 29/08/2026.
+       TITRE        titre de l'onglet
+       DESCRIPTION  méta description (une phrase, pour les moteurs)
+       RACINE       préfixe vers le kit depuis la page : "" ou "../"
+       SOUS_TITRE   « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       NAV          les <a> de navigation
+       LOCAL_CSS    <link> vers la feuille propre au site, ou vide
 
      IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
      Le site laser écrivait data-theme="light" : comme
@@ -26,6 +33,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LE CANEVAS AVANT LA FEUILLE DE STYLE. Sans cette ligne, le navigateur
+     peint la page en BLANC jusqu'à ce que verdier.css arrive — une seconde
+     requête, mesurée à 143 ms au premier appel pour 40 Ko. Sur un poste
+     réglé en sombre, ça fait un éclair blanc plein écran à CHAQUE
+     navigation. Le script anti-clignotement plus bas ne suffisait pas : il
+     pose `data-theme`, ce qui ne dit rien au navigateur sur la couleur du
+     fond avant que la feuille ne soit lue. Elle vaut aussi pour l'ascenseur
+     et les widgets natifs, qui restaient en livrée claire le long d'une
+     page sombre. Déclarée AVANT le <link>, sinon elle arrive trop tard. -->
+<meta name="color-scheme" content="light dark">
 <title>{{TITRE}}</title>
 <meta name="description" content="{{DESCRIPTION}}">
 <link rel="icon" type="image/svg+xml" href="{{RACINE}}chapeau.svg">
@@ -63,7 +80,13 @@
 (function(){try{
   var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
   var v=m?m[1]:localStorage.getItem('verdier-theme');
-  if(v)document.documentElement.setAttribute('data-theme',v);
+  // `colorScheme` en plus de `data-theme` : la balise <meta> ci-dessus
+  // annonce « les deux », donc le navigateur suit l'OS. Quand le visiteur a
+  // choisi le CONTRAIRE de son OS, il faut le lui dire ici — sans quoi le
+  // fond et l'ascenseur partiraient dans le mauvais sens le temps du
+  // chargement, et l'éclair reviendrait pour ceux-là seulement.
+  if(v){var r=document.documentElement;r.setAttribute('data-theme',v);
+        r.style.colorScheme=v;}
 }catch(e){}})();
 </script>
 

@@ -1,7 +1,16 @@
 <!-- Les modèles 3D, RASSEMBLÉS SUR UNE SEULE PAGE et pas dispersés sur les
-     pages projets. C'est un choix de poids : le visualiseur pèse 250 Ko
-     servis en gzip, et le visiteur qui vient lire une page projet n'a pas à
-     les payer. Ici, il sait où il va.
+     pages projets. C'est un choix de poids, et c'est le VISUALISEUR qui le
+     commande : 254 Ko transmis, 934 Ko à analyser — vingt-huit fois le poids
+     de cette page. Les .glb, eux, ne se chargent qu'au défilement. Disperser
+     reviendrait donc à faire payer ce fichier au LECTEUR venu pour un récit,
+     au lieu du curieux venu voir tourner un objet. Ici, il sait où il va.
+     À rediscuter le jour où la galerie sera plus visitée que les quatre
+     fiches projet réunies : la mesure est dans GoatCounter, pas dans un avis.
+
+     Les trois pastilles du héros sont ENGENDRÉES (`{{modeles:…}}`), comme la
+     description de partage : elles annonçaient « 4 modèles » et « 800 Ko »
+     à la main, ce dernier étant la taille sur DISQUE — 3,5 fois ce que le
+     serveur transmet.
 
      Chaque .glb est engendré depuis le MODÈLE FreeCAD par
      outils/exporter_glb.py — rien n'est modelé ici, et les couleurs sont
@@ -16,8 +25,8 @@
       tourner&nbsp;: glisser pour pivoter, molette pour zoomer.
     </p>
     <div class="badges">
-      <span class="badge">4 modèles</span>
-      <span class="badge">800 Ko en tout</span>
+      <span class="badge">{{modeles:compte}} modèles</span>
+      <span class="badge">{{modeles:poids}} en tout</span>
       <span class="badge">chargés au fil du défilement</span>
     </div>
   </div>

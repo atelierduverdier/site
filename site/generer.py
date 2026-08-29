@@ -17,6 +17,7 @@ import re
 import hashlib
 import shutil
 import sys
+import zlib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -502,10 +503,13 @@ PAGES = [
         'contenu': 'modeles-3d.html',
         'sortie': 'modeles-3d.html',
         'titre': "Les objets en 3D — Atelier du Verdier",
+        # ENGENDRÉE, PAS ÉCRITE. Elle annonçait « … armoire de jardin, porte
+        # de hammam » pour une page qui n'a jamais porté que quatre objets, et
+        # c'est ce texte-là que Google affiche et que Facebook déplie. Elle se
+        # déduit désormais des cartes de la page — voir `faits_modeles`.
         'description': "Les modèles FreeCAD de l'atelier, manipulables dans le "
-                       "navigateur : collier de gouttière, sabot d'aspiration, "
-                       "tonnelle, armoire de jardin, porte de hammam. Les mêmes "
-                       "fichiers que ceux qui servent à usiner et à débiter.",
+                       "navigateur : {{modeles:noms}}. Les mêmes fichiers que "
+                       "ceux qui servent à usiner et à débiter.",
         'sous_titre': 'modèles 3D',
         'resume': "Les modèles FreeCAD de l'atelier, à faire tourner dans le "
                   "navigateur.",
@@ -630,8 +634,59 @@ LIENS_PIED = [
 ]
 
 
-def nav(prefixe: str) -> str:
-    """Les liens de navigation, préfixés selon la profondeur de la page."""
+# Quelle entrée de menu s'allume, pour une page donnée.
+#
+# LA PASTILLE ÉTAIT DESSINÉE ET N'A JAMAIS SERVI. `kit/verdier.css` porte
+# depuis le premier commit du dépôt, le 12/08/2026, une règle qui colore
+# l'entrée courante en orange -- et rien n'a jamais posé l'attribut qu'elle
+# attend. Relevé le 29/08 : `aria-current` n'apparaît nulle part dans les
+# sources hors cette règle, et zéro fois dans les pages servies par les
+# QUATRE sites. Soixante-quatorze commits et cinq pages devenues quatorze
+# plus tard, la barre du haut -- collante, donc sous les yeux en permanence
+# -- ne disait toujours pas où l'on est.
+#
+# Deux valeurs, et la nuance compte : `page` quand le lien mène exactement à
+# la page affichée, `true` quand il mène à la RUBRIQUE qui la contient (une
+# fiche projet allume « Projets » sans que « Projets » soit cette fiche).
+# La règle CSS accepte les deux depuis qu'elle vise `a[aria-current]`.
+RUBRIQUES = [
+    ('modeles-3d.html', 'Modèles 3D'),
+    ('projets/', 'Projets'),
+    ('logiciels/', 'Logiciels'),
+]
+
+# Une redirection n'est pas une destination : elle sert un `meta refresh` et
+# repart. Lui allumer une entrée ferait clignoter le menu au passage.
+SANS_PASTILLE = {'projets/tonnelle-glycine.html'}
+
+
+def entree_courante(sortie: str) -> tuple:
+    """(libellé à allumer, valeur de l'attribut) pour la page en cours.
+
+    L'accueil est le cas qui demande un arbitrage : TROIS entrées y mènent
+    (« Accueil », et les deux ancres « Logiciels » et « L'atelier »). Sans
+    choix explicite les trois s'allumeraient, ce qui est pire que rien --
+    une barre où tout est allumé n'indique plus rien. C'est « Accueil » qui
+    gagne : les deux autres ne désignent qu'une section de cette page.
+    """
+    if sortie in SANS_PASTILLE:
+        return (None, None)
+    if sortie == 'index.html':
+        return ('Accueil', 'page')
+    for prefixe, libelle in RUBRIQUES:
+        if sortie == prefixe or sortie.startswith(prefixe):
+            # Le sommaire d'une rubrique EST la page ; une fiche n'en est
+            # qu'un membre.
+            exact = sortie in (prefixe, prefixe + 'index.html')
+            return (libelle, 'page' if exact else 'true')
+    return (None, None)
+
+
+def nav(prefixe: str, sortie: str = '') -> str:
+    """Les liens de navigation, préfixés selon la profondeur de la page.
+
+    `sortie` est le chemin de la page écrite : il sert à allumer son entrée.
+    """
     entrees = [
         (prefixe + 'index.html', 'Accueil'),
         (prefixe + 'index.html#logiciels', 'Logiciels'),
@@ -639,7 +694,12 @@ def nav(prefixe: str) -> str:
         (prefixe + 'projets/', 'Projets'),
         (prefixe + 'modeles-3d.html', 'Modèles 3D'),
     ]
-    return '\n      '.join(f'<a href="{u}">{t}</a>' for u, t in entrees)
+    allume, valeur = entree_courante(sortie)
+    liens = []
+    for u, t in entrees:
+        marque = f' aria-current="{valeur}"' if t == allume else ''
+        liens.append(f'<a href="{u}"{marque}>{t}</a>')
+    return '\n      '.join(liens)
 
 
 def liens_pied() -> str:
@@ -869,23 +929,34 @@ def copier_modeles() -> dict:
     et le navigateur continuerait de montrer l'ancien — le pire des bogues,
     parce qu'il est invisible depuis le serveur.
 
-    Le visualiseur, lui, garde son nom : c'est une bibliothèque figée, et son
-    adresse stable la fait mettre en cache d'une visite à l'autre.
+    Le visualiseur, lui, garde son nom : c'est une bibliothèque figée. Son
+    adresse stable le fait remettre en cache -- mais dix minutes seulement :
+    GitHub Pages sert `cache-control: max-age=600`, et son ETag dérive de
+    l'INSTANT DU DÉPLOIEMENT, pas du contenu. Un visiteur qui revient à la
+    semaine le retélécharge donc entièrement.
 
-    Rend {clé: nom de fichier empreint}, pour `{{modele:clé}}`.
+    Rend ({clé: nom de fichier empreint}, {clé: octets TRANSMIS}).
+
+    LE POIDS EST CELUI QUI PART SUR LE FIL, pas celui du disque. La page
+    annonçait « 800 Ko en tout » -- la somme des fichiers -- alors que le
+    serveur les gzippe et n'en transmet que 228. Une page dont toute la
+    défense est la légèreté s'accusait ainsi de 3,5 fois son poids réel. On
+    mesure donc la compression ici, au niveau 6 (celui des serveurs) : relevé
+    le 29/08/2026, l'écart avec ce que sert GitHub Pages est de 3 %.
     """
     if not MODELES_3D.is_dir():
-        return {}
+        return {}, {}
     cible = PUBLIC / 'modeles'
     cible.mkdir(parents=True, exist_ok=True)
 
-    empreintes, total = {}, 0
+    empreintes, transmis, total = {}, {}, 0
     for glb in sorted(MODELES_3D.glob('*.glb')):
         octets = glb.read_bytes()
         empreinte = hashlib.sha256(octets).hexdigest()[:10]
         nom = f'{glb.stem}.{empreinte}.glb'
         (cible / nom).write_bytes(octets)
         empreintes[glb.stem] = nom
+        transmis[glb.stem] = len(zlib.compress(octets, 6))
         total += len(octets)
 
     visualiseur = VENDU / 'model-viewer.min.js'
@@ -894,8 +965,9 @@ def copier_modeles() -> dict:
         total += visualiseur.stat().st_size
 
     print(f"  modèles 3D → modeles/ ({len(empreintes)} modèle(s), "
-          f"{total // 1024} Ko avec le visualiseur)")
-    return empreintes
+          f"{sum(transmis.values()) // 1024} Ko transmis, "
+          f"{total // 1024} Ko sur disque avec le visualiseur)")
+    return empreintes, transmis
 
 
 def injecter_attache(corps: str, nom: str) -> str:
@@ -997,6 +1069,65 @@ def injecter_modeles(corps: str, nom: str, empreintes: dict) -> str:
         corps = corps.replace('{{modele:' + cle + '}}', empreintes[cle])
     return corps
 
+
+
+def faits_modeles(corps: str, transmis: dict, nom: str) -> dict:
+    """Ce que la page de modèles 3D montre VRAIMENT : compte, poids, noms.
+
+    ON COMPTE SUR LA PAGE, PAS À CÔTÉ. La description de partage annonçait
+    « collier de gouttière, sabot d'aspiration, tonnelle, armoire de jardin,
+    PORTE DE HAMMAM » pour une page qui n'a jamais porté que quatre objets.
+    Cette phrase-là n'est pas un détail interne : c'est ce que Google affiche
+    dans ses résultats et ce que Facebook déplie quand on partage le lien.
+    Quelqu'un cliquait pour une porte de hammam et ne la trouvait pas.
+
+    Les pastilles du héros mentaient de leur côté -- « 4 modèles », « 800 Ko
+    en tout » -- pour la même raison : trois nombres recopiés à la main, dans
+    un site qui compte ses projets, lit la VERSION du greffon dans son source
+    et tire les cotes des tableurs FreeCAD. C'était le dernier rescapé du
+    régime de la recopie.
+
+    Tout se déduit donc du corps de la page : chaque carte qui porte un
+    `<model-viewer>` donne un objet, son `src` donne le poids transmis, son
+    `<h3>` donne le nom. Ajouter une carte suffit ; retirer un modèle aussi.
+    """
+    cartes = [bloc for bloc in corps.split('class="carte"')
+              if '<model-viewer' in bloc]
+    if not cartes:
+        sys.exit(f"generer : {nom} demande {{{{modeles:…}}}} mais ne porte "
+                 f"aucune carte avec un <model-viewer>.")
+
+    noms, octets = [], 0
+    for bloc in cartes:
+        titre = re.search(r'<h3>([^<]+)</h3>', bloc)
+        fichier = re.search(r'<model-viewer[^>]*\bsrc="[^"]*/([\w-]+)\.\w+\.glb"',
+                            bloc)
+        if not titre or not fichier:
+            sys.exit(f"generer : {nom} porte une carte 3D sans titre ou sans "
+                     f"modèle lisible — le compte serait faux.")
+        noms.append(titre.group(1).strip())
+        octets += transmis.get(fichier.group(1), 0)
+
+    # Minuscule à l'initiale : ces noms s'enfilent dans une phrase.
+    en_phrase = [n[0].lower() + n[1:] for n in noms]
+    return {
+        'compte': str(len(noms)),
+        'poids': f'{round(octets / 1024)} Ko',
+        'noms': ', '.join(en_phrase[:-1]) + ' et ' + en_phrase[-1]
+                if len(en_phrase) > 1 else en_phrase[0],
+    }
+
+
+def injecter_faits_modeles(texte: str, faits: dict, nom: str) -> str:
+    """Remplace `{{modeles:compte|poids|noms}}`. Clé inconnue = arrêt."""
+    if '{{modeles:' not in texte:
+        return texte
+    for cle in sorted(set(re.findall(r'\{\{modeles:(\w+)\}\}', texte))):
+        if cle not in faits:
+            sys.exit(f"generer : {nom} demande {{{{modeles:{cle}}}}}, qui "
+                     f"n'existe pas. Connues : {', '.join(sorted(faits))}.")
+        texte = texte.replace('{{modeles:' + cle + '}}', faits[cle])
+    return texte
 
 def empreinter(corps: str, empreintes: dict) -> str:
     """Remplace `captures/x.webp` par `captures/x.<empreinte>.webp`.
@@ -1114,7 +1245,7 @@ def main() -> None:
     logo = logo_en_ligne()
 
     empreintes = copier_ressources()
-    modeles = copier_modeles()
+    modeles, poids_modeles = copier_modeles()
     copier_appli_coupe()
     partage_appli_coupe()
     cartes = images_partage(PAGES)
@@ -1140,6 +1271,12 @@ def main() -> None:
         corps = injecter_attache(corps, page['contenu'])
         corps = injecter_compte(corps, page['contenu'])
         corps = injecter_etat(corps, page['contenu'])
+        # Les faits se comptent SUR LA PAGE, une fois les modèles injectés :
+        # ils servent au corps ET à la description de partage, qui ne peuvent
+        # donc plus se contredire.
+        faits = (faits_modeles(corps, poids_modeles, page['contenu'])
+                 if '{{modeles:' in corps + page['description'] else {})
+        corps = injecter_faits_modeles(corps, faits, page['contenu'])
         corps = corps.replace('{{LOGO}}', logo)
         corps = corps.replace('{{RACINE}}', prefixe)
         corps = empreinter(corps, empreintes)
@@ -1148,10 +1285,11 @@ def main() -> None:
             remplir(entete, {
                 'LOGO': logo,
                 'TITRE': page['titre'],
-                'DESCRIPTION': page['description'],
+                'DESCRIPTION': injecter_faits_modeles(
+                    page['description'], faits, page['contenu']),
                 'RACINE': prefixe,
                 'SOUS_TITRE': page['sous_titre'],
-                'NAV': nav(prefixe),
+                'NAV': nav(prefixe, page['sortie']),
                 'LOCAL_CSS': page.get('entete_sup', ''),
                 # `canonique` : l'adresse que cette page DECLARE etre la
                 # sienne, quand ce n'est pas la ou elle est servie. Le cas
