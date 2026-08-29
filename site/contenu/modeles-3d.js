@@ -40,7 +40,7 @@
   var DEFAUTS = {
     expo: parseFloat(vues[0].getAttribute('exposure')) || 1,
     ombre: parseFloat(vues[0].getAttribute('shadow-intensity')) || 0,
-    tourne: false
+    tourne: vues[0].hasAttribute('auto-rotate')
   };
 
   /* localStorage et non un cookie, contrairement au thème : celui-ci doit
@@ -56,14 +56,17 @@
   }
 
   var garde = lire();
+  /* LE RÉGLAGE SYSTÈME GOUVERNE LE DÉFAUT, LE CLIC GOUVERNE LE RESTE. La
+     rotation est allumée d'origine depuis le 29/08/2026 ; on ne l'impose donc
+     pas à qui a demandé moins d'animations à son système — mais s'il l'a
+     cochée lui-même, c'est un choix explicite et il tient. Sans stockage, on
+     retombe sur le défaut, corrigé du réglage système. */
+  var reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var etat = {
     expo: typeof garde.expo === 'number' ? garde.expo : DEFAUTS.expo,
     ombre: typeof garde.ombre === 'number' ? garde.ombre : DEFAUTS.ombre,
-    /* La rotation ne se rallume JAMAIS toute seule chez qui a demandé moins
-       d'animations à son système. Le réglage reste offert — c'est un geste
-       explicite — mais il ne se restaure pas. */
-    tourne: !!garde.tourne && !window.matchMedia(
-      '(prefers-reduced-motion: reduce)').matches
+    tourne: typeof garde.tourne === 'boolean' ? garde.tourne
+                                             : (DEFAUTS.tourne && !reduit)
   };
 
   function appliquer() {
@@ -116,8 +119,9 @@
   raz.type = 'button'; raz.className = 'plein-ecran';
   raz.textContent = 'valeurs d’origine';
   raz.addEventListener('click', function () {
-    etat.expo = DEFAUTS.expo; etat.ombre = DEFAUTS.ombre; etat.tourne = false;
-    b3.checked = false; c1.remettre(); c2.remettre();
+    etat.expo = DEFAUTS.expo; etat.ombre = DEFAUTS.ombre;
+    etat.tourne = DEFAUTS.tourne && !reduit;
+    b3.checked = etat.tourne; c1.remettre(); c2.remettre();
     appliquer(); ecrire();
   });
   barre.appendChild(raz);
