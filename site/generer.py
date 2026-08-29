@@ -536,27 +536,23 @@ PAGES = [
                       '  border-radius:7px;cursor:pointer}\n'
                       '.plein-ecran:hover{color:var(--fg);border-color:var(--orange)}\n'
                       'model-viewer:fullscreen{height:100vh;border-radius:0}\n'
+                      '.reglages-3d{display:flex;flex-wrap:wrap;gap:14px 22px;\n'
+                      '  align-items:center;margin:22px 0 4px;padding:12px 16px;\n'
+                      '  background:var(--bg-2);border:1px solid var(--line);\n'
+                      '  border-radius:12px}\n'
+                      '.reglage{display:flex;align-items:center;gap:9px;\n'
+                      '  font-size:.88rem;color:var(--fg-2)}\n'
+                      '.reglage .titre{min-width:9.5em}\n'
+                      '.reglage input[type=range]{width:150px;accent-color:var(--orange)}\n'
+                      '.reglage.bascule{gap:7px;cursor:pointer}\n'
+                      '.reglages-3d .plein-ecran{float:none;margin:0 0 0 auto}\n'
                       '</style>',
         # Chemin ECRIT EN DUR, sans {{RACINE}} : `remplir` substitue RACINE
         # AVANT d'insérer LOCAL_JS, un {{RACINE}} placé ici ressortirait tel
         # quel. Cette page est à la racine, le chemin relatif suffit.
         'js_local': '<script type="module" '
-                    'src="modeles/model-viewer.min.js"></script>\n'
-                    # Un bouton par vue, posé PAR LE SCRIPT et pas dans le
-                    # contenu : s'il n'y a pas de plein écran (iOS le refuse
-                    # sur un élément quelconque), aucun bouton n'apparaît, et
-                    # personne ne clique sur un bouton mort.
-                    '<script>\n'
-                    'for (const v of document.querySelectorAll("model-viewer")) {\n'
-                    '  if (!v.requestFullscreen) continue;\n'
-                    '  const b = document.createElement("button");\n'
-                    '  b.className = "plein-ecran"; b.type = "button";\n'
-                    '  b.textContent = "\\u2922 plein \\u00e9cran";\n'
-                    '  b.title = "Agrandir cet objet \\u00e0 tout l\\u2019\\u00e9cran";\n'
-                    '  b.addEventListener("click", () => v.requestFullscreen());\n'
-                    '  v.parentNode.insertBefore(b, v);\n'
-                    '}\n'
-                    '</script>',
+                    'src="modeles/model-viewer.min.js"></script>',
+        'js_fichier': 'modeles-3d.js',
     },
     {
         'contenu': 'projets.html',
@@ -1186,6 +1182,29 @@ def injecter_stl_attache(corps: str, nom: str, variantes: list) -> str:
              + '\n'.join(lignes) + '\n</tbody></table></div>')
     return corps.replace('{{attache-stl}}', table)
 
+def js_de_page(page: dict) -> str:
+    """Le JavaScript propre à une page : `js_local` (en dur) puis `js_fichier`.
+
+    UN SCRIPT DE PLUS DE DIX LIGNES NE S'ÉCRIT PAS DANS UNE CHAÎNE PYTHON.
+    Il y perd sa coloration, ses guillemets s'échappent en cascade et rien ne
+    le relit — c'est ainsi qu'on finit avec du code que personne n'ose
+    toucher. `js_fichier` nomme un vrai `.js` de `contenu/`, qu'on peut
+    ouvrir, éprouver et diffuser. Il est posé EN LIGNE dans la page et non
+    servi à part : ces scripts font quelques lignes, une requête de plus leur
+    coûterait plus cher que leur propre poids.
+    """
+    morceaux = [page.get('js_local', '')]
+    nom = page.get('js_fichier')
+    if nom:
+        source = CONTENU / nom
+        if not source.is_file():
+            sys.exit(f"generer : {page['contenu']} demande le script « {nom} », "
+                     f"absent de contenu/.")
+        morceaux.append('<script>\n'
+                        + source.read_text(encoding='utf-8').rstrip()
+                        + '\n</script>')
+    return '\n'.join(m for m in morceaux if m)
+
 def faits_modeles(corps: str, transmis: dict, nom: str) -> dict:
     """Ce que la page de modèles 3D montre VRAIMENT : compte, poids, noms.
 
@@ -1441,7 +1460,7 @@ def main() -> None:
                 'RESUME': page['resume'],
                 'LIENS': liens_pied(),
                 'ANNEE': ANNEE,
-                'LOCAL_JS': page.get('js_local', ''),
+                'LOCAL_JS': js_de_page(page),
             }, 'pied.html')
         )
 
