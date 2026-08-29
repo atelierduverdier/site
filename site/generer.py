@@ -546,10 +546,18 @@ PAGES = [
                       '  align-items:center;margin:22px 0 4px;padding:12px 16px;\n'
                       '  background:var(--bg-2);border:1px solid var(--line);\n'
                       '  border-radius:12px}\n'
+                      # `flex:1 1 250px` et non une largeur : un element flex
+                      # ne retrecit JAMAIS sous son contenu, et un libelle de
+                      # 9,5em suivi d'un curseur de 150 px faisait 297 px dans
+                      # une barre qui n'en offrait que 244 sur un telephone de
+                      # 320. Le libelle garde sa largeur (le nombre doit rester
+                      # lisible), c'est le CURSEUR qui cede.
                       '.reglage{display:flex;align-items:center;gap:9px;\n'
-                      '  font-size:.88rem;color:var(--fg-2)}\n'
-                      '.reglage .titre{min-width:9.5em}\n'
-                      '.reglage input[type=range]{width:150px;accent-color:var(--orange)}\n'
+                      '  font-size:.88rem;color:var(--fg-2);flex:1 1 250px;\n'
+                      '  min-width:0}\n'
+                      '.reglage .titre{min-width:9.5em;flex:none}\n'
+                      '.reglage input[type=range]{flex:1 1 auto;width:auto;\n'
+                      '  min-width:90px;accent-color:var(--orange)}\n'
                       '.reglage.bascule{gap:7px;cursor:pointer}\n'
                       '.reglages-3d .plein-ecran{float:none;margin:0 0 0 auto}\n'
                       '</style>',
