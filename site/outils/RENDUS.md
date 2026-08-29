@@ -112,16 +112,30 @@ fichier a d'abord affirmé le contraire, et Christophe l'a démenti le
 Remesuré aussitôt : `Import.export` sort bien 1,1 Mo pour l'assemblage du
 sabot, six maillages. La phrase « 320 octets, buffer à zéro » était fausse.
 
-**Ce qui reste vrai, et qui est la raison de l'étape Blender :** appelé
-DEPUIS UN SCRIPT, cet export ne pose **aucun matériau**. Mesuré sur quatre
-documents — l'assemblage du sabot, l'attache et ses quatre pièces, un corps
-PartDesign seul, trois corps du cabanon — tous avec des `ShapeColor` bien
-posées : `materiaux = 0` à chaque fois. L'export de Christophe, lui, est
-passé par le MENU de l'interface.
+**Et la cause de mon erreur n'était pas un bogue : c'était le mauvais
+module.** FreeCAD en a deux, et c'est le même partage que pour le STEP :
 
-La différence entre les deux chemins n'est pas encore expliquée. Tant qu'elle
-ne l'est pas, la chaîne garde Blender, qui reçoit les couleurs par un
-manifeste et ne dépend d'aucun de ces deux comportements.
+| appel | maillages | matériaux |
+|---|---|---|
+| `Import.export(objs, f)` | 4 | **0** |
+| `ImportGui.export(objs, f)` | 4 | **4, aux bonnes couleurs** |
+
+`Import` ne voit pas les ViewObjects, `ImportGui` si. Et il fait même la
+conversion sRGB → linéaire tout seul : l'ardoise `0,184` sort à `0,028`.
+Piège dans le piège — **`import ImportGui` doit venir APRÈS
+`Gui.showMainWindow()`**, sinon « Cannot load Gui module in console
+application ».
+
+**Ce qui garde quand même Blender dans la chaîne du site.** Sur un ASSEMBLAGE
+d'`App::Link`, même `ImportGui` échoue : le `.glb` du sabot sort avec ses six
+maillages nommés… et **un seul matériau**, `#727980`, le gris d'usine.
+Prévisible après coup — un `App::Link` n'a pas de `ShapeColor`, il faut aller
+la chercher sur sa cible, ce que l'exportateur ne fait pas.
+
+**Donc :** pour un document ordinaire, `ImportGui.export` suffit et Blender
+est inutile. Pour un assemblage de liens — c'est-à-dire le sabot —
+`exporter_glb.py` reste nécessaire, puisqu'il maille chaque lien et va lire
+la couleur sur sa cible.
 
 ---
 

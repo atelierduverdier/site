@@ -22,11 +22,16 @@
 #     ici. Démenti par Christophe le 29/08/2026, son porte-manteau exporté
 #     depuis le MENU : .gltf + .bin, géométrie complète, et sa vraie couleur.
 #     Remesuré : `Import.export` rend 1,1 Mo pour l'assemblage du sabot.
-#     CE QUI JUSTIFIE ENCORE BLENDER : appelé depuis un SCRIPT, cet export ne
-#     pose AUCUN matériau — mesuré sur quatre documents aux ShapeColor bien
-#     posées, `materiaux = 0` partout. L'écart entre le menu et le script
-#     n'est pas explique ; Blender, lui, reçoit les couleurs par manifeste et
-#     ne dépend d'aucun des deux.
+#     ET CE N'ETAIT PAS UN BOGUE, MAIS LE MAUVAIS MODULE : `Import.export`
+#     ne voit pas les ViewObjects et rend 0 matériau ; `ImportGui.export` en
+#     rend 4 sur les mêmes objets, aux bonnes couleurs, conversion sRGB vers
+#     linéaire comprise. (Et `import ImportGui` doit venir APRES
+#     `showMainWindow()`, sinon « Cannot load Gui module ».)
+#     CE QUI GARDE BLENDER ICI : sur un ASSEMBLAGE D'App::Link, meme
+#     ImportGui echoue — le .glb du sabot sort avec ses six maillages et UN
+#     SEUL materiau gris. Previsible : un App::Link n'a pas de ShapeColor, il
+#     faut la lire sur sa cible, ce que l'exportateur ne fait pas et ce que
+#     ce fichier-ci fait. Pour un document ordinaire, ImportGui suffirait.
 #  5. Blender prend la Base Color en LINÉAIRE. Donner les valeurs sRGB de la
 #     charte telles quelles faisait sortir l'orange #ff8a00 en #ffc100 —
 #     mesuré dans le navigateur en relisant les baseColorFactor du GLB.
