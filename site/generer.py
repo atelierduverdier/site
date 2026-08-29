@@ -519,17 +519,44 @@ PAGES = [
         # Le visualiseur n'est chargé QUE par cette page : c'est toute la
         # raison d'avoir rassemblé les modèles ici plutôt que de les
         # disperser sur les pages projets.
+        # DEUX COLONNES, PAS QUATRE. À 260 px de haut dans une grille qui en
+        # fait trois ou quatre au large, chaque objet tenait dans un timbre.
+        # `minmax(420px,1fr)` en donne deux à 1180 px et une seule sous 900 ;
+        # la hauteur suit la fenêtre, bornée pour ne pas manger l'écran d'un
+        # portable. Le bouton « plein écran » fait le reste.
         'entete_sup': '<style>\n'
-                      '.cartes-3d model-viewer{width:100%;height:260px;display:block;\n'
-                      '  margin:-4px 0 14px;border-radius:10px;background:var(--bg-3);\n'
-                      '  --poster-color:transparent}\n'
+                      '.cartes-3d{grid-template-columns:repeat(auto-fit,minmax(420px,1fr))}\n'
+                      '.cartes-3d model-viewer{width:100%;height:clamp(320px,46vh,540px);\n'
+                      '  display:block;margin:-4px 0 10px;border-radius:10px;\n'
+                      '  background:var(--bg-3);--poster-color:transparent}\n'
                       '.cartes-3d .carte{padding:14px 16px 18px}\n'
+                      '.plein-ecran{float:right;margin:-2px 0 8px;padding:4px 10px;\n'
+                      '  font-size:.82rem;font-weight:600;color:var(--fg-2);\n'
+                      '  background:var(--card);border:1px solid var(--line-2);\n'
+                      '  border-radius:7px;cursor:pointer}\n'
+                      '.plein-ecran:hover{color:var(--fg);border-color:var(--orange)}\n'
+                      'model-viewer:fullscreen{height:100vh;border-radius:0}\n'
                       '</style>',
         # Chemin ECRIT EN DUR, sans {{RACINE}} : `remplir` substitue RACINE
         # AVANT d'insérer LOCAL_JS, un {{RACINE}} placé ici ressortirait tel
         # quel. Cette page est à la racine, le chemin relatif suffit.
         'js_local': '<script type="module" '
-                    'src="modeles/model-viewer.min.js"></script>',
+                    'src="modeles/model-viewer.min.js"></script>\n'
+                    # Un bouton par vue, posé PAR LE SCRIPT et pas dans le
+                    # contenu : s'il n'y a pas de plein écran (iOS le refuse
+                    # sur un élément quelconque), aucun bouton n'apparaît, et
+                    # personne ne clique sur un bouton mort.
+                    '<script>\n'
+                    'for (const v of document.querySelectorAll("model-viewer")) {\n'
+                    '  if (!v.requestFullscreen) continue;\n'
+                    '  const b = document.createElement("button");\n'
+                    '  b.className = "plein-ecran"; b.type = "button";\n'
+                    '  b.textContent = "\\u2922 plein \\u00e9cran";\n'
+                    '  b.title = "Agrandir cet objet \\u00e0 tout l\\u2019\\u00e9cran";\n'
+                    '  b.addEventListener("click", () => v.requestFullscreen());\n'
+                    '  v.parentNode.insertBefore(b, v);\n'
+                    '}\n'
+                    '</script>',
     },
     {
         'contenu': 'projets.html',
