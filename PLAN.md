@@ -30,6 +30,7 @@ Tout est hébergé sur GitHub Pages. GoatCounter est déjà branché sur le jour
 | Config LinuxCNC PrintNC + changeur d'outil | `printnc-config` | **public** | changeur poussé le 09/08/2026 |
 | Visualiseur G-code LinuxCNC | `visualiseur-gcode` | **public** | v1 le 10/08/2026, publié le 12/08/2026 |
 | Pupitre Graphtec CE6000-60 | `graphtec-ce6000` | **public** | fini le 11/08/2026 |
+| Chutier — feuille de débit et stock de chutes | `chutier` | **public** | interface refondue et auditée le 30/08/2026, publié le 30/08/2026 |
 
 Satellites publics qui existent aussi : `gsr-gui` (enregistreur d'écran, hors atelier),
 `huanyang-vfd-reader` (lecture VFD, atelier-adjacent).
@@ -209,7 +210,9 @@ et le héros de l'accueil.
 des projets :
 
 - `logiciels/visualiseur-gcode.html`, six schémas SVG ;
-- `logiciels/pupitre-graphtec.html`, cinq schémas SVG.
+- `logiciels/pupitre-graphtec.html`, cinq schémas SVG ;
+- `logiciels/chutier.html`, un schéma SVG (le cycle des chutes) et trois
+  captures dont la page imprimée, peinte au format A4 par le programme.
 
 Écrites d'abord en **fiches vitrines sans lien dépôt** (choix D3, les deux étaient
 privés). **Les deux dépôts sont publics depuis le 12/08/2026**, et les pages portent

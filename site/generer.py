@@ -160,6 +160,51 @@ def injecter_laser(corps: str, nom: str) -> str:
     return corps
 
 
+def faits_chutier() -> dict:
+    """Ce que le chutier prouve de lui-même, compté dans son dépôt.
+
+    On ne recopie pas « 118 tests » dans une page : c'est le genre de
+    nombre qui vieillit sans prévenir, comme la VERSION de LaserAtelier
+    restée 44 versions en retard. On compte les `def test_`, là où ils
+    sont.
+    """
+    dossier = chemins.CHUTIER / 'tests'
+    if not dossier.is_dir():
+        sys.exit(f"generer : dépôt chutier introuvable ({chemins.CHUTIER}). "
+                 f"Corriger chemins.py, ou retirer la page du chutier.")
+    total = coeur = 0
+    for fichier in sorted(dossier.glob('test_*.py')):
+        n = fichier.read_text(encoding='utf-8').count('def test_')
+        total += n
+        if fichier.name == 'test_optimiseur.py':
+            coeur = n
+    if not total:
+        sys.exit("generer : aucun test compté dans le chutier — le compte "
+                 "affiché serait faux.")
+    return {'tests': str(total), 'tests_coeur': str(coeur)}
+
+
+def injecter_chutier(corps: str, nom: str) -> str:
+    """Remplace les {{chutier.xxx}}. Une clé inconnue arrête la génération."""
+    if '{{chutier' not in corps:
+        return corps
+    connues = faits_chutier()
+    manquantes = []
+
+    def remplacer(m):
+        cle = m.group(1)
+        if cle not in connues:
+            manquantes.append(cle)
+            return m.group(0)
+        return connues[cle]
+
+    corps = re.sub(r'\{\{chutier\.(\w+)\}\}', remplacer, corps)
+    if manquantes:
+        sys.exit(f"{nom} : clé(s) chutier inconnue(s) : "
+                 f"{', '.join(sorted(set(manquantes)))}")
+    return corps
+
+
 # L'appli « vitesses de coupe », servie TELLE QUELLE sur /coupe/.
 APPLI_COUPE = SITE / 'appli' / 'coupe'
 
@@ -434,7 +479,8 @@ PAGES = [
         'titre': "Atelier du Verdier — l'atelier et ses logiciels",
         'description': "Une fraiseuse PrintNC, une tête laser, un traceur de découpe, "
                        "et les logiciels écrits pour les faire tourner : LaserAtelier, "
-                       "visualiseur G-code LinuxCNC, pupitre Graphtec, config PrintNC.",
+                       "visualiseur G-code LinuxCNC, chutier de débit, pupitre "
+                       "Graphtec, config PrintNC.",
         'sous_titre': '',
         'resume': "L'atelier d'un menuisier-bricoleur outillé : une PrintNC, un laser "
                   "diode, un traceur de découpe, et le logiciel qui va avec.",
@@ -463,6 +509,19 @@ PAGES = [
         'sous_titre': 'visualiseur G-code',
         'resume': "Visualiseur de parcours LinuxCNC en PySide6/OpenGL, appuyé sur rs274. "
                   "Code public, LGPL-2.1.",
+    },
+    {
+        'contenu': 'chutier.html',
+        'sortie': 'logiciels/chutier.html',
+        'partage': CONTENU / 'captures' / 'chutier-plan.png',
+        'titre': "Chutier — débiter dans le bois qu'on a déjà",
+        'description': "Optimiseur de débit qui place les pièces dans un stock de "
+                       "planches ET de chutes, en coupes guillotine : le reste "
+                       "réutilisable passe avant le bois neuf, et le plan s'imprime "
+                       "avec ses cotes.",
+        'sous_titre': 'chutier',
+        'resume': "Feuille de débit et stock de chutes : les restes passent avant les "
+                  "planches neuves. Code public, LGPL-2.1.",
     },
     {
         'contenu': 'pupitre-graphtec.html',
@@ -1437,6 +1496,7 @@ def main() -> None:
         corps = (CONTENU / page['contenu']).read_text(encoding='utf-8')
         corps = injecter_valeurs_atc(corps, page['contenu'])
         corps = injecter_laser(corps, page['contenu'])
+        corps = injecter_chutier(corps, page['contenu'])
         corps = injecter_fcstd(corps, page['contenu'])
         corps = injecter_coupe(corps, page['contenu'])
         corps = injecter_modeles(corps, page['contenu'], modeles)

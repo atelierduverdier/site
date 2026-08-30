@@ -1,8 +1,8 @@
 # atelierduverdier.fr — le portail et la charte commune
 
 Site statique engendré par un script Python maison, servi par GitHub Pages sur
-**<https://atelierduverdier.fr>**. Il porte l'accueil, une fiche pour quatre des
-cinq logiciels de l'atelier — la config PrintNC, le cinquième, renvoie à son
+**<https://atelierduverdier.fr>**. Il porte l'accueil, une fiche pour cinq des
+six logiciels de l'atelier — la config PrintNC, la sixième, renvoie à son
 propre journal —, la rubrique projets et ses cinq réalisations, l'appli
 « vitesses de coupe » servie sur `/coupe/` — et **la charte que les autres
 sites recopient**.
@@ -41,6 +41,7 @@ fois finit toujours par diverger.
 | ce qui est affiché | lu à la génération dans |
 |---|---|
 | la version de LaserAtelier | `laser_core.py` du greffon |
+| le nombre de contrôles du chutier | les `def test_` de son dossier `tests/` |
 | les cotes des projets FreeCAD | le **tableur** du `.FCStd`, pas le script |
 | les chiffres du magasin ATC | `note_calcul.valeurs()` du projet |
 | les planches et vues 3D | les modèles FreeCAD eux-mêmes |
@@ -115,6 +116,7 @@ navigateur en le faisant, qu'aucune relecture n'aurait données :
 | `site/vendu/` | les bibliothèques tierces servies d'ici — `<model-viewer>` pour la page 3D |
 | `site/outils/reprendre_plans.py` | planches TechDraw des projets, en image |
 | `site/outils/capturer_*.py` | captures des logiciels, application lancée hors écran |
+| `site/outils/capturer_chutier.py` | idem, plus la page imprimée peinte au format A4 |
 | `outils/diffuser_kit.py` | recopie la charte chez les satellites |
 | `kit/faire_logo.py` | compose le logo, texte converti en courbes |
 

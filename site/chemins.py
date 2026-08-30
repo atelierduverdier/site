@@ -28,6 +28,7 @@ PROJETS = Path.home() / 'Projets'
 MAGASIN_ATC = PROJETS / 'machine' / 'magasin-atc'
 GRAPHTEC = PROJETS / 'logiciels' / 'graphtec-ce6000'
 VISUALISEUR = PROJETS / 'logiciels' / 'visualiseur-gcode'
+CHUTIER = PROJETS / 'logiciels' / 'chutier'
 LASER_ATELIER = (Path.home() / '.local' / 'share' / 'FreeCAD' / 'v1-1'
                  / 'Mod' / 'LaserAtelier')
 
@@ -76,6 +77,7 @@ TOUT = {
     'G-code perçage du lit': ATC_PERCAGE,
     'dépôt Graphtec': GRAPHTEC,
     'dépôt visualiseur': VISUALISEUR,
+    'dépôt chutier': CHUTIER,
     'dépôt LaserAtelier': LASER_ATELIER,
     'laser_core.py (VERSION)': LASER_CORE,
     'panneaux LaserAtelier': LASER_IMG,

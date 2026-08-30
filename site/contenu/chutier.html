@@ -1,0 +1,399 @@
+<!-- Chutier — feuille de débit et stock de chutes.
+
+     Tous les faits et tous les chiffres viennent du dépôt du projet
+     (~/Projets/logiciels/chutier) et de mesures faites dessus. Rien n'est
+     inventé ici, rien n'est arrondi dans un sens flatteur : le compte de
+     tests est LU dans tests/ à la génération ({{chutier.tests}}), pas
+     recopié.
+
+     ORDRE DE LA PAGE, comme le visualiseur et le pupitre : ce qu'on voit à
+     l'écran D'ABORD, le raisonnement et les pièges ENSUITE et REPLIÉS.
+
+     Les captures sont engendrées par site/outils/capturer_chutier.py, qui
+     lance l'interface hors écran et lui fait charger ses propres exemples.
+     Celle de l'impression n'est pas une capture de fenêtre : elle est
+     peinte par le programme aux dimensions d'une A4 paysage.
+
+     Bases de police : 9,9 px pour le héros (échelle 1,21), 12 px pour un
+     viewBox de 640 (échelle 1). Mesuré, comme sur les autres pages. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">Coupe <b>guillotine</b></span>
+          <span class="badge">PySide6</span>
+          <span class="badge">LGPL-2.1</span>
+        </div>
+        <h1>Débiter dans le bois qu'on a déjà</h1>
+        <p class="lede">
+          Les optimiseurs de débit rangent des pièces dans des planches neuves.
+          Un atelier, lui, a d'abord un tas de chutes — et c'est dedans qu'il
+          faut tailler en premier.
+        </p>
+        <div class="cta">
+          <a class="btn btn-github" href="https://github.com/atelierduverdier/chutier"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            Le code sur GitHub
+          </a>
+          <a class="btn btn-primary" href="#voir">Ce qu'on voit</a>
+          <a class="btn btn-ghost" href="#etabli">À l'établi</a>
+          <a class="btn btn-ghost" href="#capot">Sous le capot</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <!-- La boucle : ce qui reste d'un débit revient au stock du suivant.
+             C'est tout le programme en une image, et la raison de son nom. -->
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="Le cycle du chutier : les chutes de l'atelier servent en premier, les planches neuves ensuite, et les restes retournent au tas de chutes">
+          <g class="figure">
+            <rect x="96" y="10" width="148" height="30" rx="9"
+                  fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="29" text-anchor="middle" class="fort">les pièces à débiter</text>
+
+            <path d="M 140 40 L 78 76" class="accent"/>
+            <path d="M 200 40 L 262 76" class="cote"/>
+
+            <rect x="10" y="78" width="136" height="50" rx="9"
+                  fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.8"/>
+            <text x="78" y="97" text-anchor="middle" class="orange">le tas de chutes</text>
+            <text x="78" y="111" text-anchor="middle" class="petit">déjà payé, déjà là</text>
+            <text x="78" y="123" text-anchor="middle" class="petit">on l'écoule d'ABORD</text>
+
+            <rect x="194" y="78" width="136" height="50" rx="9"
+                  fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-dasharray="5 3"/>
+            <text x="262" y="97" text-anchor="middle" class="fort">les planches neuves</text>
+            <text x="262" y="111" text-anchor="middle" class="petit">seulement ce que</text>
+            <text x="262" y="123" text-anchor="middle" class="petit">les chutes ne prennent pas</text>
+
+            <path d="M 78 128 L 78 152 L 170 152 L 170 168" class="accent"/>
+            <path d="M 262 128 L 262 152 L 170 152" class="cote"/>
+
+            <rect x="96" y="170" width="148" height="30" rx="9"
+                  fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="189" text-anchor="middle" class="fort">le plan de coupe</text>
+
+            <!-- le retour : ce que le débit laisse repart au tas -->
+            <path d="M 96 185 L 40 185 L 40 132" class="accent" stroke-dasharray="4 3"/>
+            <text x="170" y="217" text-anchor="middle" class="petit">ce qui reste d'assez grand</text>
+            <text x="170" y="230" text-anchor="middle" class="petit orange">retourne au tas de chutes</text>
+            <text x="170" y="245" text-anchor="middle" class="petit">— d'où le nom</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="voir">
+  <div class="wrap">
+    <div class="sec-tag">Ce qu'on voit</div>
+    <h2>Le débit entier, d'un coup d'œil</h2>
+    <p class="sec-lede">
+      Toutes les planches empilées sous leur cartouche, les pièces colorées par
+      référence, les chutes hachurées. Ce qui n'est ni l'un ni l'autre est la perte.
+    </p>
+
+    <figure class="capture">
+      <img src="{{RACINE}}logiciels/captures/chutier-plan.webp"
+           alt="Le chutier affichant le débit d'une paire de volets battants : cinq brins de douglas empilés, seize pièces colorées, chutes hachurées, et une rangée de chiffres-clés au-dessus"
+           data-agrandir>
+      <figcaption>
+        Le débit <b>réel</b> d'une paire de volets battants, tiré du modèle FreeCAD
+        du projet : seize références, dix-huit pièces, cinq brins de douglas
+        150 × 30 de 3 et 4 m. <b>18/18 posées</b>, rendement 72,1 %, dix chutes
+        réutilisables mises de côté. Une planche seule affichée dans un panneau
+        haut ne remplit rien — un brin de 4 m sur 150 tient dans un filet de
+        quarante pixels ; empilées, elles occupent la hauteur et se lisent
+        ensemble.
+      </figcaption>
+    </figure>
+
+    <h3>Le stock, et pourquoi il n'est pas fait que de planches</h3>
+    <figure class="capture">
+      <img src="{{RACINE}}logiciels/captures/chutier-chutes.webp"
+           alt="L'onglet Stock du chutier : trois lignes dont deux cochées « Chute », et à droite un plan dont la troisième planche est une chute d'étagère"
+           data-agrandir>
+      <figcaption>
+        Une ligne de stock cochée <b>Chute</b> est un morceau déjà en atelier :
+        jamais compté à l'achat, et servi <b>en priorité</b>. Ici la troisième
+        planche du plan est une chute d'étagère de 800 × 180, entamée avant
+        qu'on touche au bois neuf. Une ligne cochée <b>Catalogue</b> fait
+        l'inverse : c'est une section qu'on peut acheter, sa quantité ne borne
+        plus rien, et le programme compte ensuite combien en prendre.
+      </figcaption>
+    </figure>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Une teinte par référence, et jamais deux pareilles</h3>
+        <p>
+          La couleur d'une pièce ne dépend que de son <b>nom</b> : la même garde
+          sa teinte d'une séance à l'autre, sans table à tenir. Deux références
+          d'un même débit ne partagent jamais une teinte — les collisions se
+          résolvent en cherchant une couleur libre, parce que deux verts
+          voisins sur un plan valent moins qu'un plan en noir et blanc.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>La saisie se lit comme un tableur</h3>
+        <p>
+          Une feuille de débit existe presque toujours ailleurs avant d'arriver
+          ici : <kbd>Ctrl+V</kbd> colle un bloc venu d'un tableur,
+          <kbd>Ctrl+D</kbd> duplique une ligne — cinq lames identiques se
+          saisissent une fois. Un nombre illisible rougit à la frappe, pas au
+          moment du calcul. L'import et l'export CSV sont le contrat d'échange
+          avec les autres projets de l'atelier.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="etabli">
+  <div class="wrap">
+    <div class="sec-tag">À l'établi</div>
+    <h2>La page qu'on emporte à la scie</h2>
+    <p class="sec-lede">
+      Un plan qu'on ne lit pas debout devant la machine n'est pas un plan.
+    </p>
+
+    <figure class="capture">
+      <img src="{{RACINE}}logiciels/captures/chutier-impression.webp"
+           alt="Une page A4 paysage imprimée : titre, bilan du débit, les cinq planches dessinées avec le nom des pièces, et sous le dessin les cotes de débit planche par planche"
+           data-agrandir>
+      <figcaption>
+        L'impression est <b>paginée</b> : une poignée de planches par page selon
+        leur format, pas soixante écrasées sur une. Sous le dessin, les
+        <b>cotes de débit</b> planche par planche — les étiquettes du plan ne
+        portent que les noms quand les pièces sont étroites, et c'est justement
+        les cotes qu'on va chercher à la scie.
+      </figcaption>
+    </figure>
+
+    <p>
+      Le programme sort aussi le plan en image à résolution d'impression, et
+      une <b>fiche d'atelier</b> en texte : les poses et les coupes planche par
+      planche, dans l'ordre où on les passe, à cocher au fur et à mesure.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Un chiffre relevé sur le papier, pas dans le code</span>
+      <p>
+        Les tailles de texte du plan étaient réglées en <b>pixels</b>. Sur une
+        page à 1200 points par pouce, les noms des pièces sortaient hauts de
+        <b>0,4 mm</b> — illisibles. Le code ne le disait pas ; le PDF, si. Elles
+        se grossissent maintenant à proportion de la résolution demandée.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="pourquoi">
+  <div class="wrap">
+    <div class="sec-tag">Pourquoi</div>
+    <h2>Ce que le programme cherche vraiment</h2>
+    <p class="sec-lede">
+      Un débit n'est pas un problème de surface. Deux solutions qui posent
+      toutes les pièces ne se valent pas, et l'ordre dans lequel on les
+      départage est une décision d'atelier, pas de mathématiques.
+    </p>
+
+    <p>
+      Entre deux plans, le programme préfère, <b>dans cet ordre</b> : moins de
+      pièces non placées ; moins cher, quand les prix sont renseignés ; moins de
+      bois <b>neuf</b> entamé — c'est là que le déstockage se joue ; moins de
+      pertes ; et enfin la plus grande chute subsistante la plus grande possible,
+      parce qu'un reste de 800 mm vaut mieux que deux de 400.
+    </p>
+
+    <p>
+      « Neuf » et « perte » comptent un <b>volume</b>, pas une surface. Une
+      planche deux fois plus épaisse, c'est deux fois plus de bois pour la même
+      surface de face — l'ignorer faisait gagner le brut le plus épais dès qu'il
+      était un peu moins large qu'un brut plus mince pourtant suffisant. Relevé
+      sur un cas réel : une pièce de 11,5 mm taillée dans du 65 alors qu'un 32
+      suffisait largement.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">{{chutier.tests}}</span><span class="l">contrôles automatiques,<br>dont {{chutier.tests_coeur}} sur le seul cœur</span></div>
+      <div class="chiffre"><span class="v">0,33 s</span><span class="l">pour 150 pièces<br>et 22 planches</span></div>
+    </div>
+
+    <p class="muted">
+      Le résultat est <b>déterministe</b> : mêmes entrées, même plan. Le solveur
+      essaie quarante-huit stratégies réglées et quelques ordres tirés au sort,
+      mais le sort est à graine fixe — deux calculs ne peuvent pas se contredire.
+    </p>
+  </div>
+</section>
+
+<section id="capot">
+  <div class="wrap">
+    <div class="sec-tag">Sous le capot</div>
+    <h2>Les règles du bois, écrites une fois</h2>
+    <p class="sec-lede">
+      Cinq décisions qui n'ont rien d'informatique et tout de la menuiserie.
+      Elles sont dépliables : le détail n'est pas retiré, il est rangé.
+    </p>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">La coupe guillotine, et ce qu'elle interdit</span>
+        <span class="s">la scie circulaire d'abord</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Chaque trait traverse le morceau <b>de bord à bord</b>, comme à la scie
+          circulaire ou sur une scie à format. C'est une contrainte forte : un
+          imbriquement libre rangerait mieux, sur le papier.
+        </p>
+        <p>
+          Mais un plan qu'on ne peut pas exécuter ne vaut rien. Les coupes sortent
+          numérotées dans un ordre <b>réellement exécutable</b> : à chaque trait,
+          le morceau courant est traversé entier. On peut les afficher sur le
+          plan, elles se lisent dans cet ordre-là.
+        </p>
+        <p class="muted">
+          Le trait de scie est retiré de la matière à chaque coupe, du côté
+          opposé à la pièce. Il est réglable, et retenu d'une séance à l'autre :
+          c'est une propriété de la scie, pas du projet.
+        </p>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">L'épaisseur se rabote, elle ne s'épaissit jamais</span>
+        <span class="s">une règle à sens unique</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Une planche convient à une pièce si elle est <b>au moins aussi
+          épaisse</b>. Plus épaisse : toujours bon, on rabotera. Plus mince : rien
+          à faire. Un même brut peut donc fournir des pièces de finitions
+          différentes, chacune rabotée à sa cote après le débit en
+          longueur et largeur.
+        </p>
+        <p>
+          La tolérance réglable n'absorbe que le <b>bruit de mesure</b> — 18,0
+          relevé au pied à coulisse contre 18,05 demandé. Elle ne sert pas à
+          faire passer une pièce plus épaisse que le stock : ce serait
+          transformer un réglage de confort en mensonge.
+        </p>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Les pièces composables : trop larges pour tout brut</span>
+        <span class="s">des lames à coller</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Un panneau de 422 mm de large n'entre dans aucune planche de 200. Coché
+          <b>composable</b>, il se décompose en lames à coller côte à côte (ou à
+          assembler tenon-rainure) — chacune devient une pièce ordinaire pour le
+          solveur, qui n'a rien à savoir de plus. La largeur perdue à chaque
+          collage est réglable.
+        </p>
+        <p>
+          Une pièce qui <b>logerait déjà</b> telle quelle n'est jamais
+          décomposée : moins de joints, plus solide.
+        </p>
+        <div class="callout note">
+          <span class="ci">Un piège trouvé en mesurant</span>
+          <p>
+            La décomposition taillait des lames larges d'exactement la planche.
+            Dès qu'on demandait une surcote de recoupe, elles ne rentraient plus
+            — et la pièce ressortait « trop grande », précisément ce qu'être
+            composable devait éviter. Mesuré : 397 mm de large sur un brut de
+            200, deux lames sans surcote, <b>zéro pièce posée</b> avec 5 mm. Ce
+            qui borne une lame, c'est la largeur du brut <b>moins</b> la surcote.
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Profils de catalogue : ce qu'on peut acheter</span>
+        <span class="s">et ce que ça coûte</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Une ligne cochée <b>Catalogue</b> n'est pas un stock : c'est une
+          section disponible chez le fournisseur. Sa quantité ne borne plus rien,
+          le programme en prend autant que le débit demande, et rend ensuite la
+          liste de ce qu'il faut acheter — par profil, avec le coût si les prix
+          sont renseignés.
+        </p>
+        <p>
+          Entre deux profils compatibles, c'est le <b>prix d'une planche</b> qui
+          départage — pas le prix au mètre, celui du morceau tel qu'on l'achète.
+          Sans prix, c'est le moins de rabotage perdu qui décide.
+        </p>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Deux couches, et un cœur qui ne connaît pas Qt</span>
+        <span class="s">un contrôle y veille</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Toute la géométrie et le solveur vivent dans un module <b>sans aucune
+          dépendance</b>, éprouvé sans écran. L'interface se construit par-dessus
+          en quatre modules et n'y touche jamais : elle assemble les entrées,
+          appelle le solveur, affiche ce qui revient.
+        </p>
+        <p>
+          Les contrôles vérifient des <b>propriétés</b> sur des cas tirés au sort
+          à graine fixe : aucune pièce hors de sa planche, aucun recouvrement, le
+          trait de scie respecté entre toute paire de rectangles, et la
+          conservation — planche = pièces + chutes + pertes, au millimètre carré.
+        </p>
+        <p class="muted">
+          Les {{chutier.tests}} contrôles tournent sans écran, et détournent les
+          réglages Qt vers un dossier jetable : un contrôle ne touche jamais la
+          configuration de l'atelier.
+        </p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Ce que le chutier ne fait pas</h2>
+    <ul>
+      <li>Pas d'imbriquement libre : les coupes sont <b>guillotine</b>, de bord à
+      bord. C'est un choix, pas une limite technique — voir plus haut.</li>
+      <li>Le stock de chutes vit dans le <b>fichier de projet</b>. « Ranger les
+      chutes au stock » met l'atelier à jour dans la saisie courante ; il manque
+      le fichier commun qu'on retrouverait d'un projet à l'autre sans le
+      recopier.</li>
+      <li>Pas encore d'import direct depuis la feuille de calcul FreeCAD d'un
+      projet. Le CSV fait le lien en attendant, dans les deux sens.</li>
+      <li>Les pièces sont des <b>rectangles</b>. Une pièce chantournée se débite
+      dans son rectangle englobant, comme à l'atelier.</li>
+      <li>Aucune notion de défaut du bois : ni nœud, ni gerce, ni flache. Le
+      plan suppose une planche saine sur toute sa surface — c'est à l'œil de
+      décaler une pièce devant l'établi.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="ci">Le code est public</span>
+      <p>
+        Sous <b>LGPL-2.1</b>, sur
+        <a href="https://github.com/atelierduverdier/chutier">github.com/atelierduverdier/chutier</a> —
+        le cœur sans dépendance, l'interface PySide6, et les {{chutier.tests}}
+        contrôles.
+      </p>
+    </div>
+  </div>
+</section>
