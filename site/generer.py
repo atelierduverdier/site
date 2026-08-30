@@ -1312,26 +1312,42 @@ def _pages_avec_modele() -> dict:
     sys.exit("generer : pas de table MODELES dans exporter_glb.py.")
 
 
-def injecter_lien3d(corps: str, sortie: str, pages: dict) -> str:
-    """Remplace `{{lien3d}}`, et REFUSE que la marque et le modèle divergent.
+# Les pages de `projets/` qui ne sont pas des fiches : le sommaire, et la
+# redirection de l'ancien nom de la tonnelle.
+PAS_DES_FICHES = {'projets/index.html', 'projets/tonnelle-glycine.html'}
 
-    C'est tout l'intérêt : une fiche dont le projet a un modèle DOIT porter la
-    marque, et une fiche sans modèle ne peut pas la porter. Le lien ne peut
-    donc plus manquer en silence — c'est le défaut qu'on répare.
+
+def injecter_lien3d(corps: str, sortie: str, pages: dict) -> str:
+    """Remplace `{{lien3d}}`. TOUTE fiche projet doit le porter.
+
+    Demande de Christophe, 29/08/2026 : « je voulais juste un lien vers
+    modeles-3d.html dans chaque projet ». J'avais d'abord réservé le bouton
+    aux projets qui ont LEUR modèle, ce qui laissait deux fiches sans rien.
+
+    Le LIBELLÉ, lui, dépend : « Le tourner en 3D » quand l'objet est dans la
+    galerie, « Les modèles 3D de l'atelier » sinon. Promettre de tourner un
+    objet qui n'y est pas serait une porte qui ne mène pas où elle dit.
+
+    Une fiche sans la marque ARRÊTE la génération : c'est ce qui a laissé
+    trois fiches muettes pendant que le bouton se posait à la main.
     """
-    a_un_modele = sortie in pages
+    est_une_fiche = (sortie.startswith('projets/')
+                     and sortie not in PAS_DES_FICHES)
     if '{{lien3d}}' not in corps:
-        if a_un_modele:
-            sys.exit(f"generer : {sortie} a un modèle 3D ({pages[sortie]}) "
-                     f"mais ne porte pas {{{{lien3d}}}} — le lien manquerait.")
+        if est_une_fiche:
+            sys.exit(f"generer : la fiche {sortie} ne porte pas "
+                     f"{{{{lien3d}}}} — elle n'aurait aucun lien vers les "
+                     f"modèles 3D.")
         return corps
-    if not a_un_modele:
-        sys.exit(f"generer : {sortie} demande {{{{lien3d}}}} alors qu'aucun "
-                 f"modèle 3D ne la vise dans exporter_glb.MODELES.")
+    if not est_une_fiche:
+        sys.exit(f"generer : {sortie} n'est pas une fiche projet et n'a rien "
+                 f"à faire de {{{{lien3d}}}}.")
+    libelle = ("Le tourner en 3D" if sortie in pages
+               else "Les modèles 3D de l'atelier")
     return corps.replace(
         '{{lien3d}}',
-        '<a class="btn btn-ghost" href="{{RACINE}}modeles-3d.html">'
-        'Le tourner en 3D</a>')
+        f'<a class="btn btn-ghost" href="{{{{RACINE}}}}modeles-3d.html">'
+        f'{libelle}</a>')
 
 def faits_modeles(corps: str, transmis: dict, nom: str) -> dict:
     """Ce que la page de modèles 3D montre VRAIMENT : compte, poids, noms.
