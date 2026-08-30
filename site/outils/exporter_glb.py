@@ -118,6 +118,14 @@ MODELES = [
     # pour que les planches et le débit ne bougent pas d'un trait) ; le site
     # se contente de CHOISIR une valeur sur sa copie. On ne place rien à la
     # main : on renseigne un paramètre que le modèle expose.
+    # PAS DE VOLETS TANT QUE LES DEUX BATTANTS SE SUPERPOSENT. Essayé le
+    # 29/08/2026 : le GLB sort, 23 pièces aux bonnes couleurs — et le rendu
+    # est NOIR. Mesure : les deux battants occupent la même place (gauche
+    # x -0,03..0,53, droit 0,00..0,52), chacun étant construit dans son
+    # propre repère. Ils s'interpénètrent, et c'est du z-fighting qu'on voit.
+    # Le remède est côté MODÈLE, comme l'angle de la porte du cabanon : que
+    # l'atelier des volets sache les poser côte à côte. Publier une image
+    # noire en attendant n'aiderait personne.
     ('meuble-balais',
      Path.home() / 'Projets/realisations/meuble-balais/MeubleABalais.FCStd',
      "L'armoire de jardin, porte ôtée : la cloison en travers et les "

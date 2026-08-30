@@ -1278,6 +1278,61 @@ def js_de_page(page: dict) -> str:
                         + '\n</script>')
     return '\n'.join(m for m in morceaux if m)
 
+def _pages_avec_modele() -> dict:
+    """{page du site -> clé du modèle 3D}, LU DANS `exporter_glb.MODELES`.
+
+    Christophe, 29/08/2026 : « il n'y a pas de lien vers le modèle 3D » — et
+    en cherchant, une seule fiche sur quatre en portait un. Trois projets
+    avaient un objet à faire tourner et ne le disaient pas, parce que le
+    bouton se posait à la main, une fiche à la fois.
+
+    On lit donc la table de l'exportateur, qui nomme déjà la page de chaque
+    modèle. ON LA LIT SANS EXÉCUTER LE FICHIER : `exporter_glb.py` n'a
+    volontairement pas de garde `__main__` — la console de FreeCAD lui donne
+    un autre `__name__` et le garde ne se déclencherait jamais. L'importer
+    lancerait donc l'export entier, FreeCADGui compris. On analyse la
+    syntaxe et on prend les deux chaînes qui nous intéressent.
+    """
+    import ast
+    chemin = Path(__file__).resolve().parent / 'outils' / 'exporter_glb.py'
+    arbre = ast.parse(chemin.read_text(encoding='utf-8'))
+    for noeud in arbre.body:
+        cibles = getattr(noeud, 'targets', [])
+        if not (cibles and getattr(cibles[0], 'id', '') == 'MODELES'):
+            continue
+        pages = {}
+        for tuple_ in noeud.value.elts:
+            e = tuple_.elts
+            if (isinstance(e[0], ast.Constant) and isinstance(e[3], ast.Constant)):
+                pages[e[3].value] = e[0].value
+        if not pages:
+            sys.exit("generer : MODELES lue, mais aucune page reconnue — "
+                     "la forme de la table a changé.")
+        return pages
+    sys.exit("generer : pas de table MODELES dans exporter_glb.py.")
+
+
+def injecter_lien3d(corps: str, sortie: str, pages: dict) -> str:
+    """Remplace `{{lien3d}}`, et REFUSE que la marque et le modèle divergent.
+
+    C'est tout l'intérêt : une fiche dont le projet a un modèle DOIT porter la
+    marque, et une fiche sans modèle ne peut pas la porter. Le lien ne peut
+    donc plus manquer en silence — c'est le défaut qu'on répare.
+    """
+    a_un_modele = sortie in pages
+    if '{{lien3d}}' not in corps:
+        if a_un_modele:
+            sys.exit(f"generer : {sortie} a un modèle 3D ({pages[sortie]}) "
+                     f"mais ne porte pas {{{{lien3d}}}} — le lien manquerait.")
+        return corps
+    if not a_un_modele:
+        sys.exit(f"generer : {sortie} demande {{{{lien3d}}}} alors qu'aucun "
+                 f"modèle 3D ne la vise dans exporter_glb.MODELES.")
+    return corps.replace(
+        '{{lien3d}}',
+        '<a class="btn btn-ghost" href="{{RACINE}}modeles-3d.html">'
+        'Le tourner en 3D</a>')
+
 def faits_modeles(corps: str, transmis: dict, nom: str) -> dict:
     """Ce que la page de modèles 3D montre VRAIMENT : compte, poids, noms.
 
@@ -1477,6 +1532,7 @@ def main() -> None:
     empreintes = copier_ressources()
     modeles, poids_modeles = copier_modeles()
     stl_attache = copier_stl_attache()
+    pages_3d = _pages_avec_modele()
     copier_appli_coupe()
     partage_appli_coupe()
     cartes = images_partage(PAGES)
@@ -1504,6 +1560,7 @@ def main() -> None:
         corps = injecter_stl_attache(corps, page['contenu'], stl_attache)
         corps = injecter_compte(corps, page['contenu'])
         corps = injecter_etat(corps, page['contenu'])
+        corps = injecter_lien3d(corps, page['sortie'], pages_3d)
         # Les faits se comptent SUR LA PAGE, une fois les modèles injectés :
         # ils servent au corps ET à la description de partage, qui ne peuvent
         # donc plus se contredire.
