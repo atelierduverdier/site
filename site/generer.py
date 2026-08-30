@@ -1318,36 +1318,46 @@ PAS_DES_FICHES = {'projets/index.html', 'projets/tonnelle-glycine.html'}
 
 
 def injecter_lien3d(corps: str, sortie: str, pages: dict) -> str:
-    """Remplace `{{lien3d}}`. TOUTE fiche projet doit le porter.
+    """Pose le lien vers les modèles 3D DANS LE HÉROS de chaque fiche projet.
 
-    Demande de Christophe, 29/08/2026 : « je voulais juste un lien vers
-    modeles-3d.html dans chaque projet ». J'avais d'abord réservé le bouton
-    aux projets qui ont LEUR modèle, ce qui laissait deux fiches sans rien.
+    Christophe, 29/08/2026 : « dans tous les projets il faudrait mettre ce
+    bouton en haut de page ». Il y était par une marque posée à la main, une
+    fiche à la fois — donc à six endroits différents : dans la rangée du
+    héros pour deux, sous une figure pour une autre, en pied de page pour les
+    trois dernières. C'est la même dispersion qui avait fait qu'il manquait
+    tout court sur trois fiches.
 
-    Le LIBELLÉ, lui, dépend : « Le tourner en 3D » quand l'objet est dans la
-    galerie, « Les modèles 3D de l'atelier » sinon. Promettre de tourner un
-    objet qui n'y est pas serait une porte qui ne mène pas où elle dit.
+    Il n'y a donc plus de marque : le générateur l'insère lui-même dans la
+    première rangée de boutons du héros. Une fiche dont le héros n'en a pas
+    ARRÊTE la génération — on refuse de deviner un emplacement plutôt que de
+    poser le bouton n'importe où.
 
-    Une fiche sans la marque ARRÊTE la génération : c'est ce qui a laissé
-    trois fiches muettes pendant que le bouton se posait à la main.
+    Le LIBELLÉ dépend du fond : « Le tourner en 3D » quand l'objet est dans
+    la galerie, « Les modèles 3D de l'atelier » sinon. Promettre de tourner
+    un objet qui n'y est pas serait une porte qui ne mène pas où elle dit.
     """
     est_une_fiche = (sortie.startswith('projets/')
                      and sortie not in PAS_DES_FICHES)
-    if '{{lien3d}}' not in corps:
-        if est_une_fiche:
-            sys.exit(f"generer : la fiche {sortie} ne porte pas "
-                     f"{{{{lien3d}}}} — elle n'aurait aucun lien vers les "
-                     f"modèles 3D.")
-        return corps
     if not est_une_fiche:
-        sys.exit(f"generer : {sortie} n'est pas une fiche projet et n'a rien "
-                 f"à faire de {{{{lien3d}}}}.")
+        return corps
+
+    fin_heros = corps.find('<section')
+    if fin_heros < 0:
+        sys.exit(f"generer : {sortie} n'a pas de <section> après son héros.")
+    heros = corps[:fin_heros]
+    marque = '<div class="cta">'
+    if marque not in heros:
+        sys.exit(f"generer : le héros de {sortie} n'a pas de rangée de "
+                 f"boutons (<div class=\"cta\">) — le lien vers les modèles "
+                 f"3D n'aurait pas d'endroit où se poser en haut de page.")
+
     libelle = ("Le tourner en 3D" if sortie in pages
                else "Les modèles 3D de l'atelier")
-    return corps.replace(
-        '{{lien3d}}',
-        f'<a class="btn btn-ghost" href="{{{{RACINE}}}}modeles-3d.html">'
-        f'{libelle}</a>')
+    bouton = ('\n      <a class="btn btn-ghost" href="{{RACINE}}modeles-3d.html">'
+              f'{libelle}</a>')
+    i = heros.index(marque) + len(marque)
+    return corps[:i] + bouton + corps[i:]
+
 
 def faits_modeles(corps: str, transmis: dict, nom: str) -> dict:
     """Ce que la page de modèles 3D montre VRAIMENT : compte, poids, noms.
