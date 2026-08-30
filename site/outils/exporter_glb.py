@@ -239,6 +239,23 @@ def solides_a_exporter(doc, choisis=None, exclus=None):
             continue
         somme = sum(c.Shape.Volume for c in enfants)
         assemblage = abs(somme - o.Shape.Volume) <= 0.02 * max(o.Shape.Volume, 1.0)
+        # UN SEUL NIVEAU, ET ON REFUSE LE DEUXIÈME. Un enfant qui serait
+        # lui-même un groupe coloré verrait ses pièces silencieusement
+        # ÉCARTÉES (il ne porte pas de ShapeColor, donc il tombe hors de
+        # `enfants`) — et si on les rattrapait, il faudrait aussi composer
+        # son placement avec celui de son parent. Mesuré le 29/08/2026 sur
+        # les cinq modèles : aucune imbrication à deux niveaux. Le jour où
+        # il y en a une, la génération s'arrête plutôt que de publier un
+        # objet amputé.
+        imbriques = [c.Name for c in _enfants_solides(o)
+                     if not _porte_une_couleur(c)
+                     and [x for x in _enfants_solides(c)
+                          if _porte_une_couleur(x)]]
+        if imbriques:
+            raise RuntimeError(
+                "groupe imbriqué sous « %s » : %s — leurs pièces seraient "
+                "perdues, et leur placement avec." % (o.Name, ", ".join(imbriques)))
+
         pose = getattr(o, 'Placement', None)
         if pose is not None and pose.isIdentity():
             pose = None
