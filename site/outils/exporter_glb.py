@@ -118,14 +118,15 @@ MODELES = [
     # pour que les planches et le débit ne bougent pas d'un trait) ; le site
     # se contente de CHOISIR une valeur sur sa copie. On ne place rien à la
     # main : on renseigne un paramètre que le modèle expose.
-    # PAS DE VOLETS TANT QUE LES DEUX BATTANTS SE SUPERPOSENT. Essayé le
-    # 29/08/2026 : le GLB sort, 23 pièces aux bonnes couleurs — et le rendu
-    # est NOIR. Mesure : les deux battants occupent la même place (gauche
-    # x -0,03..0,53, droit 0,00..0,52), chacun étant construit dans son
-    # propre repère. Ils s'interpénètrent, et c'est du z-fighting qu'on voit.
-    # Le remède est côté MODÈLE, comme l'angle de la porte du cabanon : que
-    # l'atelier des volets sache les poser côte à côte. Publier une image
-    # noire en attendant n'aiderait personne.
+    # LES VOLETS ONT DÉMASQUÉ LA PERTE DE PLACEMENT (voir `solides_a_exporter`).
+    # Leur premier export sortait noir, et j'ai accusé le modèle : mesuré
+    # dans FreeCAD, il est juste — gauche x -28..532, droit 504..1022, et
+    # 3 500 mm³ communs, la feuillure de recouvrement. C'est l'export qui
+    # perdait le décalage du groupe.
+    ('volets-battants',
+     Path.home() / 'Projets/realisations/volets-battants/Volets.FCStd',
+     "La paire de volets en douglas : lames bouvetées, barres et écharpes.",
+     'projets/volets-battants.html', None, None, None),
     ('meuble-balais',
      Path.home() / 'Projets/realisations/meuble-balais/MeubleABalais.FCStd',
      "L'armoire de jardin, porte ôtée : la cloison en travers et les "
@@ -201,6 +202,13 @@ def solides_a_exporter(doc, choisis=None, exclus=None):
         vo = getattr(_cible(o), 'ViewObject', None)
         return bool(getattr(vo, 'Transparency', 0))
 
+    # ON REND (objet, couleur, PLACEMENT DU PARENT). Le troisième terme est
+    # la faute que ce fichier a commise sur les volets battants : le groupe
+    # `Volet_Droit` porte un décalage de +504 mm, ses enfants sont en
+    # coordonnées LOCALES (x 182..490), et descendre dans les enfants pour
+    # les mailler un à un PERD ce décalage. Les deux battants retombaient
+    # l'un sur l'autre — 23 pièces aux bonnes couleurs, et un rendu noir de
+    # z-fighting. J'ai d'abord accusé le modèle ; il était juste.
     if choisis:
         retenus = []
         for nom in choisis:
@@ -209,7 +217,7 @@ def solides_a_exporter(doc, choisis=None, exclus=None):
             if o is None:
                 print(f"      (pièce « {nom} » introuvable)")
                 continue
-            retenus.append((o, couleur_de(o)))
+            retenus.append((o, couleur_de(o), None))
         return retenus
 
     tetes = [o for o in doc.Objects
@@ -223,7 +231,7 @@ def solides_a_exporter(doc, choisis=None, exclus=None):
             continue
         if _porte_une_couleur(o):
             if not transparent(o):
-                retenus.append((o, couleur_de(o)))
+                retenus.append((o, couleur_de(o), None))
             continue
         # un groupe : assemblage ou répétition ?
         enfants = [c for c in _enfants_solides(o) if _porte_une_couleur(c)]
@@ -231,14 +239,17 @@ def solides_a_exporter(doc, choisis=None, exclus=None):
             continue
         somme = sum(c.Shape.Volume for c in enfants)
         assemblage = abs(somme - o.Shape.Volume) <= 0.02 * max(o.Shape.Volume, 1.0)
+        pose = getattr(o, 'Placement', None)
+        if pose is not None and pose.isIdentity():
+            pose = None
         if assemblage:
             for c in enfants:
                 if c.Name in exclus or c.Label in exclus:
                     continue
                 if not transparent(c):
-                    retenus.append((c, couleur_de(c)))
+                    retenus.append((c, couleur_de(c), pose))
         else:
-            retenus.append((o, couleur_de(enfants[0])))
+            retenus.append((o, couleur_de(enfants[0]), None))
     # UN NOM ÉCARTÉ QUI NE DÉSIGNE RIEN DOIT SE DIRE. Sans ça, une pièce
     # renommée dans le modèle ferait réapparaître la porte du cabanon en
     # silence, et personne ne rouvrirait la liste.
@@ -347,9 +358,13 @@ def exporter(cle, modele, bac, choisis=None, exclus=None, reglages=None):
     pieces, triangles = [], 0
     dossier = bac / cle
     dossier.mkdir(parents=True, exist_ok=True)
-    for o, couleur in solides_a_exporter(doc, choisis, exclus):
+    for o, couleur, pose in solides_a_exporter(doc, choisis, exclus):
+        forme = o.Shape
+        if pose is not None:
+            forme = forme.copy()
+            forme.Placement = pose.multiply(forme.Placement)
         try:
-            m = MeshPart.meshFromShape(Shape=o.Shape, LinearDeflection=FLECHE,
+            m = MeshPart.meshFromShape(Shape=forme, LinearDeflection=FLECHE,
                                        AngularDeflection=ANGLE, Relative=False)
         except Exception:
             continue
