@@ -677,6 +677,58 @@
   </div>
 </section>
 
+<section id="rs274-casse">
+  <div class="wrap">
+    <div class="sec-tag">Le jour où ça casse</div>
+    <h2>« Tracé incomplet » : ce n'est pas lui, c'est le sol qui a bougé</h2>
+    <p class="sec-lede">
+      Le visualiseur s'appuie sur <code>rs274</code>, l'interpréteur de LinuxCNC.
+      C'est sa force — il lit le G-code comme la machine le lira — et sa seule
+      dépendance fragile. Un jour, sans prévenir, le bandeau rouge apparaît :
+    </p>
+    <pre><code>rs274: error while loading shared libraries:
+libboost_python314.so.1.91.0: cannot open shared object file</code></pre>
+    <p>
+      Rien n'a changé dans le visualiseur, ni dans le fichier ouvert. Une mise à
+      jour du système a fait monter une bibliothèque d'une version majeure, et le
+      paquet LinuxCNC — compilé contre l'ancienne — ne la trouve plus. Vécu le
+      31 août 2026 : <code>boost</code> était passé de 1.91 à 1.92 <b>onze jours
+      plus tôt</b>, et l'erreur n'est apparue qu'à la première ouverture suivante.
+    </p>
+
+    <div class="callout warn">
+      <span class="ci">Le lien symbolique est un faux ami</span>
+      <p>
+        Faire pointer l'ancienne version vers la nouvelle paraît évident, et
+        <code>rs274</code> démarre effectivement. Mais il s'effondre au premier
+        fichier interprété, sur un symbole
+        <code>boost::python::detail::init_module</code> disparu entre les deux
+        versions : l'interface binaire a changé. On obtient alors une commande
+        qui démarre et casse plus loin — pire qu'une erreur franche, parce
+        qu'elle fait croire que le problème est ailleurs.
+      </p>
+    </div>
+
+    <p>
+      <b>La seule issue est de recompiler</b>, pour que LinuxCNC soit lié aux
+      bibliothèques d'aujourd'hui :
+    </p>
+    <pre><code>paru -S --rebuild linuxcnc</code></pre>
+    <p class="muted">
+      Compter plusieurs dizaines de minutes, et le refaire à chaque montée
+      majeure de Boost ou de Python. C'est le prix d'un paquet compilé contre le
+      système : il faut le reconstruire quand celui-ci bouge. Un conteneur, lui,
+      y est insensible — c'est l'autre voie décrite dans le dépôt.
+    </p>
+    <p class="muted">
+      À la décharge du visualiseur : il ne se tait pas. Le bandeau donne le
+      message exact de <code>rs274</code> et précise que le tracé s'arrête là où
+      l'interprétation a échoué. C'est ce qui permet de trouver la cause en
+      quelques minutes plutôt que de soupçonner son propre G-code.
+    </p>
+  </div>
+</section>
+
 <section>
   <div class="wrap">
     <div class="sec-tag">Honnêteté</div>
