@@ -72,6 +72,14 @@
 }
 
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+/* L'attribut HTML `hidden` pose `display:none` par la feuille du
+   navigateur, c'est-a-dire avec la priorite la PLUS FAIBLE : la moindre
+   regle d'auteur qui fixe `display` la supplante. C'est ce qui est arrive
+   au bloc d'alerte (`.avert{display:flex}`) : le JS le marquait bien
+   `hidden` quand il n'y avait rien a signaler, mais il restait affiche —
+   vide, avec son seul titre « A CORRIGER » au-dessus de rien.
+   Vu par Christophe le 31/08, et la regle vaut pour tout ce qui se cache. */
+[hidden]{display:none !important;}
 html{-webkit-text-size-adjust:100%;}
 body{
   margin:0; background:var(--page); color:var(--txt);
