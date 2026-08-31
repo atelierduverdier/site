@@ -1,6 +1,6 @@
 <!-- Vitesses de coupe — la fiche de l'appli servie sur /coupe/.
      LE TABLEAU DES MATIÈRES N'EST PAS ÉCRIT ICI : il est engendré en lisant
-     le MAT de site/appli/coupe/index.html ({{coupe:table_matieres}}), pour
+     le MATS de site/appli/coupe/index.html ({{coupe:table_matieres}}), pour
      la même raison que les cotes ATC — une valeur écrite deux fois finit
      toujours par diverger. -->
 
@@ -90,14 +90,15 @@
       </div>
     </div>
 
-    <figure class="capture panneau">
+    <figure class="capture">
       <img src="{{RACINE}}logiciels/captures/appli-coupe.webp"
            alt="L'appli vitesses de coupe : neuf matières, champs diamètre et dents, et les quatre résultats — avance, plongée, broche, avance par tour"
            data-agrandir>
       <figcaption>
-        L'appli telle qu'elle s'ouvre : les matières en haut, les quatre résultats
-        dans la carte. Volontairement sombre et d'une seule colonne — elle se lit
-        sur un téléphone, debout devant la machine.
+        L'appli telle qu'elle s'ouvre. Sur un écran large, le résultat tient dans
+        une colonne à droite qui <b>reste visible</b> pendant qu'on modifie les
+        entrées ; sur un téléphone, tout passe en une colonne et une barre de
+        synthèse s'accroche en bas. Thème clair par défaut, sombre d'un clic.
       </figcaption>
     </figure>
   </div>
@@ -134,11 +135,11 @@
       <p>
         Celui-là ne sert pas à préparer un travail, mais à <b>juger un réglage
         existant</b>. On tape ce qu'on a dans le fichier ou sur le pupitre, et
-        l'appli dit ce que ça donne comme copeau, en pourcentage du conseillé :
-        24&nbsp;000&nbsp;tr/min à 800&nbsp;mm/min avec une fraise de 3&nbsp;mm à deux
-        dents, c'est <b>21&nbsp;% du copeau utile</b> — la fraise frotte au lieu de
-        couper, et c'est exactement ce qui brûle le bois. La même avance à
-        5&nbsp;000&nbsp;tr/min donne 101&nbsp;%.
+        l'appli dit sous le champ ce que ça donne comme copeau, en pourcentage du
+        conseillé : 21&nbsp;000&nbsp;tr/min à 800&nbsp;mm/min avec une fraise de
+        6&nbsp;mm à deux dents, c'est <b>13&nbsp;% du copeau utile</b> — la fraise
+        frotte au lieu de couper, et c'est exactement ce qui brûle le bois. La même
+        avance à 2&nbsp;700&nbsp;tr/min donne 99&nbsp;%.
       </p>
     </div>
 
@@ -165,7 +166,7 @@
     <div class="twrap">
       <table>
         <thead>
-          <tr><th>Matière</th><th class="num">broche</th><th class="num">fz à Ø6<br>(mm/dent)</th><th class="num">passe à Ø6<br>(mm)</th><th>remarque</th></tr>
+          <tr><th>Matière</th><th>Famille</th><th class="num">Vitesse de coupe<br>(m/min)</th><th class="num">Copeau à Ø6<br>(mm/dent)</th><th class="num">Profondeur<br>de passe</th></tr>
         </thead>
         <tbody>
           {{coupe:table_matieres}}

@@ -30,11 +30,15 @@ SORTIE = RACINE / 'contenu' / 'captures' / 'appli-coupe.png'
 # Échelle 2 : la page fait 460 px de large au plus, on la rend à 920 pour
 # que le texte de 11 px reste net une fois en WebP.
 ECHELLE = 2
-LARGEUR = 452        # un peu plus que le .wrap (460 - marges), sans vide latéral
+# Vue BUREAU depuis la refonte v16 : c'est en deux colonnes que l'appli se
+# comprend d'un coup d'œil — le résultat à droite pendant qu'on règle à
+# gauche. Sous 900 px elle repasse en une colonne, mais ce n'est pas cette
+# vue-là qui explique le mieux ce qu'elle fait.
+LARGEUR = 1180
 # Jusqu'au bas de la carte des résultats, ALERTE COMPRISE : avec les réglages
 # par défaut (Ø6, plafond 1 500) l'appli avertit que l'avance dépasse ce que
 # la machine tient — c'est le garde-fou qui la distingue, il doit se voir.
-HAUTEUR = 1290
+HAUTEUR = 900
 
 
 def _rogner_marges(image):

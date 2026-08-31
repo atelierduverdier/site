@@ -257,31 +257,44 @@ COUPE_RESUME = ("Choisir broche et avance au pied de la fraiseuse — "
 def matieres_coupe() -> list:
     """Lit les matières DANS le code de l'appli — jamais recopiées.
 
-    Le tableau de la fiche sort du même `MAT` que les boutons de l'appli :
+    Le tableau de la fiche sort du même `MATS` que les boutons de l'appli :
     une valeur retouchée dans l'appli met la fiche à jour à la génération
     suivante. C'est la règle VERSION, appliquée aux vitesses de coupe.
+
+    Depuis la refonte v16, `MATS` est groupé par famille (Bois, Plastiques,
+    Métaux) et chaque matière porte sa vitesse de coupe `vc`, son copeau par
+    mm de diamètre `k`, sa profondeur de passe `ap` (un texte) et sa note.
     """
     source = APPLI_COUPE / 'index.html'
     if not source.exists():
         sys.exit(f"generer : {source} introuvable — l'appli fait partie du site.")
     texte = source.read_text(encoding='utf-8')
-    bloc = re.search(r'var MAT = \{(.*?)\n\};', texte, re.S)
+    bloc = re.search(r'var MATS = \[(.*?)\n\];', texte, re.S)
     if not bloc:
-        sys.exit("generer : bloc « var MAT = {...}; » introuvable dans l'appli coupe.")
-    motif = (r'\{label:"([^"]+)",\s*vcNum:(null|[\d.]+),\s*fzPerMm:([\d.]+),'
-             r'\s*mode:"(rpm|vc)",\s*apLow:([\d.]+),\s*apHigh:([\d.]+),'
-             r'\s*note:"([^"]*)"\}')
-    matieres = [
-        {'label': label,
-         'vc': None if vc == 'null' else float(vc),
-         'fz_par_mm': float(fz), 'mode': mode,
-         'ap_lo': float(ap_lo), 'ap_hi': float(ap_hi), 'note': note}
-        for label, vc, fz, mode, ap_lo, ap_hi, note
-        in re.findall(motif, bloc.group(1))
-    ]
+        sys.exit("generer : bloc « var MATS = [...]; » introuvable dans l'appli coupe.")
+
+    matieres, famille = [], None
+    for ligne in bloc.group(1).splitlines():
+        m_fam = re.search(r"\{groupe:'([^']+)'", ligne)
+        if m_fam:
+            famille = m_fam.group(1)
+        m_it = re.search(
+            r"\{id:'([^']+)',\s*label:'([^']+)',\s*vc:([\d.]+),\s*k:([\d.]+),"
+            r"\s*ap:'([^']+)'", ligne)
+        if m_it:
+            matieres.append({
+                'famille': famille or '',
+                'id': m_it.group(1),
+                # le libellé porte un tiret conditionnel (U+00AD) : il ne se
+                # voit pas mais il compte comme un caractère, on l'ôte ici.
+                'label': m_it.group(2).replace('\u00ad', ''),
+                'vc': float(m_it.group(3)),
+                'fz_par_mm': float(m_it.group(4)),
+                'ap': m_it.group(5),
+            })
     if not matieres:
         sys.exit("generer : aucune matière lue dans l'appli coupe — le motif "
-                 "ne colle plus à l'écriture de MAT.")
+                 "ne colle plus à l'écriture de MATS.")
     return matieres
 
 
@@ -294,23 +307,21 @@ def _nombre_fr(x: float, dec: int) -> str:
 def injecter_coupe(corps: str, nom: str) -> str:
     """Remplace {{coupe.nb}} et {{coupe:table_matieres}} depuis l'appli.
 
-    Le tableau est donné pour une fraise de 6 mm — le diamètre par défaut de
-    l'appli — parce que fz et la passe y sont proportionnels au diamètre :
-    une seule colonne d'exemple suffit à situer les ordres de grandeur.
+    La colonne « copeau » est donnée pour une fraise de 6 mm — le diamètre
+    par défaut de l'appli — parce que le copeau y est proportionnel au
+    diamètre : une seule colonne d'exemple suffit à situer les ordres de
+    grandeur.
     """
     if '{{coupe' not in corps:
         return corps
     lignes = []
     for m in matieres_coupe():
-        broche = ('au maximum' if m['mode'] == 'rpm'
-                  else f"Vc {_nombre_fr(m['vc'], 0)} m/min")
         fz6 = _nombre_fr(m['fz_par_mm'] * 6, 3)
-        passe = f"{_nombre_fr(m['ap_lo'] * 6, 1)}–{_nombre_fr(m['ap_hi'] * 6, 1)}"
         lignes.append(f'<tr><td>{html.escape(m["label"])}</td>'
-                      f'<td class="num">{broche}</td>'
+                      f'<td>{html.escape(m["famille"])}</td>'
+                      f'<td class="num">{_nombre_fr(m["vc"], 0)}</td>'
                       f'<td class="num">{fz6}</td>'
-                      f'<td class="num">{passe}</td>'
-                      f'<td>{html.escape(m["note"])}</td></tr>')
+                      f'<td class="num">{html.escape(m["ap"])}</td></tr>')
     corps = corps.replace('{{coupe:table_matieres}}', '\n          '.join(lignes))
     corps = corps.replace('{{coupe.nb}}', str(len(matieres_coupe())))
     reste = re.findall(r'\{\{coupe[^}]*\}\}', corps)

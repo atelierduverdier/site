@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="jour">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#09090b">
+<meta name="theme-color" content="#f5f4f1">
 <meta name="description" content="Calculateur de vitesses de coupe pour le fraisage CNC : neuf matières du sapin à l'acier doux, bibliothèque d'outils, export FreeCAD. Fonctionne hors-ligne.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Coupe">
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- Le favicon SVG suffit au bureau, mais l'ecran d'accueil d'un telephone
@@ -17,214 +16,462 @@
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <title>Vitesses de coupe</title>
+
+<!-- Polices de la maquette. `display=swap` et non `block` : hors-ligne, ou
+     sur un reseau d'atelier qui traine, le texte doit s'afficher tout de
+     suite dans la police de repli plutot que de rester invisible. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
 <style>
-  /* Appli d'établi : UN SEUL thème, sombre — elle se lit à côté de la
-     machine, souvent en plein soleil d'atelier, et le blanc éblouit. */
-  :root{ --bg:#09090b; --panel:#18181b; --panel2:#27272a; --line:#3f3f46; --txt:#e4e4e7; --dim:#71717a; --dim2:#52525b; --orange:#ff8a00; --vert:#4ade80; --rouge:#dc2626; }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  body{margin:0; background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:env(safe-area-inset-top) 0 0;}
-  .wrap{max-width:460px; margin:0 auto; padding:22px 16px 48px;}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
-  h1{font-size:19px; font-weight:600; margin:0; letter-spacing:-.01em;}
-  .head{display:flex; align-items:center; gap:8px;}
-  /* Le chapeau, a DROITE du titre. `margin-left:auto` le pousse au bout de
-     la ligne ; il a le droit de retrecir pour ne jamais chasser le titre. */
-  .marque{margin-left:auto; line-height:0; min-width:0; flex:0 0 auto;}
-  .marque svg{height:30px; width:auto; max-width:100%; display:block;}
-  /* La pastille de version, juste apres le chapeau. */
-  .ver{font-size:10px; font-weight:700; letter-spacing:.02em; padding:3px 7px;
-       border-radius:6px; border:1px solid var(--line); background:transparent;
-       color:var(--dim); flex:0 0 auto; white-space:nowrap;}
-  .ver.ok{background:var(--vert); border-color:var(--vert); color:#04140a;}
-  .ver.vieux{background:var(--rouge); border-color:var(--rouge); color:#fff; cursor:pointer;}
-  .sub{font-size:12px; color:var(--dim); margin:2px 0 18px;}
-  .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); display:block; margin-bottom:5px;}
-  input{width:100%; background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:11px 12px; color:var(--txt); font-size:16px; font-family:ui-monospace,Menlo,monospace;}
-  input:focus{outline:none; border-color:var(--orange);}
-  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;}
-  .pleine{margin-bottom:16px;}
-  /* Les trois sens de calcul. Meme grammaire que les matieres : le choix
-     actif est plein orange, on le voit d'un coup d'oeil a l'etabli. */
-  .modes{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:0 0 16px;}
-  .mode{padding:10px 2px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--txt); font-size:13px; font-weight:500;}
-  .mode.on{background:var(--orange); border-color:var(--orange); color:#000;}
-  /* Le champ DEDUIT : ni saisissable, ni gris — c'est un resultat, il porte
-     donc la couleur des resultats. */
-  input.calcule{color:var(--orange); background:#141416; border-style:dashed; border-color:var(--line);}
-  .verdict{margin-top:10px; font-size:11px; line-height:1.5; color:var(--dim);}
-  .verdict b{color:var(--vert);}
-  .verdict.chaud b{color:var(--orange);}
-  .mats{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:20px;}
-  .mat{padding:11px 2px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--txt); font-size:13px; font-weight:500;}
-  .mat.on{background:var(--orange); border-color:var(--orange); color:#000;}
-  .fieldwrap{position:relative;}
-  .reset{position:absolute; right:8px; top:9px; background:none; border:none; color:var(--dim2); font-size:15px; padding:4px 6px;}
-  .reset:active{color:var(--orange);}
-  .hint{font-size:10px; color:var(--dim2); margin-top:3px; display:block;}
-  /* Explication d'un reglage qui ne se devine pas — plus longue qu'un hint. */
-  .aide{font-size:11px; color:var(--dim); line-height:1.5; margin:8px 0 0;
-        padding-left:10px; border-left:2px solid var(--panel2);}
-  .aide b{color:var(--txt);}
-  /* La carte des resultats est CE QU'ON VIENT CHERCHER : elle porte le
-     cadre orange de la maison pour se distinguer des champs de saisie. */
-  .card{background:var(--panel); border:2px solid var(--orange); border-radius:12px; padding:16px; margin-bottom:8px;}
-  .outs{display:grid; grid-template-columns:1fr 1fr; gap:16px 16px;}
-  .ro .k{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim);}
-  .ro .v{font-family:ui-monospace,Menlo,monospace; color:var(--orange); line-height:1.1;}
-  .ro .v.big{font-size:34px;} .ro .v{font-size:22px;}
-  .ro .u{color:var(--dim); font-size:11px; margin-left:4px; font-family:-apple-system,sans-serif;}
-  .foot{margin-top:14px; padding-top:12px; border-top:1px solid var(--panel2); font-size:11px; color:var(--dim);}
-  .warn{margin-top:8px; font-size:11px; color:var(--orange); line-height:1.5;}
-  .saverow{display:flex; gap:8px; margin:20px 0 24px;}
-  .saverow input{flex:1;}
-  .btn{border:none; border-radius:9px; font-size:14px; font-weight:500; padding:0 16px;}
-  .btn.pri{background:var(--orange); color:#000;}
-  .seclbl{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); margin-bottom:10px;}
-  .tool{display:flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--panel2); border-radius:9px; padding:9px 12px; margin-bottom:8px;}
-  .tool .load{flex:1; text-align:left; background:none; border:none; color:var(--txt); padding:0;}
-  .tool .nm{font-size:14px;} .tool .meta{font-size:11px; color:var(--dim); font-family:ui-monospace,Menlo,monospace; margin-top:2px;}
-  .del{background:none; border:none; color:var(--dim2); font-size:18px; padding:4px 8px;}
-  .del:active{color:#f87171;}
-  details{border:1px solid var(--panel2); border-radius:12px; overflow:hidden; margin-top:4px;}
-  summary{list-style:none; padding:13px 16px; font-size:14px; color:var(--txt); background:var(--panel); cursor:pointer;}
-  summary::-webkit-details-marker{display:none;}
-  .exp{padding:16px; background:var(--bg);}
-  textarea{width:100%; background:var(--panel); border:1px solid var(--panel2); border-radius:8px; padding:8px; color:var(--dim); font-family:ui-monospace,Menlo,monospace; font-size:11px; resize:vertical;}
-  .cp{background:none; border:none; color:var(--dim); font-size:12px; display:inline-flex; align-items:center; gap:4px; padding:4px 0 4px 14px;}
-  .cp:active{color:var(--orange);}
-  /* Le telechargement est l'action principale sur ordinateur : il se voit. */
-  .cp.dl{color:var(--orange);}
-  .exprow{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
-  .fctb{border:1px solid var(--panel2); border-radius:8px; padding:11px; margin-bottom:14px;}
-  .fctb .t{font-size:13px; color:var(--txt); font-weight:500; margin-bottom:8px;}
-  .tc{font-size:11px; color:var(--orange); font-family:ui-monospace,Menlo,monospace;}
-  .note{font-size:11px; color:var(--dim); line-height:1.5; margin:0 0 12px;}
-  .basdepage{margin-top:28px; font-size:11px; color:var(--dim2); text-align:center;}
-  .basdepage a{color:var(--dim); text-decoration:none; border-bottom:1px solid var(--panel2);}
+/* =======================================================================
+   Vitesses de coupe — refonte v16
+   =======================================================================
+   Les valeurs (couleurs, tailles, espacements) viennent du dossier de
+   remise `design_handoff_vitesses_de_coupe`. La palette SOMBRE est celle
+   de la maquette, au jeton pres. La palette CLAIRE n'y figure pas : elle
+   a ete construite ici, en gardant la meme hierarchie et les memes
+   rapports de contraste.
+
+   UN PIEGE DE THEME CLAIR, et il commande toute la palette : l'accent
+   #f0913a de la maquette ne fait que 2,1:1 sur du blanc — illisible en
+   texte. Il y a donc DEUX jetons d'accent : `--accent` pour les aplats
+   (bouton actif, ou l'encre est sombre par-dessus) et `--accent-ink`
+   pour le texte accentue. Sur fond sombre les deux se confondent ; sur
+   fond clair, `--accent-ink` descend a #a95c08 (5,1:1).
+   ======================================================================= */
+
+/* --- Thème JOUR (défaut) ------------------------------------------- */
+:root{
+  --page:#f5f4f1;      --card:#ffffff;      --result:#ffffff;
+  --field:#ffffff;     --calc:#fdf5ec;      --bar:#ffffff;   --seg:#eceae5;
+  --field-bd:#d7d4cd;  --card-bd:#e4e1da;   --seg-bd:#dcd9d2;
+  --result-bd:#ecd6b6; --result-bd-warn:#eebfae;
+  --txt:#1b1a17;       --txt-strong:#111110; --btn-off:#403d37;
+  --label:#55524c;     --second:#6a675f;    --help:#7b776f;  --section:#84806f;
+  --placeholder:#a5a199;
+  --accent:#f0913a;    --accent-ink:#a95c08; --on-accent:#17120c;
+  --warn-bar:#d9481f;  --warn-title:#a83a17; --warn-txt:#6f2a12; --warn-bg:#fdefe9;
+  --ok:#2f7d43;
+  --ombre:0 1px 2px rgba(28,25,20,.05), 0 1px 1px rgba(28,25,20,.04);
+}
+/* --- Thème NUIT — les jetons de la maquette, inchangés --------------- */
+:root[data-theme="nuit"]{
+  --page:#0a0a0b;      --card:#101012;      --result:#121114;
+  --field:#17171a;     --calc:#0d0d0f;      --bar:#16151a;   --seg:#131316;
+  --field-bd:#2c2c31;  --card-bd:#24242a;   --seg-bd:#26262a;
+  --result-bd:#2b2118; --result-bd-warn:#4a1f18;
+  --txt:#eae8e4;       --txt-strong:#f2f0ec; --btn-off:#cfcdc8;
+  --label:#a9a7a2;     --second:#8b8985;    --help:#74736f;  --section:#6d6c68;
+  --placeholder:#5c5b57;
+  --accent:#f0913a;    --accent-ink:#f0913a; --on-accent:#17120c;
+  --warn-bar:#ff6b4a;  --warn-title:#ff8a6b; --warn-txt:#ffcbbc; --warn-bg:#2a1310;
+  --ok:#5fbd77;
+  --ombre:none;
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0; background:var(--page); color:var(--txt);
+  font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  font-size:14px; line-height:1.55;
+  padding:env(safe-area-inset-top) 0 0;
+}
+/* Pas de transition de couleur au changement de theme : la valeur vient
+   d'une variable CSS, et une transition sur une couleur derivee d'un
+   `var()` laisse le fond a mi-chemin pendant un temps indefini — vu ici le
+   31/08, page a moitie claire alors que les cartes etaient deja sombres.
+   La maquette ne demande aucune animation, on n'en met pas. */
+.mono{font-family:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
+
+/* --- Ossature ------------------------------------------------------- */
+.cadre{max-width:1180px; margin:0 auto; padding:20px 20px 64px;}
+.entete{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding-bottom:20px;}
+.marque{display:flex; align-items:center; gap:12px; min-width:0;}
+.marque svg{height:30px; width:auto; display:block; flex:0 0 auto;}
+.marque h1{font-family:'JetBrains Mono',monospace; font-size:17px; font-weight:700; margin:0; letter-spacing:-.01em; color:var(--txt-strong);}
+.marque p{font-size:12.5px; color:var(--second); margin:2px 0 0;}
+.outils-entete{display:flex; align-items:center; gap:8px; flex:0 0 auto;}
+
+/* Bouton thème + pastille de version */
+.theme-btn{
+  min-height:36px; padding:0 12px; border-radius:9px; cursor:pointer;
+  background:var(--field); border:1px solid var(--field-bd); color:var(--second);
+  font-family:'JetBrains Mono',monospace; font-size:12px; display:inline-flex;
+  align-items:center; gap:6px;
+}
+.theme-btn:hover{color:var(--txt);}
+.ver{
+  font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.02em;
+  padding:4px 8px; border-radius:6px; border:1px solid var(--field-bd);
+  background:transparent; color:var(--help); white-space:nowrap;
+}
+.ver.ok{background:var(--ok); border-color:var(--ok); color:#fff;}
+.ver.vieux{background:var(--warn-bar); border-color:var(--warn-bar); color:#fff; cursor:pointer;}
+
+/* Deux colonnes au-dessus de 900px, le resultat reste visible pendant
+   qu'on modifie les entrees : c'est le point central de la refonte. */
+.corps{display:grid; grid-template-columns:minmax(0,1fr) 396px; gap:28px; align-items:start;}
+.col-gauche{display:flex; flex-direction:column; gap:26px; min-width:0;}
+.rail{position:sticky; top:20px; display:flex; flex-direction:column; gap:16px; min-width:0;}
+
+.sect-titre{
+  font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--section); padding-bottom:12px;
+}
+
+/* --- Matières, groupées par famille --------------------------------- */
+.fam{display:grid; grid-template-columns:62px 1fr; gap:12px; align-items:center; margin-bottom:8px;}
+.fam:last-child{margin-bottom:0;}
+.fam-lbl{font-size:11.5px; color:var(--section); text-align:right;}
+.fam-grille{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px;}
+.choix{
+  min-height:48px; padding:0 12px; border-radius:9px; cursor:pointer;
+  font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.25;
+  background:var(--field); border:1px solid var(--field-bd); color:var(--btn-off);
+  box-shadow:var(--ombre); transition:background-color .12s, border-color .12s, color .12s;
+}
+.choix:hover{border-color:var(--accent);}
+.choix.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent); font-weight:500;}
+
+/* --- Champs --------------------------------------------------------- */
+.duo{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.champ{min-width:0;}
+.champ label, .lbl{display:block; font-size:13px; color:var(--label); padding-bottom:7px;}
+.champ label .u, .lbl .u{color:var(--section);}
+input[type=text], input:not([type]){
+  width:100%; min-height:52px; padding:0 16px; border-radius:9px;
+  font-family:'JetBrains Mono',monospace; font-size:15px;
+  background:var(--field); border:1px solid var(--field-bd); color:var(--txt-strong);
+  outline:none; box-shadow:var(--ombre);
+}
+input::placeholder{color:var(--placeholder);}
+input:focus{border-color:var(--accent);}
+/* Le champ DEDUIT : bordure pointillee, encre accent, non saisissable. */
+input.calcule{background:var(--calc); border:1px dashed var(--accent); color:var(--accent-ink);}
+.aide{font-size:11.5px; color:var(--help); padding-top:6px; display:block;}
+.avec-reset{display:grid; grid-template-columns:1fr 44px; gap:8px;}
+.reset{
+  min-height:52px; border-radius:9px; cursor:pointer;
+  background:var(--field); border:1px solid var(--field-bd); color:var(--second);
+  font-family:'JetBrains Mono',monospace; font-size:15px; box-shadow:var(--ombre);
+}
+.reset:hover{color:var(--accent-ink); border-color:var(--accent);}
+
+/* --- Segmenté « ce que l'appli calcule » ---------------------------- */
+.segments{display:flex; gap:8px;}
+.segments .choix{flex:1;}
+
+/* --- Disclosure « ? » ----------------------------------------------- */
+.lbl-ligne{display:flex; align-items:center; gap:8px; padding-bottom:7px;}
+.lbl-ligne .lbl{padding:0;}
+.pastille-aide{
+  width:22px; height:22px; border-radius:50%; cursor:pointer; flex:0 0 auto;
+  background:var(--seg); border:1px solid var(--seg-bd); color:var(--second);
+  font-family:'JetBrains Mono',monospace; font-size:11.5px; line-height:1;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.bloc-aide{
+  background:var(--calc); border:1px solid var(--card-bd); border-radius:10px;
+  padding:16px; font-size:13px; line-height:1.6; color:var(--second); margin-top:12px;
+}
+.bloc-aide b{color:var(--txt);}
+.bloc-aide p{margin:0 0 10px;}
+.bloc-aide p:last-child{margin:0;}
+
+/* --- Panneau Machine ------------------------------------------------ */
+.panneau{background:var(--card); border:1px solid var(--card-bd); border-radius:12px; box-shadow:var(--ombre);}
+.panneau-tete{
+  width:100%; min-height:56px; padding:12px 18px; cursor:pointer; text-align:left;
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  background:none; border:none; color:inherit;
+}
+.panneau-tete .sect-titre{padding:0 0 4px;}
+.resume{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--second);}
+.bascule{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--help); flex:0 0 auto;}
+.panneau-corps{padding:0 18px 18px;}
+.panneau-corps .sous{font-size:12.5px; color:var(--help); padding-bottom:14px;}
+.grille-machine{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+/* --- Carte résultat -------------------------------------------------- */
+.resultat{background:var(--result); border:1px solid var(--result-bd); border-radius:14px; overflow:hidden; box-shadow:var(--ombre);}
+.resultat.alerte{border-color:var(--result-bd-warn);}
+.chiffres{padding:20px 20px 4px; display:grid; grid-template-columns:1fr 1fr; gap:22px 16px;}
+.val .k{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--section); padding-bottom:6px;}
+.val .v{font-family:'JetBrains Mono',monospace; line-height:1;}
+.val.grand .v{font-size:30px; font-weight:700; color:var(--accent-ink);}
+.val.petit .v{font-size:20px; font-weight:500; color:var(--txt);}
+.val .u{font-size:12px; font-weight:400; color:var(--second); padding-left:5px;}
+.val.petit .u{font-size:11.5px;}
+.contexte{padding:20px; display:flex; flex-direction:column; gap:8px;}
+.contexte .ligne{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--second);}
+.contexte .note{font-size:12.5px; line-height:1.55; color:var(--second);}
+.avert{background:var(--warn-bg); border-top:1px solid var(--result-bd-warn); padding:16px 20px; display:flex; gap:12px;}
+.avert .barre{width:6px; border-radius:3px; background:var(--warn-bar); flex:0 0 auto;}
+.avert .t{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--warn-title); padding-bottom:6px;}
+.avert .x{font-size:13px; line-height:1.55; color:var(--warn-txt);}
+
+/* --- Enregistrer / bibliothèque ------------------------------------- */
+.carte{background:var(--card); border:1px solid var(--card-bd); border-radius:12px; padding:16px; box-shadow:var(--ombre);}
+.ligne-save{display:flex; gap:10px;}
+.ligne-save input{min-height:48px; font-size:14px;}
+.btn-primaire{
+  min-height:48px; padding:0 18px; border-radius:9px; cursor:pointer; flex:0 0 auto;
+  background:var(--accent); border:1px solid var(--accent); color:var(--on-accent);
+  font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700;
+}
+.biblio-titre{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--section); padding:18px 0 10px;}
+.item{
+  background:var(--field); border:1px solid var(--seg-bd); border-radius:9px;
+  padding:12px 14px; display:flex; align-items:center; gap:12px; margin-bottom:8px;
+}
+.item .charger{flex:1; min-width:0; background:none; border:none; text-align:left; cursor:pointer; padding:0; color:inherit;}
+.item .nom{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--txt);}
+.item .sub{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--help); margin-top:2px;}
+.item .suppr{
+  width:32px; height:32px; border-radius:8px; cursor:pointer; flex:0 0 auto;
+  background:none; border:1px solid var(--field-bd); color:var(--second); font-size:15px; line-height:1;
+}
+.item .suppr:hover{color:var(--warn-bar); border-color:var(--warn-bar);}
+.vide{font-size:12.5px; color:var(--section);}
+
+/* --- Export --------------------------------------------------------- */
+details.export{border:1px solid var(--card-bd); border-radius:12px; background:var(--card); overflow:hidden; box-shadow:var(--ombre);}
+details.export>summary{
+  list-style:none; min-height:52px; padding:14px 16px; cursor:pointer;
+  font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--txt);
+  display:flex; align-items:center; justify-content:space-between;
+}
+details.export>summary::-webkit-details-marker{display:none;}
+details.export>summary::after{content:'+'; color:var(--second);}
+details.export[open]>summary::after{content:'–';}
+.export-corps{padding:0 16px 16px;}
+.export-corps .note{font-size:12px; color:var(--help); line-height:1.55; margin:0 0 12px;}
+textarea{
+  width:100%; background:var(--field); border:1px solid var(--field-bd); border-radius:8px;
+  padding:10px; color:var(--second); font-family:'JetBrains Mono',monospace; font-size:11px; resize:vertical;
+}
+.exprow{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;}
+.mini{
+  background:none; border:1px solid var(--field-bd); border-radius:8px; cursor:pointer;
+  color:var(--second); font-family:'JetBrains Mono',monospace; font-size:11.5px;
+  min-height:34px; padding:0 12px;
+}
+.mini.dl{color:var(--accent-ink); border-color:var(--accent);}
+.bloc-fctb{border:1px solid var(--card-bd); border-radius:9px; padding:12px; margin-bottom:12px;}
+.bloc-fctb .t{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--txt); margin-bottom:8px;}
+.tc{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--accent-ink);}
+
+/* --- Barre de synthèse (mobile) ------------------------------------- */
+.synthese{display:none;}
+
+/* --- Pied ----------------------------------------------------------- */
+.pied{margin-top:28px; font-size:11.5px; color:var(--help); text-align:center; line-height:1.7;}
+.pied a{color:var(--second); text-decoration:none; border-bottom:1px solid var(--card-bd);}
+
+/* --- Sous 900px : une colonne, barre de synthèse en bas -------------- */
+@media (max-width:899px){
+  .cadre{max-width:412px; padding:16px 16px 24px;}
+  .corps{grid-template-columns:1fr; gap:24px;}
+  .rail{position:static;}
+  .fam-grille{grid-template-columns:repeat(2, minmax(0,1fr));}
+  .synthese{
+    display:flex; position:sticky; bottom:0; z-index:5; align-items:center; gap:16px;
+    background:var(--bar); border:1px solid var(--card-bd); border-radius:14px;
+    padding:14px 18px; margin:16px 0 0; box-shadow:0 -2px 12px rgba(0,0,0,.10);
+  }
+  .synthese .bloc{flex:1; min-width:0;}
+  .synthese .k{font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--section);}
+  .synthese .v{font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:var(--accent-ink); line-height:1.2;}
+  .synthese .point{width:10px; height:10px; border-radius:50%; background:var(--warn-bar); flex:0 0 auto;}
+  .entete{flex-wrap:wrap;}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="head">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff8a00" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18l3 3 6.4-6.4a4 4 0 0 0 5.3-5.4l-2.6 2.6-2.1-2.1z"/></svg>
-    <h1>Vitesses de coupe</h1>
-    <!-- Le chapeau SEUL (sans le mot-symbole), pose ici par generer.py depuis
-         kit/chapeau.svg. Il porte son lisere blanc, donc il se detache tout
-         seul du fond noir. -->
-    <div class="marque"><!--CHAPEAU_VERDIER--></div>
-    <!-- Pastille de version. Verte = c'est bien la derniere ; rouge = une
-         version plus recente est en ligne, et la toucher force la mise a
-         jour (l'equivalent du Ctrl+Maj+R, qui n'existe pas sur telephone). -->
-    <button class="ver" id="ver" type="button">…</button>
-  </div>
-  <p class="sub">Fraise carbure — des points de départ, à affiner sur la machine.</p>
+<div class="cadre">
 
-  <div class="mats" id="mats"></div>
-
-  <div class="grid2">
-    <div><label class="lbl" for="D">Diamètre (mm)</label><input id="D" inputmode="decimal" value="6"></div>
-    <div><label class="lbl" for="Z">Dents (Z)</label><input id="Z" inputmode="decimal" value="2"></div>
-  </div>
-
-  <!-- Broche, copeau et avance sont liés par UNE seule équation,
-       Vf = broche x fz x dents : on en fixe deux, la troisième se déduit.
-       D'où ces trois sens de calcul, plutôt qu'un seul impose. -->
-  <span class="lbl">Ce que l'appli calcule</span>
-  <div class="modes" id="modes"></div>
-
-  <div class="grid2">
-    <div>
-      <label class="lbl" for="rpm">Vitesse broche (tr/min)</label>
-      <div class="fieldwrap"><input id="rpm" inputmode="decimal" value="24000"><button class="reset" data-r="rpm" aria-label="Revenir à la broche conseillée">&#8635;</button></div>
-      <span class="hint" id="hintRpm"></span>
+  <header class="entete">
+    <div class="marque">
+      <!-- Chapeau POSE par generer.py depuis kit/chapeau.svg. La maquette
+           prevoit un carre accent 26x26 a cette place ; on y met la marque
+           de la maison, qui joue le meme role et dit d'ou vient l'appli. -->
+      <!--CHAPEAU_VERDIER-->
+      <div>
+        <h1>Vitesses de coupe</h1>
+        <p>Fraise carbure — des points de départ, à affiner sur la machine.</p>
+      </div>
     </div>
-    <div>
-      <label class="lbl" for="fz">fz (mm/dent)</label>
-      <div class="fieldwrap"><input id="fz" inputmode="decimal" value="0.15"><button class="reset" data-r="fz" aria-label="Revenir au fz conseillé">&#8635;</button></div>
-      <span class="hint" id="hintFz"></span>
+    <div class="outils-entete">
+      <button class="theme-btn" id="btnTheme" type="button" aria-label="Basculer entre le thème clair et sombre">
+        <span id="themeIcone">☾</span><span id="themeTexte">nuit</span>
+      </button>
+      <button class="ver" id="ver" type="button">…</button>
     </div>
+  </header>
+
+  <div class="corps">
+    <div class="col-gauche">
+
+      <section>
+        <div class="sect-titre">Matière</div>
+        <div id="matieres"></div>
+      </section>
+
+      <section>
+        <div class="sect-titre">Outil</div>
+        <div class="duo">
+          <div class="champ">
+            <label for="d">Diamètre <span class="u">(mm)</span></label>
+            <input id="d" type="text" inputmode="decimal" value="6">
+          </div>
+          <div class="champ">
+            <label for="z">Nombre de dents <span class="u">(Z)</span></label>
+            <input id="z" type="text" inputmode="numeric" value="2">
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sect-titre">Ce que l'appli calcule</div>
+        <div class="segments" id="modes"></div>
+
+        <div class="duo" style="margin-top:20px">
+          <div class="champ">
+            <label for="n">Vitesse de broche <span class="u">(tr/min)</span></label>
+            <div class="avec-reset" id="wrapN">
+              <input id="n" type="text" inputmode="decimal">
+              <button class="reset" id="resetN" type="button" title="Revenir au conseillé">↻</button>
+            </div>
+            <span class="aide" id="aideN"></span>
+          </div>
+          <div class="champ">
+            <label for="fz">Copeau par dent <span class="u">(fz, mm)</span></label>
+            <div class="avec-reset" id="wrapFz">
+              <input id="fz" type="text" inputmode="decimal">
+              <button class="reset" id="resetFz" type="button" title="Revenir au conseillé">↻</button>
+            </div>
+            <span class="aide" id="aideFz"></span>
+          </div>
+        </div>
+
+        <div class="champ" style="margin-top:20px">
+          <label for="vf">Avance de travail <span class="u">(Vf, mm/min)</span></label>
+          <input id="vf" type="text" inputmode="decimal">
+          <span class="aide" id="aideVf"></span>
+        </div>
+      </section>
+
+      <section>
+        <div class="lbl-ligne">
+          <span class="lbl" id="lblAe"><label for="ae" style="padding:0">Largeur de coupe <span class="u">(ae, mm)</span></label></span>
+          <button class="pastille-aide" id="btnAide" type="button" aria-expanded="false"
+                  aria-controls="blocAide" aria-label="À quoi sert la largeur de coupe">?</button>
+        </div>
+        <input id="ae" type="text" inputmode="decimal" placeholder="pleine largeur">
+        <span class="aide" id="aideAe"></span>
+        <div class="bloc-aide" id="blocAide" hidden>
+          <p>Ce que la fraise mord <b>sur le côté</b>, à plat — pas la profondeur
+             (celle-là c'est Ap, rappelée dans le résultat).</p>
+          <p><b>Rainure ou découpe traversante</b> : laisser vide.</p>
+          <p><b>Reprise de contour</b> : mettre la surépaisseur qu'on rase, souvent
+             0,1 à 0,5 mm. Le copeau devient bien plus fin que prévu et la fraise
+             brûle au lieu de couper ; l'appli corrige l'avance en conséquence.</p>
+        </div>
+      </section>
+
+      <section class="panneau">
+        <button class="panneau-tete" id="teteMachine" type="button" aria-expanded="false" aria-controls="corpsMachine">
+          <span style="min-width:0">
+            <span class="sect-titre" style="display:block">Machine</span>
+            <span class="resume" id="resumeMachine"></span>
+          </span>
+          <span class="bascule" id="basculeMachine">modifier</span>
+        </button>
+        <div class="panneau-corps" id="corpsMachine" hidden>
+          <div class="sous">Réglé une fois pour toutes, pas à chaque calcul.</div>
+          <div class="grille-machine">
+            <div class="champ">
+              <label for="mMin">Broche min <span class="u">(tr/min)</span></label>
+              <input id="mMin" type="text" inputmode="decimal" value="1000">
+            </div>
+            <div class="champ">
+              <label for="mMax">Broche max <span class="u">(tr/min)</span></label>
+              <input id="mMax" type="text" inputmode="decimal" value="24000">
+            </div>
+            <div class="champ">
+              <label for="plunge">Plongée <span class="u">(% de Vf)</span></label>
+              <input id="plunge" type="text" inputmode="decimal" value="35">
+            </div>
+            <div class="champ">
+              <label for="vfMax">Avance max <span class="u">(mm/min)</span></label>
+              <input id="vfMax" type="text" inputmode="decimal" value="1500">
+              <span class="aide">Ce que la machine tient vraiment.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /col-gauche -->
+
+    <aside class="rail">
+      <div class="resultat" id="carteResultat">
+        <div class="chiffres">
+          <div class="val grand"><div class="k">Avance Vf</div><div class="v"><span id="oVf">—</span><span class="u">mm/min</span></div></div>
+          <div class="val grand"><div class="k">Broche</div><div class="v"><span id="oN">—</span><span class="u">tr/min</span></div></div>
+          <div class="val petit"><div class="k">Plongée Vz</div><div class="v"><span id="oVz">—</span><span class="u">mm/min</span></div></div>
+          <div class="val petit"><div class="k">Avance/tour</div><div class="v"><span id="oFpr">—</span><span class="u">mm/tr</span></div></div>
+        </div>
+        <div class="contexte">
+          <div class="ligne" id="oContexte"></div>
+          <div class="note" id="oNote"></div>
+        </div>
+        <div class="avert" id="blocAvert" hidden>
+          <div class="barre"></div>
+          <div><div class="t">À corriger</div><div class="x" id="oAvert"></div></div>
+        </div>
+      </div>
+
+      <div class="carte">
+        <div class="ligne-save">
+          <input id="tool" type="text" placeholder="Nom de l'outil">
+          <button class="btn-primaire" id="save" type="button">Enregistrer</button>
+        </div>
+        <div class="biblio-titre" id="biblioTitre">Bibliothèque (0)</div>
+        <div id="biblio"><div class="vide">Aucun outil enregistré pour l'instant.</div></div>
+      </div>
+
+      <details class="export" id="export" hidden>
+        <summary>Exporter vers FreeCAD</summary>
+        <div class="export-corps">
+          <div class="exprow">
+            <span class="lbl" style="padding:0">Bibliothèque (JSON)</span>
+            <span><button class="mini dl" id="dlJson" type="button">Télécharger</button>
+                  <button class="mini" id="cpJson" type="button">Copier</button></span>
+          </div>
+          <p class="note">Une sauvegarde de vos outils, à reprendre sur un autre appareil.</p>
+          <textarea id="jsonBox" rows="4" readonly></textarea>
+          <div style="height:18px"></div>
+          <span class="lbl" style="padding:0 0 8px">Un .fctb par outil</span>
+          <p class="note">Le .fctb porte la géométrie de la fraise. Les vitesses vont dans le
+             Tool Controller du Job : SpindleSpeed, HorizFeed, VertFeed.</p>
+          <div id="listeFctb"></div>
+        </div>
+      </details>
+    </aside>
+  </div><!-- /corps -->
+
+  <!-- Barre de synthèse : sous 900px, elle tient le rôle du rail sticky. -->
+  <div class="synthese" id="synthese">
+    <div class="bloc"><div class="k">Vf</div><div class="v" id="sVf">—</div></div>
+    <div class="bloc"><div class="k">Broche</div><div class="v" id="sN">—</div></div>
+    <div class="point" id="sPoint" hidden></div>
   </div>
 
-  <div class="pleine">
-    <label class="lbl" for="vf">Avance Vf (mm/min)</label>
-    <input id="vf" inputmode="decimal" value="7200">
-    <span class="hint" id="hintVf"></span>
-  </div>
-
-  <div class="pleine">
-    <label class="lbl" for="ae">Passe radiale ae (mm) — la largeur, pas la profondeur</label>
-    <!-- VIDE par defaut, et c'est le choix sur : le detourage pleine largeur
-         est le cas courant, et un 0,5 oublie dans ce champ donnerait une
-         avance 1,81 fois trop rapide sur une rainure. -->
-    <input id="ae" inputmode="decimal" value="" placeholder="pleine largeur">
-    <span class="hint" id="hintAe"></span>
-    <p class="aide">
-      Ce que la fraise mord <b>sur le côté</b>, à plat, perpendiculairement à sa
-      trajectoire. Ce n'est <b>pas</b> la profondeur : celle-là, c'est
-      <b>Ap</b>, rappelée sous les résultats.<br>
-      En <b>détourage pleine largeur</b> — une rainure, une découpe qui traverse —
-      la fraise coupe sur tout son diamètre : laisser le champ <b>vide</b>.<br>
-      En <b>reprise de contour</b>, quand on est passé une première fois en
-      laissant exprès une surépaisseur et qu'on revient la raser, ae vaut cette
-      surépaisseur — souvent <b>0,1 à 0,5&nbsp;mm</b>. C'est là que le copeau
-      devient bien plus fin que prévu et que la fraise brûle au lieu de couper ;
-      l'appli corrige l'avance en conséquence.
-    </p>
-  </div>
-
-  <div class="grid2">
-    <div><label class="lbl" for="rpmMin">Broche min (tr/min)</label><input id="rpmMin" inputmode="decimal" value="1000"></div>
-    <div><label class="lbl" for="rpmMax">Broche max (tr/min)</label><input id="rpmMax" inputmode="decimal" value="24000"></div>
-  </div>
-  <div class="grid2">
-    <div><label class="lbl" for="plunge">Plongée (% de Vf)</label><input id="plunge" inputmode="decimal" value="35"></div>
-    <div>
-      <label class="lbl" for="vfMax">Avance max (mm/min)</label>
-      <input id="vfMax" inputmode="decimal" value="1500" placeholder="sans limite">
-      <span class="hint">ce que la machine tient vraiment</span>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="outs">
-      <div class="ro"><div class="k">Avance Vf</div><div class="v big"><span id="oVf">0</span><span class="u">mm/min</span></div></div>
-      <div class="ro"><div class="k">Plongée Vz</div><div class="v big"><span id="oVz">0</span><span class="u">mm/min</span></div></div>
-      <div class="ro"><div class="k">Broche</div><div class="v"><span id="oRpm">0</span><span class="u">tr/min</span></div></div>
-      <div class="ro"><div class="k">Avance/tour</div><div class="v"><span id="oFpr">0</span><span class="u">mm/tr</span></div></div>
-    </div>
-    <div class="foot" id="foot"></div>
-    <div class="verdict" id="verdict" style="display:none"></div>
-    <div class="warn" id="warn" style="display:none"></div>
-  </div>
-
-  <div class="saverow">
-    <input id="tname" placeholder="Nom de l'outil">
-    <button class="btn pri" id="save">Enregistrer</button>
-  </div>
-
-  <div id="libwrap" style="display:none">
-    <div class="seclbl" id="libttl"></div>
-    <div id="lib"></div>
-  </div>
-
-  <details id="expwrap" style="display:none">
-    <summary>Exporter</summary>
-    <div class="exp">
-      <div class="exprow"><span class="lbl" style="margin:0">JSON — bibliothèque</span>
-        <span><button class="cp" id="dlJson">Télécharger</button><button class="cp" id="cpJson">Copier</button></span></div>
-      <p class="note">Une sauvegarde de vos outils, à reprendre sur un autre appareil.</p>
-      <textarea id="jsonBox" rows="5" readonly></textarea>
-      <div style="height:16px"></div>
-      <span class="lbl">FreeCAD — un .fctb par outil</span>
-      <p class="note">« Télécharger » enregistre le fichier ; à déposer dans la bibliothèque
-        d'outils de l'atelier CAM de FreeCAD. Le .fctb porte la géométrie de la fraise ;
-        les vitesses, elles, se recopient dans le Tool Controller du Job (SpindleSpeed,
-        HorizFeed, VertFeed) — d'où le second bouton, plus bas, qui les met en presse-papier.</p>
-      <div id="fctbList"></div>
-    </div>
-  </details>
-
-  <p class="basdepage">
+  <p class="pied">
     Vos outils restent dans ce navigateur, rien n'est envoyé.<br>
     <a href="../logiciels/vitesses-coupe.html">D'où viennent ces valeurs</a> ·
     <a href="https://atelierduverdier.fr/">Atelier du Verdier</a>
@@ -233,449 +480,378 @@
 
 <script>
 "use strict";
-// Points de départ pour fraise CARBURE sur portique amateur, cohérents avec
-// les tables constructeur (Sorotec, Datron) pour cette classe de machine.
-// fzPerMm : charge par dent PROPORTIONNELLE au diamètre (fz = fzPerMm × Ø).
-// mode "rpm" : broche au max, c'est la charge/dent qui pilote (bois, MDF...).
-// mode "vc"  : broche calculée depuis la vitesse de coupe Vc (métaux, plastiques).
-// ap : profondeur de passe conseillée, en multiples du diamètre.
-var MAT = {
-  bois_tendre: {label:"Bois tendre", vcNum:null, fzPerMm:0.025,  mode:"rpm", apLow:0.5, apHigh:1.0,
-                note:"Pin, sapin, peuplier. Copeau franc : trop lent, ça chauffe et ça brûle."},
-  bois_dur:    {label:"Bois dur",    vcNum:null, fzPerMm:0.018,  mode:"rpm", apLow:0.4, apHigh:0.8,
-                note:"Chêne, hêtre, frêne. Un bois qui brûle est presque toujours fraisé trop lentement."},
-  cp:          {label:"Contreplaqué",vcNum:null, fzPerMm:0.017,  mode:"rpm", apLow:0.4, apHigh:0.8,
-                note:"Les colles usent le carbure plus vite que le bois lui-même."},
-  mdf:         {label:"MDF",         vcNum:null, fzPerMm:0.0217, mode:"rpm", apLow:0.5, apHigh:1.0,
-                note:"Poussière très fine : aspiration indispensable."},
-  pmma:        {label:"Plexi",       vcNum:250,  fzPerMm:0.011,  mode:"vc",  apLow:0.3, apHigh:0.5,
-                note:"PMMA. Une dent de préférence, gros copeau : un copeau trop fin fond au lieu de couper."},
-  pom:         {label:"POM",         vcNum:250,  fzPerMm:0.013,  mode:"vc",  apLow:0.3, apHigh:0.5,
-                note:"Delrin. S'usine remarquablement bien ; surveiller les copeaux longs."},
-  alu:         {label:"Alu",         vcNum:200,  fzPerMm:0.00833,mode:"vc",  apLow:0.3, apHigh:0.5,
-                note:"Lubrification conseillée, bonne évacuation des copeaux — sinon l'alu colle à la fraise."},
-  laiton:      {label:"Laiton",      vcNum:150,  fzPerMm:0.00667,mode:"vc",  apLow:0.3, apHigh:0.5,
-                note:"Laiton de décolletage : usinage facile."},
-  acier:       {label:"Acier doux",  vcNum:80,   fzPerMm:0.004,  mode:"vc",  apLow:0.1, apHigh:0.2,
-                note:"S235. Exigeant pour un portique : passes fines, machine rigide, air ou arrosage."}
-};
-var K_TOOLS="fs_tools", K_PREFS="fs_prefs";
-// Version des reglages machine. Les valeurs par defaut ecrites dans le HTML
-// ne servent qu'a la premiere visite : ensuite ce sont les reglages
-// enregistres qui gagnent. Quand les defauts CHANGENT (v2 : broche mini a
-// 1 000, plafond d'avance a 1 500), il faut donc les imposer une fois, sinon
-// personne ne les verrait jamais.
-var PREFS_VERSION=2;
-var material="bois_tendre", tools=[];
 
-// --- Les trois sens de calcul -------------------------------------------
-// Vf = broche x fz x dents. Trois grandeurs, une equation : on en saisit
-// deux, la troisieme se deduit. `mode` dit LAQUELLE est deduite.
-//   "vf"  : broche + copeau -> avance        (le cas classique)
-//   "rpm" : avance voulue + copeau -> broche (« je veux avancer a 800 »)
-//   "fz"  : avance + broche -> copeau        (« mes reglages, ils valent quoi ? »)
-var MODES = [
-  {cle:"vf",  label:"L'avance",  champ:"vf"},
-  {cle:"rpm", label:"La broche", champ:"rpm"},
-  {cle:"fz",  label:"Le copeau", champ:"fz"}
+/* =======================================================================
+   Données matières — reprises telles quelles du dossier de remise.
+   `vc` en m/min, `k` = copeau par dent et par mm de diamètre (fz = k x d).
+   ======================================================================= */
+var MATS = [
+  {groupe:'Bois', items:[
+    {id:'bois-tendre', label:'Bois tendre', vc:400, k:0.025, ap:'3–6 mm',
+     note:'Pin, sapin, peuplier. Copeau franc : trop lent, ça chauffe et ça brûle.'},
+    {id:'bois-dur', label:'Bois dur', vc:350, k:0.018, ap:'2–4 mm',
+     note:'Chêne, hêtre, frêne. Sortie propre si l’avance reste soutenue.'},
+    {id:'contreplaque', label:'Contre­plaqué', vc:380, k:0.020, ap:'2–5 mm',
+     note:'Colles abrasives : la fraise s’use vite, préfère une passe franche.'},
+    {id:'mdf', label:'MDF', vc:420, k:0.022, ap:'3–8 mm',
+     note:'Très abrasif et poussiéreux. Aspiration obligatoire.'}
+  ]},
+  {groupe:'Plastiques', items:[
+    {id:'plexi', label:'Plexi', vc:300, k:0.015, ap:'1–3 mm',
+     note:'Fond si ça chauffe : monodent, coupe polie, et surtout pas de recoupe du copeau.'},
+    {id:'pom', label:'POM', vc:350, k:0.018, ap:'2–5 mm',
+     note:'Copeau long : évacuation à l’air comprimé.'}
+  ]},
+  {groupe:'Métaux', items:[
+    {id:'alu', label:'Alu', vc:250, k:0.012, ap:'0,5–2 mm',
+     note:'Lubrification indispensable : alcool ou micro-brouillard.'},
+    {id:'laiton', label:'Laiton', vc:180, k:0.010, ap:'0,5–2 mm',
+     note:'Copeau court, ça part bien. Attention à l’accrochage en entrée.'},
+    {id:'acier', label:'Acier doux', vc:90, k:0.007, ap:'0,2–0,8 mm',
+     note:'Rigidité avant tout : petites passes, arrosage, et on écoute la broche.'}
+  ]}
 ];
-var mode="vf";
-// Les valeurs RESOLUES du dernier calcul : c'est elles qu'on enregistre et
-// qu'on exporte, jamais le contenu brut des champs, dont l'un est deduit.
-var ETAT={d:6,z:2,rpm:24000,fz:0.15,vf:7200,vz:2520,vc:0};
+function matParId(id){
+  for(var g=0; g<MATS.length; g++)
+    for(var i=0; i<MATS[g].items.length; i++)
+      if(MATS[g].items[i].id===id) return MATS[g].items[i];
+  return MATS[0].items[0];
+}
+
+/* --- État. `n`, `fz`, `vf` vides = on suit la valeur conseillée. ------ */
+var S = {
+  mat:'bois-tendre', d:'6', z:'2', mode:'avance',
+  n:'', fz:'', vf:'', ae:'',
+  mMin:'1000', mMax:'24000', plunge:'35', vfMax:'1500',
+  machineOpen:false, aeOpen:false, tool:'', lib:[]
+};
+var K_LIB='fs_tools', K_PREFS='fs_prefs', K_THEME='coupe_theme';
+var PREFS_VERSION=3;
+var VERSION="{{VERSION}}";
 
 function $(id){return document.getElementById(id);}
-// Aucune de ces grandeurs n'est negative — un diametre, un nombre de dents,
-// une avance. Un signe moins saisi par megarde produisait pourtant une
-// avance NEGATIVE affichee en gros : on borne des la lecture.
-function num(s){var v=parseFloat(String(s).replace(",",".")); return (isFinite(v)&&v>0)?v:0;}
-function clamp(v,lo,hi){return Math.min(Math.max(v,lo),hi);}
-function rnd(v,d){d=d||0; var p=Math.pow(10,d); return Math.round(v*p)/p;}
-function fr(n){return n.toLocaleString("fr-FR");}
-// Pour l'AFFICHAGE seulement : virgule française. Les champs de saisie
-// gardent le point (num() accepte les deux à la lecture).
-function frd(n,d){return n.toLocaleString("fr-FR",{maximumFractionDigits:d});}
 
-// --- Amincissement du copeau (passe radiale legere) ---------------------
-// Une fraise ne mord pas droit : elle entre et sort de la matiere en arc.
-// Quand elle n'engage qu'une bande etroite (ae < rayon), l'epaisseur reelle
-// du copeau est bien PLUS FINE que fz, et la fraise se met a frotter la ou
-// on croyait couper. Le facteur qui rattrape ca :
-//        D / (2 x racine(ae x (D - ae)))
-// Il vaut 1 a ae = D/2 (demi-fraise), 1,7 a ae = D/10, et grimpe vite en
-// dessous. C'est le calcul que font les tables professionnelles et
-// qu'ignorent les abaques amateur — d'ou des finitions qui brulent alors
-// que les memes reglages passent tres bien en pleine passe.
-function facteurAminci(d,ae){
-  if(!(d>0) || !(ae>0)) return 1;      // champ vide = pleine largeur
-  if(ae>=d/2) return 1;                // au-dela de la demi-fraise, sans effet
-  return d/(2*Math.sqrt(ae*(d-ae)));
+/* Lecture d'un nombre : accepte la virgule ET les espaces de groupement
+   (une valeur recopiée depuis un affichage formaté en contient). Une
+   entrée vide, nulle ou négative retombe sur la valeur de repli — jamais
+   de blocage, jamais d'avance négative. */
+function num(v, fb){
+  var x = parseFloat(String(v).replace(/[\s  ]/g,'').replace(',', '.'));
+  return (isFinite(x) && x > 0) ? x : fb;
 }
+function fmt(n, dec){
+  if(!isFinite(n)) return '—';
+  dec = dec || 0;
+  return n.toLocaleString('fr-FR', {minimumFractionDigits:dec, maximumFractionDigits:dec})
+          .replace(/ | /g, ' ');
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 
-function recoFz(mat,d){return rnd(MAT[mat].fzPerMm*d,3);}
-function recoRpm(mat,d,lo,hi){
-  if(MAT[mat].mode==="rpm") return hi;
-  return clamp(Math.round((MAT[mat].vcNum*1000)/(Math.PI*(d||1))),lo,hi);
-}
+/* =======================================================================
+   Le calcul. Vf = N x Z x fz : trois grandeurs, une équation ; on en
+   saisit deux, la troisième se déduit. `mode` dit laquelle.
+   ======================================================================= */
+function calculer(){
+  var m = matParId(S.mat);
+  var d = num(S.d, 6);
+  var z = Math.max(1, Math.round(num(S.z, 2)));
+  var mMin = num(S.mMin, 1000), mMax = num(S.mMax, 24000);
+  var plunge = num(S.plunge, 35), vfMax = num(S.vfMax, 1500);
 
-// --- persistance (locale au navigateur, rien ne part) ---
-function loadStore(){
-  try{ var t=localStorage.getItem(K_TOOLS); if(t) tools=JSON.parse(t); }catch(e){}
-  try{ var p=localStorage.getItem(K_PREFS); if(p){var s=JSON.parse(p);
-    // Reglages d'une version anterieure : on garde les nouveaux defauts du
-    // HTML et on les reenregistre, plutot que de resservir les anciens.
-    if(s.v!==PREFS_VERSION){ savePrefs(); return; }
-    if(s.rpmMin)$("rpmMin").value=s.rpmMin; if(s.rpmMax)$("rpmMax").value=s.rpmMax;
-    if(s.plunge)$("plunge").value=s.plunge; if(s.vfMax)$("vfMax").value=s.vfMax; } }catch(e){}
-}
-function savePrefs(){
-  try{ localStorage.setItem(K_PREFS, JSON.stringify({v:PREFS_VERSION,
-    rpmMin:$("rpmMin").value,rpmMax:$("rpmMax").value,
-    plunge:$("plunge").value,vfMax:$("vfMax").value})); }catch(e){}
-}
-function saveTools(){ try{ localStorage.setItem(K_TOOLS, JSON.stringify(tools)); }catch(e){} }
+  // Conseillés : la broche vient de la vitesse de coupe de la matière,
+  // arrondie au demi-millier — un cadran de variateur ne se règle pas au
+  // tour près. Le copeau est proportionnel au diamètre.
+  var recN = Math.min(mMax, Math.max(mMin, Math.round((m.vc*1000)/(Math.PI*d)/500)*500));
+  var recFz = Math.round(m.k*d*1000)/1000;
 
-// --- matières ---
-function buildMats(){
-  var m=$("mats"); m.innerHTML="";
-  Object.keys(MAT).forEach(function(k){
-    var b=document.createElement("button");
-    b.className="mat"+(k===material?" on":""); b.textContent=MAT[k].label;
-    b.onclick=function(){ applyMat(k); };
-    m.appendChild(b);
-  });
-}
-// Poser les valeurs conseillees de la matiere. On ne touche PAS au champ
-// deduit : ce serait ecraser un resultat par une consigne. En mode
-// « copeau », l'avance visee est le seul reglage libre avec la broche.
-function poserConseils(){
-  var d=num($("D").value), lo=num($("rpmMin").value), hi=num($("rpmMax").value);
-  if(mode!=="fz") $("fz").value=recoFz(material,d);
-  if(mode!=="rpm") $("rpm").value=recoRpm(material,d,lo,hi);
-  compute();
-}
-function applyMat(k){ material=k; buildMats(); poserConseils(); }
-function onDiam(){ poserConseils(); }
+  // Amincissement radial : une fraise entre et sort de la matière en arc.
+  // Sous la demi-fraise, le copeau réel est plus fin que fz et l'avance
+  // doit être relevée d'autant, sans quoi la fraise frotte au lieu de couper.
+  var ae = num(S.ae, 0);
+  var thinning = (ae > 0 && ae < d/2) ? 1/Math.sqrt(1 - Math.pow(1 - (2*ae)/d, 2)) : 1;
 
-// --- les trois sens de calcul ---
-function buildModes(){
-  var m=$("modes"); m.innerHTML="";
-  MODES.forEach(function(o){
-    var b=document.createElement("button");
-    b.className="mode"+(o.cle===mode?" on":""); b.textContent=o.label;
-    b.onclick=function(){ setMode(o.cle); };
-    m.appendChild(b);
-  });
-}
-function setMode(k){
-  // On bascule SANS que rien ne bouge a l'ecran : le champ qui devient
-  // saisissable prend la valeur qu'il affichait comme resultat. Sinon
-  // changer de sens de calcul ferait sauter les chiffres sans raison.
-  $("rpm").value=Math.round(ETAT.rpm);
-  $("fz").value=rnd(ETAT.fz,4);
-  $("vf").value=rnd(ETAT.vf);
-  mode=k;
-  buildModes(); marquerChampCalcule(); compute();
-}
-function marquerChampCalcule(){
-  MODES.forEach(function(o){
-    var e=$(o.champ), calcule=(o.cle===mode);
-    e.readOnly=calcule;
-    e.classList.toggle("calcule", calcule);
-    // Le bouton « revenir au conseille » n'a pas de sens sur un resultat.
-    var r=document.querySelector('.reset[data-r="'+o.champ+'"]');
-    if(r) r.style.display=calcule?"none":"";
-  });
-}
-
-// --- calcul ---
-function compute(){
-  var d=num($("D").value), z=num($("Z").value);
-  var lo=num($("rpmMin").value), hi=num($("rpmMax").value);
-  var vfMax=num($("vfMax").value);
-  // fz est le copeau VISE (l'epaisseur reelle voulue) ; ce qu'on programme
-  // est fz x k, ou k rattrape l'amincissement d'une passe radiale legere.
-  var k=facteurAminci(d,num($("ae").value));
-  var fz, rpm, vf, rpmE=null, vfDemande=null;
-
-  if(mode==="rpm"){
-    // Avance voulue + copeau -> broche.
-    fz=num($("fz").value); vfDemande=num($("vf").value);
-    var rpmBrut=(fz*k*z>0)?(vfDemande/(fz*k*z)):0;
-    var rpmIdeal=Math.round(rpmBrut);
-    // Anti-derive. L'avance est arrondie a l'entier dans son champ ; en
-    // repartant de cette valeur arrondie, la broche retombe un tour plus
-    // bas (24 000 -> 23 999) et un simple aller-retour entre deux sens de
-    // calcul faisait glisser le reglage. Si la broche d'avant tient la
-    // meme avance au mm/min pres, c'est elle qu'on garde.
-    if(ETAT.rpm>0 && Math.abs(rpmIdeal-ETAT.rpm)<=1
-       && rnd(ETAT.rpm*fz*k*z)===rnd(vfDemande)) rpmIdeal=ETAT.rpm;
-    rpm=clamp(rpmIdeal,lo,hi);
-    vf=rpm*fz*k*z;                     // l'avance REELLE, apres bornage
-    $("rpm").value=rpm;
-    // On n'alerte QUE si les bornes ont mordu — pas pour le tour perdu a
-    // l'arrondi, qui n'a rien a voir avec les limites de la broche.
-    if(rpmIdeal!==rpm) rpmE=rpmIdeal;
-  } else if(mode==="fz"){
-    // Avance + broche -> copeau. Le mode « mes reglages valent quoi ? »
-    rpmE=Math.round(num($("rpm").value)); rpm=clamp(rpmE,lo,hi);
-    if(rpmE===rpm) rpmE=null;
-    vf=num($("vf").value);
-    fz=(rpm*k*z>0)?(vf/(rpm*k*z)):0;   // on remonte au copeau REEL
-    $("fz").value=rnd(fz,4);
+  var n = num(S.n, recN), fz = num(S.fz, recFz), vf = num(S.vf, 0);
+  var fzEff = fz * thinning;
+  if(S.mode === 'avance'){
+    vf = n * z * fzEff;
+  } else if(S.mode === 'broche'){
+    if(!vf) vf = recN * z * fzEff;
+    n = vf / (z * fzEff);
   } else {
-    // Broche + copeau -> avance. Le cas classique.
-    rpmE=Math.round(num($("rpm").value)); rpm=clamp(rpmE,lo,hi);
-    if(rpmE===rpm) rpmE=null;
-    fz=num($("fz").value);
-    vf=rpm*fz*k*z;
-    $("vf").value=rnd(vf);
+    if(!vf) vf = n * z * recFz * thinning;
+    fz = vf / (n * z * thinning);
   }
 
-  var vc=(Math.PI*d*rpm)/1000;
-  var vz=vf*(num($("plunge").value)/100);
-  var fpr=fz*k*z;                      // ce que la machine avance par tour
-  ETAT={d:d,z:z,rpm:rpm,fz:fz,vf:vf,vz:vz,vc:vc,k:k,ae:num($("ae").value)};
-  $("oVf").textContent=fr(rnd(vf));
-  $("oVz").textContent=fr(rnd(vz));
-  $("oRpm").textContent=fr(rpm);
-  $("oFpr").textContent=frd(fpr,3);
-  $("foot").innerHTML="Profondeur de passe (Ap) : "+frd(MAT[material].apLow*d,1)+"&ndash;"+frd(MAT[material].apHigh*d,1)+" mm &nbsp;&middot;&nbsp; Vc "+rnd(vc,0)+" m/min &nbsp;&middot;&nbsp; "+MAT[material].note
-    +(k>1.005 ? "<br><span style='color:var(--orange)'>Copeau aminci par la passe étroite : avance multipliée par "+frd(k,2)+" pour garder "+frd(fz,3)+" mm/dent réels ("+frd(fz*k,3)+" mm/dent programmés).</span>" : "");
+  var vz = vf * plunge / 100;
+  var vc = Math.PI * d * n / 1000;
+  var fpr = vf / n;
 
-  var alertes=[];
-  // Bornes inversees : clamp() rend alors la borne HAUTE sans rien dire, et
-  // tous les calculs suivants portent sur une broche que l'on n'a pas
-  // choisie. Mieux vaut le dire que de calculer juste sur des bornes fausses.
-  if(lo>hi && hi>0){
-    alertes.push("Broche mini ("+fr(lo)+") au-dessus de la maxi ("+fr(hi)+") : "
-      +"les deux bornes sont inversees, le calcul retient "+fr(rpm)+" tr/min.");
+  var warns = [];
+  if(vf > vfMax){
+    var cible = Math.round(vfMax/(z*fzEff)/500)*500;
+    warns.push('Vf calculée '+fmt(vf)+' > plafond machine '+fmt(vfMax)+' mm/min. Viser '
+               +fmt(cible)+' tr/min pour garder le copeau.');
   }
-  if(rpmE!==null){
-    alertes.push(mode==="rpm"
-      ? ("Il faudrait "+fr(rpmE)+" tr/min pour avancer à "+fr(rnd(vfDemande))+" mm/min avec ce copeau — hors des limites de la broche. Ramenée à "+fr(rpm)+" tr/min, soit "+fr(rnd(vf))+" mm/min réels.")
-      : (fr(rpmE)+" tr/min hors limites broche, ramené à "+fr(rpm)+"."));
-  }
-  // La broche mini peut FORCER la vitesse de coupe au-delà de la cible :
-  // acier ou laiton en petit diamètre. Le calcul clignote plutôt que de
-  // laisser croire que tout va bien — c'est l'arête qui paie, sinon.
-  if(MAT[material].mode==="vc" && MAT[material].vcNum && vc>MAT[material].vcNum*1.25){
-    alertes.push("Vc réelle "+rnd(vc,0)+" m/min, au-delà du point de départ ("+MAT[material].vcNum+") : la broche ne descend pas assez pour ce Ø — usure accélérée.");
-  }
-  // Une avance que la machine ne tient pas ne fait pas gagner de temps :
-  // le copeau réel s'amincit et la fraise frotte. On propose la broche qui
-  // garde la charge par dent SOUS le plafond.
-  // Le « +0.5 » n'est pas une coquetterie : sans lui, une avance calculée à
-  // 1 500,05 mm/min contre un plafond réglé à 1 500 alerte pour un
-  // vingtième de millimètre par minute.
-  // Tous les calculs ci-dessous passent par `fz*k` — le copeau REELLEMENT
-  // programme. Avec fz seul, deux amincissements differents proposaient la
-  // meme broche, ce qui est impossible : c'est ce qui a trahi la faute.
-  if(vfMax>0 && vf>vfMax+0.5 && fz>0 && z>0){
-    var rSugg=Math.floor(vfMax/(fz*k*z));
-    if(rSugg>=lo){
-      alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond machine "+fr(vfMax)+" mm/min : viser "+fr(clamp(rSugg,lo,hi))+" tr/min pour garder le copeau.");
-    } else {
-      // La broche mini ne suffit plus : ce n'est plus la VITESSE qu'il faut
-      // baisser, c'est le NOMBRE DE DENTS. A la broche mini, une fraise de
-      // z' dents avance de lo*fz*z' — d'ou le nombre de dents tenable.
-      // C'est la raison d'etre des fraises 1 dent en bois et en plastique
-      // sur les petites machines : elles ne sont pas un compromis, elles
-      // sont l'outil des avances lentes.
-      var zMax=Math.floor(vfMax/(lo*fz*k));
-      if(zMax>=1 && zMax<z){
-        alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond "+fr(vfMax)+" mm/min, et même à "
-          +fr(lo)+" tr/min une fraise "+z+" dents va trop vite. Une fraise <b>"+zMax+" dent"
-          +(zMax>1?"s":"")+"</b> donnerait "+fr(rnd(lo*fz*k*zMax))+" mm/min à "+fr(lo)
-          +" tr/min : c'est l'outil de cette avance-là.");
-      } else {
-        alertes.push("Vf calculée "+fr(rnd(vf))+" &gt; plafond "+fr(vfMax)+" mm/min, et même une "
-          +"fraise 1 dent à "+fr(lo)+" tr/min dépasse : monter le plafond, ou prendre un plus "
-          +"petit diamètre (le copeau suit le Ø).");
-      }
-    }
-  }
-  // Le VERDICT sur le copeau : ce que valent les reglages, compare au fz
-  // conseille pour cette matiere et ce diametre. Affiche en permanence en
-  // mode « copeau » — c'est tout l'objet de ce mode — et seulement quand
-  // ca sort des clous dans les autres, pour ne pas bavarder.
-  var conseille=recoFz(material,d), ratio=conseille>0?(fz/conseille):0;
-  var v=$("verdict"), texte=null, chaud=true;
-  if(ratio>0){
-    var pc=Math.round(ratio*100)+" % du conseillé";
-    if(ratio<0.5)       texte="<b>Copeau très fin</b> ("+pc+") : la fraise frotte plus qu'elle ne coupe. C'est ce qui chauffe, brûle le bois et use l'arête.";
-    else if(ratio<0.8)  texte="<b>Copeau fin</b> ("+pc+") : ça coupe, mais on chauffe plus que nécessaire.";
-    else if(ratio<=1.3){ texte="<b>Bon copeau</b> ("+pc+")."; chaud=false; }
-    else                texte="<b>Copeau épais</b> ("+pc+") : surveiller l'effort, la casse et l'état de l'arête.";
-  }
-  if(texte && (mode==="fz" || ratio<0.8 || ratio>1.3)){
-    v.style.display="block"; v.className="verdict"+(chaud?" chaud":""); v.innerHTML=texte;
-  } else v.style.display="none";
+  if(n > mMax) warns.push('Broche '+fmt(n)+' tr/min au-dessus du max ('+fmt(mMax)
+                          +'). Prendre une fraise plus grosse ou accepter un Vc plus bas.');
+  else if(n < mMin) warns.push('Broche '+fmt(n)+' tr/min sous le mini ('+fmt(mMin)
+                               +'). Le couple ne suivra pas.');
+  if(thinning > 1.6) warns.push('Passe très fine : copeau aminci ×'
+                                +(Math.round(thinning*10)/10).toString().replace('.', ',')
+                                +', l’avance a été relevée d’autant.');
 
-  var w=$("warn");
-  if(alertes.length){ w.style.display="block"; w.innerHTML=alertes.join("<br>"); }
-  else w.style.display="none";
-  // Rappels sous les champs. Un champ DEDUIT n'a pas de « conseillé » —
-  // c'est un resultat ; on y met plutot ce dont il decoule.
-  $("hintRpm").textContent = (mode==="rpm")
-    ? "déduit de l'avance et du copeau"
-    : "conseillé : "+fr(recoRpm(material,d,lo,hi));
-  $("hintFz").textContent = (mode==="fz")
-    ? "déduit de l'avance et de la broche — conseillé : "+frd(conseille,3)
-    : "conseillé : "+frd(conseille,3);
-  $("hintVf").textContent = (mode==="vf")
-    ? "déduite de la broche et du copeau"
-    : "l'avance que vous visez";
-  var ae=num($("ae").value);
-  $("hintAe").textContent = (k>1.005)
-    ? ("reprise de contour — copeau aminci, avance ×"+frd(k,2)
-       + (k>2 ? " : très fort, la machine plafonnera avant" : ""))
-    : (ae>0 ? "au-delà de la demi-fraise : plus d'amincissement"
-            : "vide = détourage pleine largeur, rien à corriger");
+  return {m:m, d:d, z:z, recN:recN, recFz:recFz, thinning:thinning,
+          n:n, fz:fz, vf:vf, vz:vz, vc:vc, fpr:fpr, ae:ae, warns:warns};
 }
 
-function currentTool(){
-  // Les valeurs RESOLUES, jamais les champs bruts : selon le mode, l'un
-  // d'eux est un resultat et pourrait etre en cours de saisie.
-  var nm=$("tname").value.trim() || (MAT[material].label+" "+ETAT.d+"mm Z"+ETAT.z);
-  // `ae` fait partie de l'outil : sans lui, un outil enregistre en reprise
-  // de contour se rechargeait avec l'avance de la pleine largeur, pendant
-  // que la bibliotheque et l'export continuaient d'afficher l'ancienne.
-  // Deux chiffres contradictoires pour le meme outil, et c'est celui de
-  // l'export qu'on recopie dans la machine.
-  return {name:nm, material:material, matLabel:MAT[material].label,
-          D:ETAT.d, Z:ETAT.z, fz:rnd(ETAT.fz,4), rpm:Math.round(ETAT.rpm),
-          ae:(ETAT.ae>0?ETAT.ae:null),
-          vf:rnd(ETAT.vf), plunge:rnd(ETAT.vz)};
+/* --- Rendu ----------------------------------------------------------- */
+function construireMatieres(){
+  var c = $('matieres'); c.innerHTML='';
+  MATS.forEach(function(g){
+    var ligne = document.createElement('div'); ligne.className='fam';
+    var lbl = document.createElement('div'); lbl.className='fam-lbl'; lbl.textContent=g.groupe;
+    var grille = document.createElement('div'); grille.className='fam-grille';
+    g.items.forEach(function(it){
+      var b = document.createElement('button');
+      b.type='button';
+      b.className='choix'+(it.id===S.mat?' on':'');
+      b.innerHTML = esc(it.label);          // le libellé porte un tiret conditionnel
+      b.onclick=function(){
+        // Changer de matière repart des conseillés : garder une broche
+        // saisie pour le bois en passant à l'acier n'aurait aucun sens.
+        S.mat=it.id; S.n=''; S.fz=''; S.vf='';
+        construireMatieres(); rendre();
+      };
+      grille.appendChild(b);
+    });
+    ligne.appendChild(lbl); ligne.appendChild(grille); c.appendChild(ligne);
+  });
+}
+function construireModes(){
+  var c = $('modes'); c.innerHTML='';
+  [['avance',"L'avance"],['broche','La broche'],['copeau','Le copeau']].forEach(function(p){
+    var b = document.createElement('button');
+    b.type='button'; b.className='choix'+(S.mode===p[0]?' on':''); b.textContent=p[1];
+    b.onclick=function(){ S.mode=p[0]; S.n=''; S.fz=''; S.vf=''; construireModes(); rendre(); };
+    c.appendChild(b);
+  });
 }
 
-// --- bibliothèque ---
-function renderLib(){
-  var w=$("libwrap");
-  if(!tools.length){ w.style.display="none"; renderExport(); return; }
-  w.style.display="block";
-  $("libttl").textContent="Bibliothèque ("+tools.length+")";
-  var c=$("lib"); c.innerHTML="";
-  tools.forEach(function(t){
-    var row=document.createElement("div"); row.className="tool";
-    var b=document.createElement("button"); b.className="load";
-    b.innerHTML="<div class='nm'>"+esc(t.name)+"</div><div class='meta'>"+esc(t.matLabel)+" &middot; Ø"+t.D+" Z"+t.Z+" &middot; "+fr(t.rpm)+" tr/min &middot; "+vfDe(t)+" mm/min</div>";
-    b.onclick=function(){ loadTool(t); };
-    var del=document.createElement("button"); del.className="del"; del.innerHTML="&#128465;";
-    del.setAttribute("aria-label","Supprimer "+t.name);
-    del.onclick=function(){ tools=tools.filter(function(x){return x.name!==t.name;}); saveTools(); renderLib(); };
+function rendre(){
+  var r = calculer();
+  var nCalc = (S.mode==='broche'), fzCalc = (S.mode==='copeau'), vfCalc = (S.mode==='avance');
+
+  // Les champs déduits sont en lecture seule et portent l'encre accent.
+  // Un champ ÉDITABLE n'est jamais prérempli avec un nombre formaté : on
+  // recopierait des espaces de groupement dans une saisie.
+  function poser(id, calc, valCalc, valSaisie, aide){
+    var e = $(id);
+    e.readOnly = calc;
+    e.classList.toggle('calcule', calc);
+    if(document.activeElement !== e) e.value = calc ? valCalc : valSaisie;
+    $(aide.id).textContent = aide.txt;
+  }
+  poser('n', nCalc, fmt(r.n), (S.n || String(r.recN)),
+        {id:'aideN', txt: nCalc ? 'Déduite de l’avance et du copeau' : 'Conseillé : '+fmt(r.recN)});
+  // En mode « copeau », l'aide porte le VERDICT : le copeau obtenu comparé
+  // au conseillé. C'est tout l'intérêt de ce sens de calcul — juger un
+  // réglage existant — et un pourcentage le dit plus vite qu'un nombre.
+  var pc = r.recFz > 0 ? Math.round(r.fz / r.recFz * 100) : 0;
+  poser('fz', fzCalc, fmt(r.fz,3).replace(/0+$/,'').replace(/,$/,''),
+        (S.fz || String(r.recFz).replace('.', ',')),
+        {id:'aideFz', txt: fzCalc
+           ? ('Déduit de la broche et de l’avance — ' + pc + ' % du conseillé'
+              + (pc < 50 ? ' : la fraise frotte plus qu’elle ne coupe.'
+                 : pc < 80 ? ' : ça coupe, mais on chauffe.'
+                 : pc <= 130 ? ' : bon copeau.' : ' : copeau épais, surveiller l’effort.'))
+           : 'Conseillé : '+String(r.recFz).replace('.', ',')});
+  poser('vf', vfCalc, fmt(r.vf), (S.vf || String(Math.round(r.recN*r.z*r.recFz))),
+        {id:'aideVf', txt: vfCalc ? 'Déduite de la broche et du copeau' : 'Ce que tu veux atteindre'});
+  $('wrapN').style.display  = nCalc  ? 'block' : 'grid';
+  $('wrapFz').style.display = fzCalc ? 'block' : 'grid';
+
+  $('aideAe').textContent = r.ae > 0
+    ? (r.thinning > 1.005 ? 'Reprise de contour — copeau aminci, avance ×'
+                            + (Math.round(r.thinning*100)/100).toString().replace('.', ',')
+                          : 'Au-delà de la demi-fraise : plus d’amincissement.')
+    : 'Vide = la fraise coupe sur tout son diamètre. Rien à corriger.';
+
+  // Résultat
+  $('oVf').textContent  = fmt(r.vf);
+  $('oN').textContent   = fmt(r.n);
+  $('oVz').textContent  = fmt(r.vz);
+  $('oFpr').textContent = fmt(r.fpr, 2);
+  $('oContexte').textContent = 'Profondeur Ap ' + r.m.ap + ' · Vc ' + fmt(r.vc) + ' m/min · '
+        + (r.ae > 0 ? 'ae ' + String(num(S.ae,0)).replace('.', ',') + ' mm' : 'pleine largeur');
+  $('oNote').textContent = r.m.note;
+
+  var alerte = r.warns.length > 0;
+  $('carteResultat').classList.toggle('alerte', alerte);
+  $('blocAvert').hidden = !alerte;
+  $('oAvert').textContent = r.warns.join(' ');
+
+  // Barre de synthèse (mobile)
+  $('sVf').textContent = fmt(r.vf);
+  $('sN').textContent  = fmt(r.n);
+  $('sPoint').hidden   = !alerte;
+
+  // Résumé machine
+  $('resumeMachine').textContent = fmt(num(S.mMin,1000))+'–'+fmt(num(S.mMax,24000))+' tr/min · '
+        + fmt(num(S.vfMax,1500))+' mm/min · plongée '+fmt(num(S.plunge,35))+' %';
+
+  sauverPrefs();
+  return r;
+}
+
+/* --- Bibliothèque ---------------------------------------------------- */
+function vfDe(t){
+  // Un outil venu d'un fichier bricolé à la main peut ne pas porter son
+  // avance : on la recalcule plutôt que d'afficher « undefined ».
+  if(t.vf != null && isFinite(t.vf)) return Math.round(t.vf);
+  var d = num(t.d, 6), z = Math.max(1, Math.round(num(t.z, 2)));
+  var ae = num(t.ae, 0);
+  var th = (ae > 0 && ae < d/2) ? 1/Math.sqrt(1 - Math.pow(1 - (2*ae)/d, 2)) : 1;
+  return Math.round(num(t.n, 0) * z * num(t.fz, 0) * th);
+}
+function rendreBiblio(){
+  var c = $('biblio'); c.innerHTML='';
+  $('biblioTitre').textContent = 'Bibliothèque ('+S.lib.length+')';
+  if(!S.lib.length){
+    c.innerHTML = '<div class="vide">Aucun outil enregistré pour l’instant.</div>';
+    $('export').hidden = true; return;
+  }
+  $('export').hidden = false;
+  S.lib.forEach(function(it, i){
+    var row = document.createElement('div'); row.className='item';
+    var b = document.createElement('button'); b.type='button'; b.className='charger';
+    b.innerHTML = '<div class="nom">'+esc(it.name)+'</div><div class="sub">'
+                + esc(it.sub || (fmt(num(it.n,0))+' tr/min · '+fmt(vfDe(it))+' mm/min'))+'</div>';
+    b.onclick = function(){
+      // On recharge l'outil ENTIER, `ae` compris : sans lui, un outil
+      // enregistré en reprise de contour se rouvrirait avec l'avance de la
+      // pleine largeur, et l'export dirait autre chose que l'écran.
+      S.mat = it.mat; S.d = String(it.d); S.z = String(it.z);
+      S.n = String(it.n); S.fz = String(it.fz); S.ae = it.ae ? String(it.ae) : '';
+      S.vf = ''; S.mode = 'avance';
+      $('d').value = S.d; $('z').value = S.z; $('ae').value = S.ae;
+      construireMatieres(); construireModes(); rendre();
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+    var del = document.createElement('button');
+    del.type='button'; del.className='suppr'; del.textContent='×';
+    del.setAttribute('aria-label', 'Supprimer '+it.name);
+    del.onclick = function(){ S.lib.splice(i,1); sauverLib(); rendreBiblio(); };
     row.appendChild(b); row.appendChild(del); c.appendChild(row);
   });
-  renderExport();
+  rendreExport();
 }
-function loadTool(t){
-  material=(t.material in MAT)?t.material:"bois_tendre";
-  $("D").value=t.D; $("Z").value=t.Z; $("tname").value=t.name;
-  // Les trois grandeurs sont reposees telles qu'enregistrees : quel que
-  // soit le sens de calcul courant, le triplet est coherent, donc le champ
-  // deduit retombera sur sa valeur.
-  $("fz").value=t.fz; $("rpm").value=t.rpm;
-  $("ae").value=(t.ae>0?t.ae:"");     // pose AVANT compute : il en depend
-  $("vf").value=vfDe(t);      // recalcule si l'outil n'en portait pas
-  buildMats(); compute();
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-// Un outil venu d'un JSON bricole a la main peut ne pas porter `vf` :
-// il affichait alors « undefined mm/min », y compris dans le texte qu'on
-// copie vers FreeCAD. On le recalcule plutot que de l'avouer.
-function vfDe(t){
-  if(t.vf!=null && isFinite(t.vf)) return t.vf;
-  return rnd(t.rpm*t.fz*facteurAminci(t.D, t.ae>0?t.ae:0)*t.Z);
-}
-function esc(s){return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
-
-// --- export ---
 function fctb(t){
-  return JSON.stringify({version:2,name:t.name,shape:"endmill.fcstd",parameter:{
-    Diameter:t.D+" mm", Flutes:t.Z, Chipload:t.fz+" mm",
-    CuttingEdgeHeight:(t.D*3).toFixed(2)+" mm", Length:(t.D*8).toFixed(2)+" mm",
-    ShankDiameter:t.D+" mm", Material:"Carbide"}, attribute:{}}, null, 2);
+  var d = num(t.d, 6);
+  return JSON.stringify({version:2, name:t.name, shape:'endmill.fcstd', parameter:{
+    Diameter:d+' mm', Flutes:Math.max(1,Math.round(num(t.z,2))), Chipload:num(t.fz,0)+' mm',
+    CuttingEdgeHeight:(d*3).toFixed(2)+' mm', Length:(d*8).toFixed(2)+' mm',
+    ShankDiameter:d+' mm', Material:'Carbide'}, attribute:{}}, null, 2);
 }
-function renderExport(){
-  var w=$("expwrap");
-  if(!tools.length){ w.style.display="none"; return; }
-  w.style.display="block";
-  $("jsonBox").value=JSON.stringify(tools,null,2);
-  var c=$("fctbList"); c.innerHTML="";
-  tools.forEach(function(t){
-    var box=document.createElement("div"); box.className="fctb";
-    var fn=t.name.replace(/[^a-z0-9]+/gi,"_")+".fctb";
-    box.innerHTML="<div class='t'>"+esc(t.name)+"</div>"
-      +"<div class='exprow'><span class='hint' style='margin:0'>"+fn+"</span>"
-      +"<span><button class='cp dl'>Télécharger</button><button class='cp'>Copier</button></span></div>"
-      +"<textarea rows='6' readonly>"+esc(fctb(t))+"</textarea>"
-      +"<div class='exprow' style='margin-top:6px'><span class='tc'>RPM "+t.rpm+" &middot; Vf "+vfDe(t)+" &middot; Vz "+t.plunge+"</span><button class='cp'>Copier</button></div>";
-    var dl=box.querySelector(".dl");
-    dl.onclick=function(){ telecharger(fn, fctb(t)); var o=dl.textContent; dl.textContent="Enregistré"; setTimeout(function(){dl.textContent=o;},1200); };
-    var btns=box.querySelectorAll(".cp:not(.dl)");
-    btns[0].onclick=function(){ copy(fctb(t), btns[0]); };
-    btns[1].onclick=function(){ copy("SpindleSpeed="+t.rpm+"\nHorizFeed="+vfDe(t)+" mm/min\nVertFeed="+t.plunge+" mm/min", btns[1]); };
+function rendreExport(){
+  $('jsonBox').value = JSON.stringify(S.lib, null, 2);
+  var c = $('listeFctb'); c.innerHTML='';
+  S.lib.forEach(function(t){
+    var box = document.createElement('div'); box.className='bloc-fctb';
+    var nom = t.name.replace(/[^a-z0-9]+/gi,'_')+'.fctb';
+    box.innerHTML = '<div class="t">'+esc(t.name)+'</div>'
+      + '<div class="exprow"><span class="aide" style="padding:0">'+esc(nom)+'</span>'
+      + '<span><button class="mini dl" type="button">Télécharger</button>'
+      + '<button class="mini" type="button">Copier</button></span></div>'
+      + '<textarea rows="5" readonly>'+esc(fctb(t))+'</textarea>'
+      + '<div class="exprow" style="margin:8px 0 0"><span class="tc">SpindleSpeed '
+      + Math.round(num(t.n,0)) + ' · HorizFeed ' + vfDe(t) + ' · VertFeed '
+      + Math.round(vfDe(t)*num(S.plunge,35)/100) + '</span>'
+      + '<button class="mini" type="button">Copier</button></div>';
+    var btns = box.querySelectorAll('button');
+    btns[0].onclick = function(){ telecharger(nom, fctb(t)); marquer(btns[0],'Enregistré'); };
+    btns[1].onclick = function(){ copier(fctb(t), btns[1]); };
+    btns[2].onclick = function(){
+      copier('SpindleSpeed='+Math.round(num(t.n,0))+'\nHorizFeed='+vfDe(t)
+             +' mm/min\nVertFeed='+Math.round(vfDe(t)*num(S.plunge,35)/100)+' mm/min', btns[2]);
+    };
     c.appendChild(box);
   });
 }
-function copy(text,btn){
-  var done=function(){ var o=btn.textContent; btn.textContent="Copié"; setTimeout(function(){btn.textContent=o;},1200); };
-  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done,function(){fallback(text);done();}); }
-  else { fallback(text); done(); }
+function marquer(b, txt){ var o=b.textContent; b.textContent=txt; setTimeout(function(){b.textContent=o;},1200); }
+function copier(texte, btn){
+  var fini = function(){ marquer(btn, 'Copié'); };
+  if(navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(texte).then(fini, function(){ repli(texte); fini(); });
+  else { repli(texte); fini(); }
 }
-function fallback(text){
-  var ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select();
-  try{document.execCommand("copy");}catch(e){} document.body.removeChild(ta);
+function repli(texte){
+  var ta=document.createElement('textarea'); ta.value=texte; document.body.appendChild(ta);
+  ta.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta);
 }
-// Vraie ecriture d'un fichier sur le disque (pas le presse-papier) : sur
-// ordinateur, c'est ce qu'on veut pour deposer le .fctb dans la
-// bibliotheque d'outils de FreeCAD sans le recreer a la main.
-function telecharger(nomFichier, contenu){
-  var blob=new Blob([contenu], {type:"application/json"});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement("a"); a.href=url; a.download=nomFichier;
+function telecharger(nom, contenu){
+  var blob = new Blob([contenu], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href=url; a.download=nom;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
 }
 
-// --- Suis-je a jour ? ----------------------------------------------------
-// La version est posee par generer.py depuis le CACHE du service worker :
-// une seule valeur, jamais recopiee. version.json porte celle du serveur ;
-// le service worker le laisse expres passer au reseau.
-var VERSION="{{VERSION}}";
+/* --- Persistance ------------------------------------------------------ */
+function sauverLib(){ try{ localStorage.setItem(K_LIB, JSON.stringify(S.lib)); }catch(e){} }
+function sauverPrefs(){
+  try{ localStorage.setItem(K_PREFS, JSON.stringify({v:PREFS_VERSION,
+    mMin:S.mMin, mMax:S.mMax, plunge:S.plunge, vfMax:S.vfMax})); }catch(e){}
+}
+function charger(){
+  try{ var l=localStorage.getItem(K_LIB); if(l) S.lib=JSON.parse(l)||[]; }catch(e){}
+  try{
+    var p=localStorage.getItem(K_PREFS);
+    if(p){
+      var s=JSON.parse(p);
+      // Réglages d'une version antérieure : on garde les nouveaux défauts.
+      if(s.v===PREFS_VERSION){
+        if(s.mMin) S.mMin=s.mMin; if(s.mMax) S.mMax=s.mMax;
+        if(s.plunge) S.plunge=s.plunge; if(s.vfMax) S.vfMax=s.vfMax;
+      }
+    }
+  }catch(e){}
+  ['mMin','mMax','plunge','vfMax'].forEach(function(k){ $(k).value = S[k]; });
+}
+
+/* --- Thème : JOUR par défaut ------------------------------------------ */
+function appliquerTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  $('themeIcone').textContent = (t==='nuit') ? '☀' : '☾';
+  $('themeTexte').textContent = (t==='nuit') ? 'jour' : 'nuit';
+  $('btnTheme').title = (t==='nuit') ? 'Passer au thème clair' : 'Passer au thème sombre';
+  var meta = document.querySelector('meta[name=theme-color]');
+  if(meta) meta.setAttribute('content', t==='nuit' ? '#0a0a0b' : '#f5f4f1');
+  try{ localStorage.setItem(K_THEME, t); }catch(e){}
+}
+
+/* --- Suis-je à jour ? ------------------------------------------------- */
 function controlerVersion(){
-  var b=$("ver");
-  b.textContent=VERSION;
-  b.className="ver";
-  b.title="Version de l'appli. Vérification de la mise à jour…";
-  fetch("./version.json?t="+Date.now(), {cache:"no-store"})
-    .then(function(r){ return r.ok?r.json():null; })
+  var b = $('ver');
+  b.textContent = VERSION; b.className = 'ver';
+  b.title = 'Version de l’appli. Vérification de la mise à jour…';
+  fetch('./version.json?t='+Date.now(), {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(j){
       if(!j || !j.version) return;
-      if(j.version===VERSION){
-        b.className="ver ok";
-        b.title="À jour : c'est bien la dernière version ("+VERSION+").";
+      if(j.version === VERSION){
+        b.className='ver ok'; b.title='À jour : c’est bien la dernière version ('+VERSION+').';
       } else {
-        b.className="ver vieux";
-        b.textContent=VERSION+" ⟳";
-        b.title="Version "+j.version+" disponible. Toucher pour mettre à jour "
-               +"(au clavier : Ctrl + Maj + R).";
-        b.onclick=forcerMaj;
+        b.className='ver vieux'; b.textContent=VERSION+' ⟳';
+        b.title='Version '+j.version+' disponible. Toucher pour mettre à jour (Ctrl + Maj + R).';
+        b.onclick = forcerMaj;
       }
     })
-    .catch(function(){
-      // Hors-ligne : on ne SAIT pas, donc on n'affirme rien — ni vert ni rouge.
-      b.title="Version "+VERSION+". Hors-ligne : mise à jour non vérifiable.";
-    });
+    .catch(function(){ b.title='Version '+VERSION+'. Hors-ligne : mise à jour non vérifiable.'; });
 }
-// L'equivalent du Ctrl+Maj+R, qui n'existe pas sur un telephone : on jette
-// le service worker et ses caches, puis on recharge sur une adresse neuve
-// pour que le cache HTTP du navigateur ne resserve pas l'ancienne page.
 function forcerMaj(){
-  var recharger=function(){
-    location.replace(location.pathname+"?maj="+Date.now());
-  };
-  if(!("serviceWorker" in navigator)){ recharger(); return; }
+  var recharger = function(){ location.replace(location.pathname+'?maj='+Date.now()); };
+  if(!('serviceWorker' in navigator)){ recharger(); return; }
   navigator.serviceWorker.getRegistrations()
     .then(function(rs){ return Promise.all(rs.map(function(r){ return r.unregister(); })); })
     .then(function(){ return caches.keys(); })
@@ -683,59 +859,79 @@ function forcerMaj(){
     .then(recharger, recharger);
 }
 
-// --- démarrage ---
-loadStore();
-buildMats();
-buildModes();
-marquerChampCalcule();
-["D","Z","rpm","fz","vf","ae","rpmMin","rpmMax","plunge","vfMax","tname"].forEach(function(id){
-  $(id).addEventListener("input", function(){
-    if(id==="D"){ onDiam(); }
-    else { compute(); }
-    if(id==="rpmMin"||id==="rpmMax"||id==="plunge"||id==="vfMax") savePrefs();
-  });
-});
-document.querySelectorAll(".reset").forEach(function(b){
-  b.onclick=function(){
-    var d=num($("D").value), lo=num($("rpmMin").value), hi=num($("rpmMax").value);
-    if(b.dataset.r==="rpm") $("rpm").value=recoRpm(material,d,lo,hi);
-    else $("fz").value=recoFz(material,d);
-    compute();
+/* --- Démarrage -------------------------------------------------------- */
+(function init(){
+  var t = 'jour';
+  try{ var st = localStorage.getItem(K_THEME); if(st==='jour'||st==='nuit') t = st; }catch(e){}
+  appliquerTheme(t);
+  $('btnTheme').onclick = function(){
+    appliquerTheme(document.documentElement.getAttribute('data-theme')==='nuit' ? 'jour' : 'nuit');
   };
-});
-$("save").onclick=function(){
-  var t=currentTool();
-  var i=-1; for(var k=0;k<tools.length;k++){ if(tools[k].name===t.name){i=k;break;} }
-  if(i>=0) tools[i]=t; else tools.push(t);
-  saveTools(); renderLib();
-  var b=$("save"), o=b.textContent; b.textContent="OK"; setTimeout(function(){b.textContent=o;},1200);
-};
-$("cpJson").onclick=function(){ copy($("jsonBox").value, $("cpJson")); };
-$("dlJson").onclick=function(){
-  telecharger("outils-vitesses-coupe.json", $("jsonBox").value);
-  var b=$("dlJson"), o=b.textContent; b.textContent="Enregistré"; setTimeout(function(){b.textContent=o;},1200);
-};
 
-compute();
-renderLib();
-controlerVersion();
+  charger();
+  construireMatieres();
+  construireModes();
 
-// Enregistrement du service worker : c'est lui qui rend l'appli disponible
-// hors-ligne une fois qu'elle a été ouverte une première fois.
-if("serviceWorker" in navigator){
-  window.addEventListener("load", function(){
-    navigator.serviceWorker.register("./sw.js").catch(function(){});
+  // Les champs de saisie alimentent l'état, puis on recalcule tout.
+  [['d','d'],['z','z'],['n','n'],['fz','fz'],['vf','vf'],['ae','ae'],
+   ['mMin','mMin'],['mMax','mMax'],['plunge','plunge'],['vfMax','vfMax'],
+   ['tool','tool']].forEach(function(p){
+    $(p[0]).addEventListener('input', function(){ S[p[1]] = this.value; rendre(); });
   });
-}
+
+  $('resetN').onclick  = function(){ S.n=''; rendre(); };
+  $('resetFz').onclick = function(){ S.fz=''; rendre(); };
+
+  $('btnAide').onclick = function(){
+    S.aeOpen = !S.aeOpen;
+    $('blocAide').hidden = !S.aeOpen;
+    this.setAttribute('aria-expanded', S.aeOpen ? 'true' : 'false');
+  };
+  $('teteMachine').onclick = function(){
+    S.machineOpen = !S.machineOpen;
+    $('corpsMachine').hidden = !S.machineOpen;
+    $('basculeMachine').textContent = S.machineOpen ? 'replier' : 'modifier';
+    this.setAttribute('aria-expanded', S.machineOpen ? 'true' : 'false');
+  };
+
+  $('save').onclick = function(){
+    var r = calculer();
+    var nom = (S.tool || '').trim() || (r.m.label.replace(/­/g,'') + ' · Ø' + S.d + ' Z' + S.z);
+    var outil = {
+      name:nom, sub:fmt(r.n)+' tr/min · '+fmt(r.vf)+' mm/min',
+      mat:S.mat, d:S.d, z:S.z,
+      n:String(Math.round(r.n)), fz:String(Math.round(r.fz*1000)/1000),
+      ae:S.ae, vf:Math.round(r.vf), plunge:Math.round(r.vz)
+    };
+    // Un même nom remplace l'ancien plutôt que de créer un doublon.
+    var i = -1;
+    for(var k=0; k<S.lib.length; k++) if(S.lib[k].name===nom){ i=k; break; }
+    if(i >= 0) S.lib[i] = outil; else S.lib.unshift(outil);
+    S.tool=''; $('tool').value='';
+    sauverLib(); rendreBiblio();
+    marquer($('save'), 'OK');
+  };
+  $('cpJson').onclick = function(){ copier($('jsonBox').value, $('cpJson')); };
+  $('dlJson').onclick = function(){
+    telecharger('outils-vitesses-coupe.json', $('jsonBox').value);
+    marquer($('dlJson'), 'Enregistré');
+  };
+
+  rendre();
+  rendreBiblio();
+  controlerVersion();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
+})();
 </script>
 
-<!-- Fréquentation : même compteur GoatCounter que le reste du site, même
-     préfixe /portail que les pages du portail (voir kit/pied.html). Chargé
-     en dernier et asynchrone : hors-ligne, il échoue en silence et l'appli
-     ne s'en aperçoit pas. -->
-<script>
-  window.goatcounter = { path: function (p) { return '/portail' + p } };
-</script>
+<!-- Fréquentation : même compteur que le reste du site. Chargé en dernier
+     et asynchrone : hors-ligne, il échoue en silence. -->
+<script>window.goatcounter = { path: function (p) { return '/portail' + p } };</script>
 <script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>
