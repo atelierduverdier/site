@@ -200,7 +200,10 @@ input.calcule{background:var(--calc); border:1px dashed var(--accent); color:var
 .resultat.alerte{border-color:var(--result-bd-warn);}
 .chiffres{padding:20px 20px 4px; display:grid; grid-template-columns:1fr 1fr; gap:22px 16px;}
 .val .k{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--section); padding-bottom:6px;}
-.val .v{font-family:'JetBrains Mono',monospace; line-height:1;}
+.val .v{font-family:'JetBrains Mono',monospace; line-height:1;
+  /* « 21 000 » contient une espace : sans ceci il passe a la ligne sur un
+     ecran etroit et se lit « 21 » puis « 000 ». Un nombre ne se coupe pas. */
+  white-space:nowrap;}
 .val.grand .v{font-size:30px; font-weight:700; color:var(--accent-ink);}
 .val.petit .v{font-size:20px; font-weight:500; color:var(--txt);}
 .val .u{font-size:12px; font-weight:400; color:var(--second); padding-left:5px;}
@@ -210,6 +213,12 @@ input.calcule{background:var(--calc); border:1px dashed var(--accent); color:var
 .contexte .note{font-size:12.5px; line-height:1.55; color:var(--second);}
 .avert{background:var(--warn-bg); border-top:1px solid var(--result-bd-warn); padding:16px 20px; display:flex; gap:12px;}
 .avert .barre{width:6px; border-radius:3px; background:var(--warn-bar); flex:0 0 auto;}
+/* Le texte de l'alerte est long et la carte est en `overflow:hidden` : sans
+   `min-width:0`, un enfant de conteneur flex refuse de descendre sous la
+   largeur de son contenu, deborde, et se fait couper — on ne voit alors
+   plus que le titre « A CORRIGER » au-dessus d'un bloc vide. */
+.avert>div:last-child{min-width:0; flex:1 1 auto;}
+.avert .x{overflow-wrap:anywhere;}
 .avert .t{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--warn-title); padding-bottom:6px;}
 .avert .x{font-size:13px; line-height:1.55; color:var(--warn-txt);}
 
@@ -272,6 +281,19 @@ textarea{
 .pied a{color:var(--second); text-decoration:none; border-bottom:1px solid var(--card-bd);}
 
 /* --- Sous 900px : une colonne, barre de synthèse en bas -------------- */
+/* Tres petits ecrans : plutot que de laisser les nombres se casser, on
+   descend leur taille. 30 px de mono ne tiennent pas dans une demi-largeur
+   de 320 px. */
+@media (max-width:389px){
+  .val.grand .v{font-size:25px;}
+  .val.petit .v{font-size:18px;}
+  .chiffres{gap:18px 12px; padding:16px 16px 4px;}
+  .contexte, .avert{padding-left:16px; padding-right:16px;}
+  /* Empecher la casse du nombre ne suffit pas : a deux colonnes dans
+     320 px, « 21 000 tr/min » deborde et l'unite se fait couper. Elle
+     passe donc SOUS le nombre, ou elle a toute la place. */
+  .val .u{display:block; padding-left:0; margin-top:3px;}
+}
 @media (max-width:899px){
   .cadre{max-width:412px; padding:16px 16px 24px;}
   .corps{grid-template-columns:1fr; gap:24px;}
