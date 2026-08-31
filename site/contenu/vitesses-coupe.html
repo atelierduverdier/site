@@ -254,6 +254,46 @@
 
 <section>
   <div class="wrap">
+    <div class="sec-tag">Deux fois la même appli</div>
+    <h2>Dans le navigateur, et sur le PC de l'atelier</h2>
+    <p class="sec-lede">
+      La même appli existe en deux exemplaires : celle-ci, qui s'ouvre dans un
+      navigateur et s'installe sur un téléphone, et une <b>appli de bureau</b> en
+      PySide6 pour le PC de l'atelier. Même mise en page, mêmes matières, mêmes
+      avertissements.
+    </p>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Un seul calcul, pas deux</h3>
+        <p>
+          Les formules ne sont écrites qu'<b>une fois</b>, dans un module qui ne
+          connaît ni l'écran ni le navigateur — l'appli de bureau l'appelle
+          directement, l'appli web en porte la traduction ligne pour ligne. Deux
+          copies d'une même formule finissent toujours par diverger ; ici, ce qui
+          pourrait diverger est <b>testé</b>.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Les valeurs de contrôle ne viennent pas du code</h3>
+        <p>
+          Trente-huit contrôles vérifient le calcul, et leurs valeurs de référence
+          sont tirées des <b>captures de la maquette</b>, pas du programme qu'elles
+          jugent : un test qui reprend la formule qu'il vérifie ne vérifie rien.
+          Deux d'entre eux ont d'ailleurs échoué au premier passage — et c'était
+          l'attendu qui était faux, pas le calcul.
+        </p>
+      </div>
+    </div>
+
+    <div class="liens" style="margin-top:18px">
+      <a href="https://github.com/atelierduverdier/vitesses-coupe">Le dépôt de l'appli de bureau</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <div class="sec-tag">À l'établi</div>
     <h2>Sur le téléphone, à demeure</h2>
 
