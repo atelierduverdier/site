@@ -77,10 +77,20 @@ FICHIERS_KIT = ['verdier.css', 'verdier.js', 'chapeau.svg', 'logo.svg']
 # génération le DIT à chaque passage plutôt que de l'oublier en silence.
 PHOTOS = CONTENU / 'photos'
 PHOTOS_HEROS = {
-    'index.html': (
-        'fraiseuse-en-usinage.jpg',
-        "La fraiseuse PrintNC de l'atelier, en cours d'usinage sur son lit "
-        "martyr, la tête et son tuyau d'aspiration au-dessus de la pièce"),
+    'index.html': {
+        'fichier': 'printnc.jpg',
+        'alt': "La fraiseuse PrintNC dans l'atelier : bâti orange, lit martyr "
+               "en contreplaqué percé d'une trame de trous, portique et tuyau "
+               "d'aspiration souple, le tout posé sur son établi",
+        # LE RAPPORT SUIT LA PHOTO, PAS L'INVERSE. La case est en `cover` :
+        # elle ROGNE ce qui dépasse. Cette prise-ci fait 1400 x 631, soit
+        # 2,22 — c'est un panorama, la machine occupe toute la largeur du
+        # cadre. Au 3/2 par défaut, il aurait fallu couper 227 px de chaque
+        # côté : le chariot de l'axe Y à gauche, le bout du portique à
+        # droite. Au 2/1 il n'en part que 69 de chaque bord, et ce sont
+        # l'établi et l'étagère, pas la machine.
+        'ratio': '2/1',
+    },
 }
 # La photo est servie à ~466 px de large sur un écran de bureau, moins
 # ailleurs. 1400 px couvre le double de ça pour les écrans à forte densité,
@@ -1147,17 +1157,26 @@ def injecter_photo_heros(corps: str, sortie: str, nom: str, servies: set) -> str
         sys.exit(f"generer : {nom} demande {{{{photo-heros}}}}, mais "
                  f"« {sortie} » n'a pas d'entrée dans PHOTOS_HEROS.")
     servies.add(sortie)
-    fichier, alt = PHOTOS_HEROS[sortie]
-    publiee = publier_photo(fichier)
+    reglage = PHOTOS_HEROS[sortie]
+    manquantes = {'fichier', 'alt'} - set(reglage)
+    if manquantes:
+        sys.exit(f"generer : l'entrée PHOTOS_HEROS de « {sortie} » n'a pas de "
+                 f"{', '.join(sorted(manquantes))}.")
+    # Le rapport est facultatif ; sans lui, c'est le 3/2 du kit qui tient.
+    ratio = reglage.get('ratio')
+    ouvrant = ('<div class="hero-photo">' if not ratio
+               else f'<div class="hero-photo" style="--photo-ratio:{ratio}">')
+
+    publiee = publier_photo(reglage['fichier'])
     if publiee is None:
-        print(f"  ! photo du héros absente : {PHOTOS / fichier} — la case "
-              f"reste neutre en attendant")
-        bloc = '<div class="hero-photo"></div>'
+        print(f"  ! photo du héros absente : {PHOTOS / reglage['fichier']} — "
+              f"la case reste neutre en attendant")
+        bloc = ouvrant + '</div>'
     else:
         servi, largeur, hauteur = publiee
-        bloc = (f'<div class="hero-photo">'
+        bloc = (f'{ouvrant}'
                 f'<img src="{{{{RACINE}}}}photos/{servi}" '
-                f'alt="{html.escape(alt, quote=True)}" '
+                f'alt="{html.escape(reglage["alt"], quote=True)}" '
                 f'width="{largeur}" height="{hauteur}" '
                 f'decoding="async"></div>')
     return corps.replace('{{photo-heros}}', bloc)
@@ -1733,6 +1752,24 @@ def main() -> None:
 
         sortie.write_text(html, encoding='utf-8')
         print(f"  {page['sortie']:<32} {sortie.stat().st_size:>7} o")
+
+    # UNE PHOTO DÉPOSÉE QUE PERSONNE NE NOMME ARRÊTE LA GÉNÉRATION. Le
+    # 31/08/2026, la photo de la fraiseuse est arrivée sous `printnc.jpg`
+    # pendant que PHOTOS_HEROS attendait `fraiseuse-en-usinage.jpg`. La
+    # génération l'a bien dit — « ! photo du héros absente » — puis elle a
+    # continué, et le site est parti EN LIGNE avec son aplat gris alors que
+    # la photo était sur le disque. Un avertissement au milieu de trente
+    # lignes n'arrête personne ; le dossier vide, lui, reste un cas normal
+    # (on attend la photo) et garde son simple rappel.
+    nommees = {r['fichier'] for r in PHOTOS_HEROS.values()}
+    if PHOTOS.is_dir():
+        deposees = {f.name for f in PHOTOS.iterdir()
+                    if f.suffix.lower() in ('.jpg', '.jpeg', '.png')}
+        ignorees = sorted(deposees - nommees)
+        if ignorees:
+            sys.exit(f"generer : {', '.join(ignorees)} attend dans "
+                     f"contenu/photos/ sans qu'aucune entrée de PHOTOS_HEROS "
+                     f"le nomme — la page partirait avec son aplat.")
 
     orphelines = sorted(set(PHOTOS_HEROS) - photos_servies)
     if orphelines:
