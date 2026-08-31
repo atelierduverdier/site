@@ -292,6 +292,93 @@
   </div>
 </section>
 
+<section id="installer">
+  <div class="wrap">
+    <div class="sec-tag">Installer</div>
+    <h2>De l'appli jusqu'au G-code, en deux gestes</h2>
+    <p class="sec-lede">
+      L'appli web ne demande rien : elle s'ouvre, et s'installe sur un téléphone
+      si on veut. Ce qui suit concerne l'appli de bureau et son branchement dans
+      FreeCAD — pour que les vitesses arrivent dans le Job sans être recopiées à
+      la main.
+    </p>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>1. L'appli de bureau</h3>
+        <p>
+          Python 3 et PySide6, rien d'autre. Sur Arch ou dérivés :
+        </p>
+        <pre><code>sudo pacman -S pyside6
+git clone https://github.com/atelierduverdier/vitesses-coupe.git
+cd vitesses-coupe
+python3 vitesses_coupe.py</code></pre>
+        <p class="muted">
+          Un fichier <code>.desktop</code> est fourni si vous voulez un lanceur
+          dans le menu. Le calcul se vérifie par <code>python3 tests_noyau.py</code>.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>2. Le bouton dans FreeCAD</h3>
+        <p>
+          Copier la macro et son icône dans le dossier des macros — il est
+          <b>versionné</b>, et plusieurs versions cohabitent souvent :
+        </p>
+        <pre><code>cp importer_outil_coupe.FCMacro icone_outil_coupe.svg \
+   ~/.local/share/FreeCAD/v1-1/Macro/</code></pre>
+        <p class="muted">
+          En cas de doute sur le dossier, la réponse vient de FreeCAD lui-même,
+          dans sa console Python : <code>FreeCAD.getUserMacroDir(True)</code>.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Poser le bouton dans la barre d'outils</span>
+      <p>
+        Dans FreeCAD : <b>Outils → Personnaliser… → onglet Macros</b>. Choisir
+        <code>importer_outil_coupe.FCMacro</code>, saisir un texte de menu
+        (« Importer un outil de coupe » — ce champ est <b>obligatoire</b>),
+        désigner l'icône, puis <b>Ajouter</b>. Passer ensuite à l'onglet
+        <b>Barres d'outils</b>, sélectionner l'atelier <b>CAM</b> en haut à
+        droite, créer une barre et y déplacer la commande avec la flèche →.
+      </p>
+    </div>
+
+    <h3 style="margin-top:26px">Le parcours, une fois installé</h3>
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Où</th><th>Quoi</th><th>Ce qui se passe</th></tr></thead>
+        <tbody>
+          <tr><td>Appli</td><td>régler la fraise, <b>↑ Écrire dans FreeCAD…</b></td>
+              <td>la fraise entre dans la bibliothèque d'outils, ses vitesses sont retenues</td></tr>
+          <tr><td>FreeCAD</td><td>le <b>bouton</b> de l'atelier CAM</td>
+              <td>la fraise arrive dans le Job avec sa broche, son avance, sa plongée et les rapides</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">Pourquoi deux endroits, et pas un seul</span>
+      <p>
+        Un fichier d'outil FreeCAD décrit la <b>fraise</b> — diamètre, dents,
+        longueurs — et ne peut pas porter de vitesses : celles-ci appartiennent
+        au Tool Controller du Job. Le format a bien un champ libre, mais FreeCAD
+        <b>le vide</b> dès qu'il réécrit l'outil. Les vitesses sont donc gardées
+        par l'appli, dans <code>~/.config/vitesses-coupe/</code>, et rattachées à
+        la fraise par le nom de son fichier.
+      </p>
+      <p>
+        Conséquence le jour d'un changement de version majeure de FreeCAD : le
+        dossier de données est versionné et repart neuf, donc les fraises n'y
+        sont pas. Les vitesses, elles, restent. Rien n'est perdu, mais il faut
+        recopier les <code>.fctb</code> et les <code>.fctl</code> d'un dossier à
+        l'autre — la marche à suivre est dans le dépôt.
+      </p>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="wrap">
     <div class="sec-tag">À l'établi</div>
