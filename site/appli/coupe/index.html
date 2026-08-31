@@ -160,6 +160,8 @@ input:focus{border-color:var(--accent);}
 /* Le champ DEDUIT : bordure pointillee, encre accent, non saisissable. */
 input.calcule{background:var(--calc); border:1px dashed var(--accent); color:var(--accent-ink);}
 .aide{font-size:11.5px; color:var(--help); padding-top:6px; display:block;}
+.case{display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--label); cursor:pointer;}
+.case input{width:18px; height:18px; margin:1px 0 0; accent-color:var(--accent); flex:0 0 auto;}
 .avec-reset{display:grid; grid-template-columns:1fr 44px; gap:8px;}
 .reset{
   min-height:52px; border-radius:9px; cursor:pointer;
@@ -365,6 +367,54 @@ textarea{
         </div>
       </section>
 
+      <section class="panneau">
+        <button class="panneau-tete" id="teteFraise" type="button" aria-expanded="false" aria-controls="corpsFraise">
+          <span style="min-width:0">
+            <span class="sect-titre" style="display:block">La fraise en détail</span>
+            <span class="resume" id="resumeFraise"></span>
+          </span>
+          <span class="bascule" id="basculeFraise">préciser</span>
+        </button>
+        <div class="panneau-corps" id="corpsFraise" hidden>
+          <div class="sous" style="font-size:12.5px; color:var(--help); padding-bottom:14px">
+            Rien de tout ceci ne change les vitesses. C'est ce qui part dans le
+            fichier d'outil FreeCAD — et ce qui permet de prévenir de ce que la
+            formule ignore.
+          </div>
+          <div class="champ" style="margin-bottom:14px">
+            <label class="lbl">Forme du bout</label>
+            <div class="segments" id="formes"></div>
+          </div>
+          <div class="grille-machine">
+            <div class="champ">
+              <label for="hcoupe">Hauteur de coupe <span class="u">(mm)</span></label>
+              <input id="hcoupe" type="text" inputmode="decimal" placeholder="déduite">
+            </div>
+            <div class="champ">
+              <label for="lgtotale">Longueur totale <span class="u">(mm)</span></label>
+              <input id="lgtotale" type="text" inputmode="decimal" placeholder="déduite">
+            </div>
+            <div class="champ">
+              <label for="queue">Diamètre de queue <span class="u">(mm)</span></label>
+              <input id="queue" type="text" inputmode="decimal" placeholder="= diamètre de coupe">
+            </div>
+            <div class="champ" id="champExtra" hidden>
+              <label for="extra" id="lblExtra">Rayon de coin <span class="u">(mm)</span></label>
+              <input id="extra" type="text" inputmode="decimal" placeholder="déduit">
+            </div>
+          </div>
+          <div class="champ" style="margin-top:14px">
+            <label class="lbl">Sens de l'hélice</label>
+            <div class="segments" id="helices" style="flex-wrap:wrap"></div>
+            <span class="aide" id="aideHelice"></span>
+          </div>
+          <label class="case" style="margin-top:14px">
+            <input type="checkbox" id="plongeant" checked>
+            <span>Bout plongeant (fishtail) — peut entrer droit dans la matière</span>
+          </label>
+        </div>
+      </section>
+
       <section>
         <div class="sect-titre">Ce que l'appli calcule</div>
         <div class="segments" id="modes"></div>
@@ -557,12 +607,59 @@ function matParId(id){
   return MATS[0].items[0];
 }
 
+/* --- La fraise elle-même ---------------------------------------------
+   Rien ici n'entre dans Vf = N x Z x fz : la géométrie ne change PAS les
+   vitesses. Elle sert au fichier d'outil FreeCAD — qui décrit sinon une
+   fraise inventée — et aux avertissements que la formule ne peut pas
+   donner. Mêmes valeurs que `coupe_noyau.py`, côté appli de bureau. */
+var FORMES = [
+  {id:'plat',    label:'Plat',    shape:'endmill.fcstd',  type:'Endmill',  extra:null},
+  {id:'boule',   label:'Boule',   shape:'ballend.fcstd',  type:'Ballend',  extra:null},
+  {id:'torique', label:'Torique', shape:'bullnose.fcstd', type:'Bullnose',
+   extra:{label:'Rayon de coin', unite:'mm', cle:'CornerRadius', defaut:function(d){return Math.round(d/6*100)/100;}}},
+  {id:'vbit',    label:'V',       shape:'v-bit.fcstd',    type:'V-bit',
+   extra:{label:'Angle de pointe', unite:'°', cle:'CuttingEdgeAngle', defaut:function(){return 90;}}}
+];
+var HELICES = [
+  {id:'montante', label:'Montante',
+   note:'Les copeaux sortent vers le haut : rainures profondes possibles, mais la face du dessus s’écaille.'},
+  {id:'descendante', label:'Descendante',
+   note:'Belle face du dessus, mais les copeaux sont tassés dans la rainure.',
+   alerte:'Fraise descendante : les copeaux ne s’évacuent pas vers le haut. Passes moins profondes, et surveiller l’échauffement.'},
+  {id:'compression', label:'Compression',
+   note:'Propre des deux côtés, mais il lui faut une profondeur suffisante pour que la partie basse morde.',
+   alerte:'Fraise de compression : sous une certaine profondeur, la partie basse ne travaille pas et l’intérêt disparaît.'},
+  {id:'droite', label:'Droite',
+   note:'Pas d’hélice : effort axial faible, évacuation médiocre.'}
+];
+function formeParId(id){ for(var i=0;i<FORMES.length;i++) if(FORMES[i].id===id) return FORMES[i]; return FORMES[0]; }
+function heliceParId(id){ for(var i=0;i<HELICES.length;i++) if(HELICES[i].id===id) return HELICES[i]; return HELICES[0]; }
+
+/* Complète la géométrie, en déduisant ce qui n'a pas été saisi. */
+function geometrie(){
+  var d = num(S.d, 6);
+  var f = formeParId(S.forme);
+  var g = {forme:f, diametre:d,
+           hauteurCoupe:num(S.hcoupe, Math.round(d*3*100)/100),
+           longueur:num(S.lgtotale, Math.round(d*8*100)/100),
+           queue:num(S.queue, d),
+           deduit:[]};
+  if(!num(S.hcoupe,0)) g.deduit.push('hauteur de coupe');
+  if(!num(S.lgtotale,0)) g.deduit.push('longueur');
+  if(!num(S.queue,0)) g.deduit.push('queue');
+  if(f.extra) g.extra = num(S.extra, f.extra.defaut(d));
+  if(g.longueur < g.hauteurCoupe) g.longueur = Math.round(g.hauteurCoupe*1.5*100)/100;
+  return g;
+}
+
 /* --- État. `n`, `fz`, `vf` vides = on suit la valeur conseillée. ------ */
 var S = {
   mat:'bois-tendre', d:'6', z:'2', mode:'avance',
   n:'', fz:'', vf:'', ae:'',
   mMin:'1000', mMax:'24000', plunge:'35', vfMax:'1500',
   rapidH:'8000', rapidV:'2700',
+  forme:'plat', hcoupe:'', lgtotale:'', queue:'', extra:'',
+  helice:'montante', plongeant:true, fraiseOpen:false,
   machineOpen:false, aeOpen:false, tool:'', lib:[]
 };
 var K_LIB='fs_tools', K_PREFS='fs_prefs', K_THEME='coupe_theme';
@@ -668,6 +765,32 @@ function construireMatieres(){
     ligne.appendChild(lbl); ligne.appendChild(grille); c.appendChild(ligne);
   });
 }
+function construireFormes(){
+  var c = $('formes'); c.innerHTML='';
+  FORMES.forEach(function(f){
+    var b = document.createElement('button');
+    b.type='button'; b.className='choix'+(S.forme===f.id?' on':''); b.textContent=f.label;
+    b.onclick=function(){ S.forme=f.id; S.extra=''; construireFormes(); rendre(); };
+    c.appendChild(b);
+  });
+  var f = formeParId(S.forme);
+  $('champExtra').hidden = !f.extra;
+  if(f.extra){
+    $('lblExtra').innerHTML = f.extra.label+' <span class="u">('+f.extra.unite+')</span>';
+    $('extra').placeholder = 'déduit';
+  }
+}
+function construireHelices(){
+  var c = $('helices'); c.innerHTML='';
+  HELICES.forEach(function(h){
+    var b = document.createElement('button');
+    b.type='button'; b.className='choix'+(S.helice===h.id?' on':''); b.textContent=h.label;
+    b.style.flex='1 1 40%';
+    b.onclick=function(){ S.helice=h.id; construireHelices(); rendre(); };
+    c.appendChild(b);
+  });
+  $('aideHelice').textContent = heliceParId(S.helice).note;
+}
 function construireModes(){
   var c = $('modes'); c.innerHTML='';
   [['avance',"L'avance"],['broche','La broche'],['copeau','Le copeau']].forEach(function(p){
@@ -726,6 +849,27 @@ function rendre(){
         + (r.ae > 0 ? 'ae ' + String(num(S.ae,0)).replace('.', ',') + ' mm' : 'pleine largeur');
   $('oNote').textContent = r.m.note;
 
+  // Ce que la géométrie impose et que la formule ne dit pas.
+  var g = geometrie();
+  var avertFraise = [];
+  var h = heliceParId(S.helice);
+  if(h.alerte) avertFraise.push(h.alerte);
+  if(!S.plongeant) avertFraise.push('Bout non plongeant : entrer en rampe ou en '
+    + 'hélice, jamais droit dans la matière.');
+  var profondeurs = (r.m.ap || '').match(/[\d,]+/g) || [];
+  var apMax = 0;
+  profondeurs.forEach(function(x){ var v=parseFloat(x.replace(',','.')); if(v>apMax) apMax=v; });
+  if(apMax && g.hauteurCoupe < apMax)
+    avertFraise.push('La fraise ne coupe que sur '+fmt(g.hauteurCoupe,1)+' mm, moins '
+      + 'que la passe conseillée : plusieurs passes, ou une fraise plus longue.');
+  r.warns = r.warns.concat(avertFraise);
+
+  // Le résumé du panneau replié, pour savoir sans l'ouvrir.
+  $('resumeFraise').textContent = g.forme.label.toLowerCase()
+    + ' · coupe ' + fmt(g.hauteurCoupe,1) + ' mm · queue ' + fmt(g.queue,2) + ' mm · '
+    + heliceParId(S.helice).label.toLowerCase()
+    + (g.deduit.length ? ' · ' + g.deduit.length + ' valeur(s) déduite(s)' : '');
+
   var alerte = r.warns.length > 0;
   $('carteResultat').classList.toggle('alerte', alerte);
   $('blocAvert').hidden = !alerte;
@@ -774,8 +918,13 @@ function rendreBiblio(){
       S.mat = it.mat; S.d = String(it.d); S.z = String(it.z);
       S.n = String(it.n); S.fz = String(it.fz); S.ae = it.ae ? String(it.ae) : '';
       S.vf = ''; S.mode = 'avance';
+      S.forme = it.forme || 'plat'; S.hcoupe = it.hcoupe || ''; S.lgtotale = it.lgtotale || '';
+      S.queue = it.queue || ''; S.extra = it.extra || '';
+      S.helice = it.helice || 'montante'; S.plongeant = (it.plongeant !== false);
       $('d').value = S.d; $('z').value = S.z; $('ae').value = S.ae;
-      construireMatieres(); construireModes(); rendre();
+      ['hcoupe','lgtotale','queue','extra'].forEach(function(k){ $(k).value = S[k]; });
+      $('plongeant').checked = S.plongeant;
+      construireMatieres(); construireModes(); construireFormes(); construireHelices(); rendre();
       window.scrollTo({top:0, behavior:'smooth'});
     };
     var del = document.createElement('button');
@@ -787,11 +936,26 @@ function rendreBiblio(){
   rendreExport();
 }
 function fctb(t){
+  // Le fichier décrit la fraise TELLE QU'ELLE EST quand on l'a renseignée,
+  // et non plus une fraise inventée à partir du seul diamètre : FreeCAD
+  // s'en sert pour la simulation de collision et la profondeur atteignable.
   var d = num(t.d, 6);
-  return JSON.stringify({version:2, name:t.name, shape:'endmill.fcstd', parameter:{
-    Diameter:d+' mm', Flutes:Math.max(1,Math.round(num(t.z,2))), Chipload:num(t.fz,0)+' mm',
-    CuttingEdgeHeight:(d*3).toFixed(2)+' mm', Length:(d*8).toFixed(2)+' mm',
-    ShankDiameter:d+' mm', Material:'Carbide'}, attribute:{}}, null, 2);
+  var f = formeParId(t.forme || 'plat');
+  var p = {
+    Diameter: d+' mm',
+    Flutes: Math.max(1, Math.round(num(t.z,2))),
+    Chipload: num(t.fz,0)+' mm',
+    CuttingEdgeHeight: (num(t.hcoupe, Math.round(d*3*100)/100))+' mm',
+    Length: (num(t.lgtotale, Math.round(d*8*100)/100))+' mm',
+    ShankDiameter: (num(t.queue, d))+' mm',
+    Material: 'Carbide'
+  };
+  if(f.extra && f.id==='torique') p.CornerRadius = num(t.extra, d/6)+' mm';
+  if(f.extra && f.id==='vbit'){ p.CuttingEdgeAngle = num(t.extra, 90)+' °'; p.TipDiameter = '0.1 mm'; }
+  return JSON.stringify({version:2, name:t.name, shape:f.shape, 'shape-type':f.type,
+    parameter:p,
+    // Ce que FreeCAD ne sait pas ranger, mais qu'on ne veut pas perdre.
+    attribute:{helice:t.helice||'montante', plongeant:t.plongeant!==false}}, null, 2);
 }
 function rendreExport(){
   $('jsonBox').value = JSON.stringify(S.lib, null, 2);
@@ -918,11 +1082,21 @@ function forcerMaj(){
   charger();
   construireMatieres();
   construireModes();
+  construireFormes();
+  construireHelices();
+  $('plongeant').addEventListener('change', function(){ S.plongeant = this.checked; rendre(); });
+  $('teteFraise').onclick = function(){
+    S.fraiseOpen = !S.fraiseOpen;
+    $('corpsFraise').hidden = !S.fraiseOpen;
+    $('basculeFraise').textContent = S.fraiseOpen ? 'replier' : 'préciser';
+    this.setAttribute('aria-expanded', S.fraiseOpen ? 'true' : 'false');
+  };
 
   // Les champs de saisie alimentent l'état, puis on recalcule tout.
   [['d','d'],['z','z'],['n','n'],['fz','fz'],['vf','vf'],['ae','ae'],
    ['mMin','mMin'],['mMax','mMax'],['plunge','plunge'],['vfMax','vfMax'],
    ['rapidH','rapidH'],['rapidV','rapidV'],
+   ['hcoupe','hcoupe'],['lgtotale','lgtotale'],['queue','queue'],['extra','extra'],
    ['tool','tool']].forEach(function(p){
     $(p[0]).addEventListener('input', function(){ S[p[1]] = this.value; rendre(); });
   });
@@ -954,7 +1128,11 @@ function forcerMaj(){
       // transport, propres a la machine. On les emporte quand meme avec
       // l'outil pour que le Tool Controller de FreeCAD soit rempli en
       // entier — c'est lui qui les reclame, pas la fraise.
-      rapidH:Math.round(num(S.rapidH,8000)), rapidV:Math.round(num(S.rapidV,2700))
+      rapidH:Math.round(num(S.rapidH,8000)), rapidV:Math.round(num(S.rapidV,2700)),
+      // La géométrie suit l'outil : sans elle, le fichier FreeCAD
+      // redeviendrait une fraise inventée au rechargement.
+      forme:S.forme, hcoupe:S.hcoupe, lgtotale:S.lgtotale, queue:S.queue,
+      extra:S.extra, helice:S.helice, plongeant:S.plongeant
     };
     // Un même nom remplace l'ancien plutôt que de créer un doublon.
     var i = -1;
