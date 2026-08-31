@@ -411,6 +411,15 @@ textarea{
               <input id="vfMax" type="text" inputmode="decimal" value="1500">
               <span class="aide">Ce que la machine tient vraiment.</span>
             </div>
+            <div class="champ">
+              <label for="rapidH">Rapide horizontal <span class="u">(mm/min)</span></label>
+              <input id="rapidH" type="text" inputmode="decimal" value="8000">
+            </div>
+            <div class="champ">
+              <label for="rapidV">Rapide vertical <span class="u">(mm/min)</span></label>
+              <input id="rapidV" type="text" inputmode="decimal" value="2700">
+              <span class="aide">Déplacements hors matière (G0), lus dans la config de la machine.</span>
+            </div>
           </div>
         </div>
       </section>
@@ -523,10 +532,11 @@ var S = {
   mat:'bois-tendre', d:'6', z:'2', mode:'avance',
   n:'', fz:'', vf:'', ae:'',
   mMin:'1000', mMax:'24000', plunge:'35', vfMax:'1500',
+  rapidH:'8000', rapidV:'2700',
   machineOpen:false, aeOpen:false, tool:'', lib:[]
 };
 var K_LIB='fs_tools', K_PREFS='fs_prefs', K_THEME='coupe_theme';
-var PREFS_VERSION=3;
+var PREFS_VERSION=4;
 var VERSION="{{VERSION}}";
 
 function $(id){return document.getElementById(id);}
@@ -766,14 +776,19 @@ function rendreExport(){
       + '<textarea rows="5" readonly>'+esc(fctb(t))+'</textarea>'
       + '<div class="exprow" style="margin:8px 0 0"><span class="tc">SpindleSpeed '
       + Math.round(num(t.n,0)) + ' · HorizFeed ' + vfDe(t) + ' · VertFeed '
-      + Math.round(vfDe(t)*num(S.plunge,35)/100) + '</span>'
+      + Math.round(t.plunge != null ? t.plunge : vfDe(t)*num(S.plunge,35)/100)
+      + ' · Rapides ' + Math.round(num(t.rapidH,8000)) + '/' + Math.round(num(t.rapidV,2700))
+      + '</span>'
       + '<button class="mini" type="button">Copier</button></div>';
     var btns = box.querySelectorAll('button');
     btns[0].onclick = function(){ telecharger(nom, fctb(t)); marquer(btns[0],'Enregistré'); };
     btns[1].onclick = function(){ copier(fctb(t), btns[1]); };
     btns[2].onclick = function(){
-      copier('SpindleSpeed='+Math.round(num(t.n,0))+'\nHorizFeed='+vfDe(t)
-             +' mm/min\nVertFeed='+Math.round(vfDe(t)*num(S.plunge,35)/100)+' mm/min', btns[2]);
+      copier('SpindleSpeed=' + Math.round(num(t.n,0))
+             + '\nHorizFeed=' + vfDe(t) + ' mm/min'
+             + '\nVertFeed=' + Math.round(t.plunge != null ? t.plunge : vfDe(t)*num(S.plunge,35)/100) + ' mm/min'
+             + '\nHorizRapid=' + Math.round(num(t.rapidH,8000)) + ' mm/min'
+             + '\nVertRapid=' + Math.round(num(t.rapidV,2700)) + ' mm/min', btns[2]);
     };
     c.appendChild(box);
   });
@@ -801,7 +816,8 @@ function telecharger(nom, contenu){
 function sauverLib(){ try{ localStorage.setItem(K_LIB, JSON.stringify(S.lib)); }catch(e){} }
 function sauverPrefs(){
   try{ localStorage.setItem(K_PREFS, JSON.stringify({v:PREFS_VERSION,
-    mMin:S.mMin, mMax:S.mMax, plunge:S.plunge, vfMax:S.vfMax})); }catch(e){}
+    mMin:S.mMin, mMax:S.mMax, plunge:S.plunge, vfMax:S.vfMax,
+    rapidH:S.rapidH, rapidV:S.rapidV})); }catch(e){}
 }
 function charger(){
   try{ var l=localStorage.getItem(K_LIB); if(l) S.lib=JSON.parse(l)||[]; }catch(e){}
@@ -813,10 +829,11 @@ function charger(){
       if(s.v===PREFS_VERSION){
         if(s.mMin) S.mMin=s.mMin; if(s.mMax) S.mMax=s.mMax;
         if(s.plunge) S.plunge=s.plunge; if(s.vfMax) S.vfMax=s.vfMax;
+        if(s.rapidH) S.rapidH=s.rapidH; if(s.rapidV) S.rapidV=s.rapidV;
       }
     }
   }catch(e){}
-  ['mMin','mMax','plunge','vfMax'].forEach(function(k){ $(k).value = S[k]; });
+  ['mMin','mMax','plunge','vfMax','rapidH','rapidV'].forEach(function(k){ $(k).value = S[k]; });
 }
 
 /* --- Thème : JOUR par défaut ------------------------------------------ */
@@ -875,6 +892,7 @@ function forcerMaj(){
   // Les champs de saisie alimentent l'état, puis on recalcule tout.
   [['d','d'],['z','z'],['n','n'],['fz','fz'],['vf','vf'],['ae','ae'],
    ['mMin','mMin'],['mMax','mMax'],['plunge','plunge'],['vfMax','vfMax'],
+   ['rapidH','rapidH'],['rapidV','rapidV'],
    ['tool','tool']].forEach(function(p){
     $(p[0]).addEventListener('input', function(){ S[p[1]] = this.value; rendre(); });
   });
@@ -901,7 +919,12 @@ function forcerMaj(){
       name:nom, sub:fmt(r.n)+' tr/min · '+fmt(r.vf)+' mm/min',
       mat:S.mat, d:S.d, z:S.z,
       n:String(Math.round(r.n)), fz:String(Math.round(r.fz*1000)/1000),
-      ae:S.ae, vf:Math.round(r.vf), plunge:Math.round(r.vz)
+      ae:S.ae, vf:Math.round(r.vf), plunge:Math.round(r.vz),
+      // Les rapides ne sortent pas du calcul : ce sont des vitesses de
+      // transport, propres a la machine. On les emporte quand meme avec
+      // l'outil pour que le Tool Controller de FreeCAD soit rempli en
+      // entier — c'est lui qui les reclame, pas la fraise.
+      rapidH:Math.round(num(S.rapidH,8000)), rapidV:Math.round(num(S.rapidV,2700))
     };
     // Un même nom remplace l'ancien plutôt que de créer un doublon.
     var i = -1;
