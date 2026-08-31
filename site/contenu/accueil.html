@@ -62,16 +62,16 @@
           <a class="btn btn-primary" href="#logiciels">Les logiciels</a>
           <a class="btn btn-ghost" href="#atelier">L'atelier</a>
           <a class="btn btn-ghost" href="{{RACINE}}projets/">Les projets</a>
-          <!-- Même bouton que le héros du site laser : .btn-kofi est déjà
-               dans kit/verdier.css, il n'y avait que le portail à ne pas
-               s'en servir — et à ne citer ko-fi nulle part. -->
-          <a class="btn btn-kofi" href="https://ko-fi.com/atelierduverdier"
-             target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+          <!-- KO-FI EST DESCENDU AU PIED DE PAGE (LIENS_PIED de generer.py).
+               Posé ici, un quatrième bouton — le seul en rouge — disputait
+               la première vue aux trois liens qui mènent au contenu. Une
+               demande de soutien se lit après ce qu'elle soutient. -->
         </div>
       </div>
-      <div class="hero-art">
-        {{LOGO}}
-      </div>
+      <!-- La photo de l'atelier. Le chemin et le texte alternatif sont
+           dans PHOTOS_HEROS (site/generer.py) : ce bloc-ci ne choisit ni
+           l'un ni l'autre, il dit seulement où la case se pose. -->
+      {{photo-heros}}
     </div>
   </div>
 </div>
@@ -89,7 +89,7 @@
 
       <div class="carte">
         <div class="head">
-          <span class="ci">🔥</span>
+          <span class="ci">{{ico:laser}}</span>
           <h3>LaserAtelier</h3>
           <span class="etat public">public</span>
         </div>
@@ -112,7 +112,7 @@
 
       <div class="carte">
         <div class="head">
-          <span class="ci">📐</span>
+          <span class="ci">{{ico:parcours}}</span>
           <h3>Visualiseur G-code</h3>
           <span class="etat public">public</span>
         </div>
@@ -131,7 +131,7 @@
 
       <div class="carte">
         <div class="head">
-          <span class="ci">🪚</span>
+          <span class="ci">{{ico:debit}}</span>
           <h3>Chutier</h3>
           <span class="etat public">public</span>
         </div>
@@ -150,7 +150,7 @@
 
       <div class="carte">
         <div class="head">
-          <span class="ci">✂️</span>
+          <span class="ci">{{ico:traceur}}</span>
           <h3>Pupitre Graphtec</h3>
           <span class="etat public">public</span>
         </div>
@@ -168,7 +168,7 @@
 
       <div class="carte">
         <div class="head">
-          <span class="ci">🧮</span>
+          <span class="ci">{{ico:vitesse}}</span>
           <h3>Vitesses de coupe</h3>
           <span class="etat public">en ligne</span>
         </div>
@@ -187,7 +187,7 @@
 
       <div class="carte">
         <div class="head">
-          <span class="ci">⚙️</span>
+          <span class="ci">{{ico:engrenage}}</span>
           <h3>Config PrintNC</h3>
           <span class="etat public">public</span>
         </div>

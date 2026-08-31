@@ -22,6 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import chemins
+import pictos
 import valeurs_atc
 import valeurs_attache
 import valeurs_fcstd
@@ -60,6 +61,31 @@ PLANS_REPRIS = [
 ]
 
 FICHIERS_KIT = ['verdier.css', 'verdier.js', 'chapeau.svg', 'logo.svg']
+
+# --- La photo du héros ---------------------------------------------------
+# LE BLOC DE DROITE DU HÉROS NE DIT PLUS CE QU'ON SAIT DÉJÀ. Il portait le
+# logo et le nom du site — les deux à 40 px au-dessus, dans la barre. Sur la
+# zone la plus regardée de la page, c'était une répétition.
+#
+# Le chemin et le texte alternatif se règlent ICI, jamais dans la page :
+# c'est le générateur qui publie le fichier, le convertit et lui donne son
+# empreinte. Poser une nouvelle photo tient donc en deux gestes — la déposer
+# dans contenu/photos/, changer la ligne ci-dessous.
+#
+# TANT QUE LE FICHIER N'EXISTE PAS, la case reste un aplat neutre au bon
+# format : la page ne bouge pas d'un pixel le jour où la photo arrive. La
+# génération le DIT à chaque passage plutôt que de l'oublier en silence.
+PHOTOS = CONTENU / 'photos'
+PHOTOS_HEROS = {
+    'index.html': (
+        'fraiseuse-en-usinage.jpg',
+        "La fraiseuse PrintNC de l'atelier, en cours d'usinage sur son lit "
+        "martyr, la tête et son tuyau d'aspiration au-dessus de la pièce"),
+}
+# La photo est servie à ~466 px de large sur un écran de bureau, moins
+# ailleurs. 1400 px couvre le double de ça pour les écrans à forte densité,
+# et pas davantage : au-delà on ne fait plus qu'alourdir la page.
+PHOTO_LARGEUR_MAX = 1400
 
 # --- La carte de partage -------------------------------------------------
 # 1200 x 630, le format que Facebook, LinkedIn et Mastodon attendent pour
@@ -725,7 +751,7 @@ PAGES = [
 ]
 
 LIENS_PIED = [
-    ('https://ko-fi.com/atelierduverdier', '☕ Ko-fi'),
+    ('https://ko-fi.com/atelierduverdier', '☕ Soutenir sur Ko-fi'),
     ('https://github.com/atelierduverdier', 'GitHub'),
     ('https://laser.atelierduverdier.fr', 'Atelier Laser'),
     ('https://printnc.atelierduverdier.fr', 'Journal PrintNC'),
@@ -1067,6 +1093,74 @@ def copier_modeles() -> dict:
           f"{sum(transmis.values()) // 1024} Ko transmis, "
           f"{total // 1024} Ko sur disque avec le visualiseur)")
     return empreintes, transmis
+
+
+def publier_photo(fichier: str) -> tuple:
+    """Publie une photo de contenu/photos/ dans public/photos/, en WebP.
+
+    Rend (nom du fichier servi, largeur, hauteur), ou None si la photo n'a
+    pas encore été fournie — auquel cas le héros garde son aplat neutre.
+
+    MÊME RÈGLE QUE LES CAPTURES : l'empreinte du contenu dans le nom. Une
+    photo remplacée sous le même nom continuerait de s'afficher dans sa
+    version d'avant, et rien dans l'adresse ne dirait au navigateur que le
+    contenu a bougé.
+
+    En LOSSY, contrairement aux captures : une photo n'est pas un aplat,
+    le sans-perte n'y gagne rien et pèse cinq fois plus.
+    """
+    source = PHOTOS / fichier
+    if not source.is_file():
+        return None
+    try:
+        from PIL import Image
+    except ImportError:
+        sys.exit("generer : il faut Pillow pour publier les photos.")
+
+    image = Image.open(source).convert('RGB')
+    if image.width > PHOTO_LARGEUR_MAX:
+        hauteur = round(image.height * PHOTO_LARGEUR_MAX / image.width)
+        image = image.resize((PHOTO_LARGEUR_MAX, hauteur), Image.LANCZOS)
+
+    cible = PUBLIC / 'photos'
+    cible.mkdir(parents=True, exist_ok=True)
+    brut = cible / 'x.webp'
+    image.save(brut, 'WEBP', quality=82, method=6)
+    marque = hashlib.sha256(brut.read_bytes()).hexdigest()[:8]
+    final = cible / f'{source.stem}.{marque}.webp'
+    brut.replace(final)
+    print(f"  photo {source.name} → photos/{final.name} "
+          f"({image.width}×{image.height}, {final.stat().st_size // 1024} Ko)")
+    return (final.name, image.width, image.height)
+
+
+def injecter_photo_heros(corps: str, sortie: str, nom: str, servies: set) -> str:
+    """Remplace `{{photo-heros}}` par la case image du héros.
+
+    Une page qui pose la marque sans avoir d'entrée dans PHOTOS_HEROS
+    ARRÊTE la génération : mieux vaut pas de page qu'un héros dont le bloc
+    de droite est un trou sans explication.
+    """
+    if '{{photo-heros}}' not in corps:
+        return corps
+    if sortie not in PHOTOS_HEROS:
+        sys.exit(f"generer : {nom} demande {{{{photo-heros}}}}, mais "
+                 f"« {sortie} » n'a pas d'entrée dans PHOTOS_HEROS.")
+    servies.add(sortie)
+    fichier, alt = PHOTOS_HEROS[sortie]
+    publiee = publier_photo(fichier)
+    if publiee is None:
+        print(f"  ! photo du héros absente : {PHOTOS / fichier} — la case "
+              f"reste neutre en attendant")
+        bloc = '<div class="hero-photo"></div>'
+    else:
+        servi, largeur, hauteur = publiee
+        bloc = (f'<div class="hero-photo">'
+                f'<img src="{{{{RACINE}}}}photos/{servi}" '
+                f'alt="{html.escape(alt, quote=True)}" '
+                f'width="{largeur}" height="{hauteur}" '
+                f'decoding="async"></div>')
+    return corps.replace('{{photo-heros}}', bloc)
 
 
 def injecter_attache(corps: str, nom: str) -> str:
@@ -1562,6 +1656,10 @@ def main() -> None:
     copier_appli_coupe()
     partage_appli_coupe()
     cartes = images_partage(PAGES)
+    # Les pages dont le héros a effectivement reçu sa case photo : une
+    # entrée de PHOTOS_HEROS que personne ne pose est une photo qu'on croit
+    # publiée et qui n'est nulle part.
+    photos_servies = set()
 
     if DOMAINE:
         (PUBLIC / 'CNAME').write_text(DOMAINE + '\n', encoding='utf-8')
@@ -1586,6 +1684,9 @@ def main() -> None:
         corps = injecter_stl_attache(corps, page['contenu'], stl_attache)
         corps = injecter_compte(corps, page['contenu'])
         corps = injecter_etat(corps, page['contenu'])
+        corps = pictos.injecter(corps, page['contenu'])
+        corps = injecter_photo_heros(corps, page['sortie'],
+                                     page['contenu'], photos_servies)
         corps = injecter_lien3d(corps, page['sortie'], pages_3d)
         # Les faits se comptent SUR LA PAGE, une fois les modèles injectés :
         # ils servent au corps ET à la description de partage, qui ne peuvent
@@ -1632,6 +1733,12 @@ def main() -> None:
 
         sortie.write_text(html, encoding='utf-8')
         print(f"  {page['sortie']:<32} {sortie.stat().st_size:>7} o")
+
+    orphelines = sorted(set(PHOTOS_HEROS) - photos_servies)
+    if orphelines:
+        sys.exit(f"generer : PHOTOS_HEROS décrit une photo pour "
+                 f"{', '.join(orphelines)}, mais ces pages ne posent pas "
+                 f"{{{{photo-heros}}}} — la photo ne s'afficherait nulle part.")
 
     total = sum(f.stat().st_size for f in PUBLIC.rglob('*') if f.is_file())
     print(f"\n{len(PAGES)} page(s) — public/ pèse {total // 1024} Ko")

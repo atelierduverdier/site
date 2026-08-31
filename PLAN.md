@@ -532,6 +532,30 @@ libellés proches, pour retrouver le bon.
 Le passage libre de la tonnelle n'est pas écrit : la page cite les **quatre cotes** et la
 soustraction, pour qu'il ne puisse pas vieillir.
 
+### Chantier 7 — La passe visuelle ✅ **faite le 31/08/2026**
+
+Six reproches de Christophe, tous relevés à l'écran, tous corrigés dans les **sources** —
+le kit, le générateur, le contenu — jamais dans le HTML produit.
+
+| ce qui n'allait pas | ce qui a été fait |
+|---|---|
+| le héros montrait le **logo et le nom du site**, déjà dans la barre 40 px plus haut | une **case photo** (`PHOTOS_HEROS` de `generer.py`), ratio 3/2, `cover`, coins de carte, aplat neutre tant que la photo n'est pas fournie |
+| trois cartes serrées à ~290 px dès 950 px de fenêtre | `--carte-min` passe de 290 à **340 px** : la 3ᵉ colonne attend 1104 px. Plus `text-wrap:pretty` sur les paragraphes de carte |
+| la pastille d'état se recentrait sur un titre à deux lignes | `.carte .head` en `align-items:flex-start`, titre et pastille décalés de 6 px pour rester en face du carré du picto |
+| des **émojis** en couleur, d'un style par système | `site/pictos.py` : 22 pictos au trait, `currentColor`, un seul gabarit — 29 émojis remplacés sur 7 pages |
+| un **bleu** venu du thème par défaut (encart d'aparté, pastille « en cours ») | `--note` repeint en gris neutre ; l'échelle d'état devient vert (fait) · orange (en cours) · gris (pas commencé) |
+| le bouton `◐` lu comme un chevron, Ko-fi en concurrence avec les liens du héros | le bouton porte un **tracé** de contraste ; Ko-fi descend au pied de page |
+
+**Le conteneur n'a pas bougé, et c'est mesuré :** `--maxw` valait déjà 1180 px, dans la
+fourchette demandée. Les « 900 px » venaient d'une **fenêtre** de ~980 px, où `.wrap` se
+borne à la fenêtre et où la grille posait quand même trois colonnes. C'est la grille qui
+était en cause, pas la largeur de page.
+
+**Ce qui reste :** déposer la photo dans `site/contenu/photos/fraiseuse-en-usinage.jpg`.
+La génération le rappelle à chaque passage tant qu'elle n'y est pas.
+
+---
+
 ---
 
 ## 6. Décisions prises — 11/08/2026

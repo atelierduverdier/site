@@ -75,7 +75,16 @@ header.topbar{
 .navlinks a[aria-current]{color:var(--orange-encre); background:var(--orange-soft)}
 
 .theme-btn,.nav-btn{border:1px solid var(--line-2); background:var(--card); color:var(--fg-2);
-  width:38px;height:38px;border-radius:9px;cursor:pointer;font-size:1.05rem; flex:none}
+  width:38px;height:38px;border-radius:9px;cursor:pointer;font-size:1.05rem; flex:none;
+  display:grid; place-items:center}
+/* LE BOUTON DE THÈME PORTAIT UN CARACTÈRE, « ◐ », ET C'ÉTAIT LE PROBLÈME.
+   Il a le titre et l'aria-label qu'il faut depuis le début — mais dessiné
+   par la police de texte, à 17 px, il sort en petit demi-cercle maigre que
+   Christophe a lu comme un chevron « ‹ » le 31/08/2026 : un bouton dont on
+   ne devine pas la fonction n'invite personne à cliquer. Un tracé, lui, est
+   dessiné par la page et pas par le système : même trait, même épaisseur et
+   même taille partout, comme les pictos des cartes. */
+.theme-btn svg,.nav-btn svg{width:18px;height:18px;display:block}
 .theme-btn{margin-left:6px}
 .theme-btn:hover,.nav-btn:hover{color:var(--fg); border-color:var(--orange)}
 .nav-btn{display:none; margin-left:auto}   /* montré seulement en étroit */
@@ -86,7 +95,7 @@ header.topbar{
    Le menu est un panneau déroulant, sans dépendance : si le JS ne se charge
    pas, le bouton reste inerte mais rien d'autre ne casse. */
 @media(max-width:860px){
-  .nav-btn{display:block}
+  .nav-btn{display:grid}
   .theme-btn{margin-left:0}
   .navlinks{
     display:none; position:absolute; left:0; right:0; top:60px;

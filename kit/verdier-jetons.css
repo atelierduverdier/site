@@ -34,8 +34,18 @@
   --fg:#23272e; --fg-2:#5a626e; --fg-3:#858d99;
   --line:#e2e5ea; --line-2:#d3d8df;
   --card:#ffffff; --shadow:0 1px 2px rgba(20,25,35,.06),0 8px 24px rgba(20,25,35,.06);
-  --tip:#eaf6ee; --tip-b:#3f9d5a; --warn:#fdf0e6; --warn-b:#e07a1f; --note:#eaf0fb; --note-b:#3f6fd1;
+  --tip:#eaf6ee; --tip-b:#3f9d5a; --warn:#fdf0e6; --warn-b:#e07a1f; --note:#f1f3f6; --note-b:#5a626e;
   --radius:14px; --maxw:1180px;
+  /* LA LARGEUR MINIMALE D'UNE CARTE, et c'est elle qui décide du nombre de
+     colonnes — pas une requête de média. Elle valait 290 px : la grille
+     posait donc TROIS colonnes dès 950 px de fenêtre, à 293 px pièce.
+     Mesuré le 31/08/2026 sur une fenêtre de 980 : trois cartes de 293, des
+     paragraphes qui finissaient sur un mot seul, et Christophe qui a lu
+     « 900 px de conteneur, cartes écrasées à 285 ». Le conteneur faisait
+     bien ses 1180 px — c'est la grille qui se serrait trop tôt.
+     À 340, la troisième colonne attend 1104 px de fenêtre : trois de front
+     sur un écran de bureau, deux sur une tablette, une sur un téléphone. */
+  --carte-min:340px;
   /* LA MESURE : la largeur d'une ligne de TEXTE, qui n'est pas celle de la
      page. Sans elle, un paragraphe prenait les 1136 px de la colonne, soit
      154 signes par ligne (mesuré le 29/08/2026 sur la fiche du sabot,
@@ -60,7 +70,7 @@
     --fg:#e6e9ee; --fg-2:#a8b0bc; --fg-3:#7c8592;
     --line:#2a3038; --line-2:#353c46;
     --card:#1b1f25; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
-    --tip:#17281c; --tip-b:#48a765; --warn:#2e2113; --warn-b:#e08b3a; --note:#161f30; --note-b:#5183e0;
+    --tip:#17281c; --tip-b:#48a765; --warn:#2e2113; --warn-b:#e08b3a; --note:#20242b; --note-b:#a8b0bc;
   }
 }
 
@@ -73,7 +83,7 @@
   --fg:#e6e9ee; --fg-2:#a8b0bc; --fg-3:#7c8592;
   --line:#2a3038; --line-2:#353c46;
   --card:#1b1f25; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
-  --tip:#17281c; --tip-b:#48a765; --warn:#2e2113; --warn-b:#e08b3a; --note:#161f30; --note-b:#5183e0;
+  --tip:#17281c; --tip-b:#48a765; --warn:#2e2113; --warn-b:#e08b3a; --note:#20242b; --note-b:#a8b0bc;
 }
 
 :root[data-theme="light"]{
@@ -97,7 +107,7 @@
   --fg:#23272e; --fg-2:#5a626e; --fg-3:#858d99;
   --line:#e2e5ea; --line-2:#d3d8df;
   --card:#ffffff; --shadow:0 1px 2px rgba(20,25,35,.06),0 8px 24px rgba(20,25,35,.06);
-  --tip:#eaf6ee; --tip-b:#3f9d5a; --warn:#fdf0e6; --warn-b:#e07a1f; --note:#eaf0fb; --note-b:#3f6fd1;
+  --tip:#eaf6ee; --tip-b:#3f9d5a; --warn:#fdf0e6; --warn-b:#e07a1f; --note:#f1f3f6; --note-b:#5a626e;
 }
 
 :root{

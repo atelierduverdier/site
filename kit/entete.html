@@ -110,7 +110,17 @@
     <nav class="navlinks" id="menu-principal">
       {{NAV}}
     </nav>
+    <!-- Le contraste, DESSINÉ et non écrit. Le caractère « ◐ » était rendu
+         par la police du système : maigre, minuscule, et lu comme un
+         chevron. Le tracé ci-dessous est le même trait que les pictos des
+         cartes, et le demi-disque plein dit ce que fait le bouton. -->
     <button class="theme-btn" type="button" title="Thème clair / sombre"
-            aria-label="Basculer entre le thème clair et le thème sombre">◐</button>
+            aria-label="Basculer entre le thème clair et le thème sombre">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8.6"/>
+        <path d="M12 3.4a8.6 8.6 0 0 1 0 17.2Z" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
   </div>
 </header>

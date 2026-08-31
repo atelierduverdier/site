@@ -373,7 +373,7 @@
         <h3>Trois choses vérifiées avant d'être codées</h3>
         <div class="cartes">
           <div class="carte">
-            <div class="head"><span class="ci">⚖️</span><h3>Sous-processus, pas import</h3></div>
+            <div class="head"><span class="ci">{{ico:balance}}</span><h3>Sous-processus, pas import</h3></div>
             <p>
               LinuxCNC est en <b>GPL-2.0</b>. Importer son module Python serait une édition
               de liens et rendrait le dépôt dérivé. Un processus séparé qui échange du texte
@@ -381,7 +381,7 @@
             </p>
           </div>
           <div class="carte">
-            <div class="head"><span class="ci">🚫</span><h3>Jamais <code>-n 0</code></h3></div>
+            <div class="head"><span class="ci">{{ico:interdit}}</span><h3>Jamais <code>-n 0</code></h3></div>
             <p>
               En mode « continuer », <code>rs274</code> signale l'erreur, poursuit, et
               <b>sort avec le code 0</b>. Le parcours est tronqué sans que rien ne le dise.
@@ -390,7 +390,7 @@
             </p>
           </div>
           <div class="carte">
-            <div class="head"><span class="ci">🗑️</span><h3>Toujours un <code>.var</code> jetable</h3></div>
+            <div class="head"><span class="ci">{{ico:corbeille}}</span><h3>Toujours un <code>.var</code> jetable</h3></div>
             <p>
               Sans <code>-v</code>, <code>rs274</code> écrit ses paramètres persistants dans
               le fichier d'exemple de la configuration. Un <code>G10 L2</code> dans un
