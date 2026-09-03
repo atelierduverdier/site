@@ -673,7 +673,11 @@ function $(id){return document.getElementById(id);}
    entrée vide, nulle ou négative retombe sur la valeur de repli — jamais
    de blocage, jamais d'avance négative. */
 function num(v, fb){
-  var x = parseFloat(String(v).replace(/[\s  ]/g,'').replace(',', '.'));
+  // Number(), pas parseFloat : parseFloat lisait 8 dans « 8mm » quand le
+  // noyau Python de l'appli de bureau refuse et retombe sur le défaut. Les
+  // deux applis doivent refuser les mêmes saisies.
+  var t = String(v == null ? '' : v).replace(/[\s  ]/g,'').replace(',', '.');
+  var x = t === '' ? NaN : Number(t);
   return (isFinite(x) && x > 0) ? x : fb;
 }
 function fmt(n, dec){
@@ -726,7 +730,10 @@ function calculer(){
 
   var warns = [];
   if(vf > vfMax){
-    var cible = Math.round(vfMax/(z*fzEff)/500)*500;
+    // Arrondi vers le BAS : au demi-millier le plus proche, la broche
+    // proposée pouvait encore dépasser le plafond (fz 0,13, plafond 1 500 :
+    // « viser 6 000 » donnait 1 560). Jamais sous 500.
+    var cible = Math.max(500, Math.floor(vfMax/(z*fzEff)/500)*500);
     warns.push('Vf calculée '+fmt(vf)+' > plafond machine '+fmt(vfMax)+' mm/min. Viser '
                +fmt(cible)+' tr/min pour garder le copeau.');
   }
@@ -829,7 +836,10 @@ function rendre(){
                  : pc < 80 ? ' : ça coupe, mais on chauffe.'
                  : pc <= 130 ? ' : bon copeau.' : ' : copeau épais, surveiller l’effort.'))
            : 'Conseillé : '+String(r.recFz).replace('.', ',')});
-  poser('vf', vfCalc, fmt(r.vf), (S.vf || String(Math.round(r.recN*r.z*r.recFz))),
+  // Non saisi, le champ montre ce que le calcul a VRAIMENT pris : avec une
+  // largeur ae, le conseillé recalculé à part disait 6 300 quand la carte
+  // disait 11 397, l'amincissement en moins.
+  poser('vf', vfCalc, fmt(r.vf), (S.vf || String(Math.round(r.vf))),
         {id:'aideVf', txt: vfCalc ? 'Déduite de la broche et du copeau' : 'Ce que tu veux atteindre'});
   $('wrapN').style.display  = nCalc  ? 'block' : 'grid';
   $('wrapFz').style.display = fzCalc ? 'block' : 'grid';
