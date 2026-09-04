@@ -23,23 +23,27 @@
       <div>
         <div class="badges">
           <span class="badge">Coupe <b>guillotine</b></span>
-          <span class="badge">PySide6</span>
+          <span class="badge">Imbrication <b>CNC</b></span>
+          <span class="badge">Bureau <b>et</b> navigateur</span>
           <span class="badge">LGPL-2.1</span>
         </div>
         <h1>Débiter dans le bois qu'on a déjà</h1>
         <p class="lede">
           Les optimiseurs de débit rangent des pièces dans des planches neuves.
           Un atelier, lui, a d'abord un tas de chutes — et c'est dedans qu'il
-          faut tailler en premier.
+          faut tailler en premier. À la scie circulaire, ou à la fraise pour
+          les formes qui ne sont pas des rectangles.
         </p>
         <div class="cta">
+          <a class="btn btn-primary" href="https://atelierduverdier.github.io/chutier/"
+             target="_blank" rel="noopener">L'essayer dans le navigateur</a>
           <a class="btn btn-github" href="https://github.com/atelierduverdier/chutier"
              target="_blank" rel="noopener">
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
             Le code sur GitHub
           </a>
-          <a class="btn btn-primary" href="#voir">Ce qu'on voit</a>
-          <a class="btn btn-ghost" href="#etabli">À l'établi</a>
+          <a class="btn btn-ghost" href="#voir">Ce qu'on voit</a>
+          <a class="btn btn-ghost" href="#cnc">La CNC</a>
           <a class="btn btn-ghost" href="#capot">Sous le capot</a>
         </div>
       </div>
@@ -114,17 +118,70 @@
     <h3>Le stock, et pourquoi il n'est pas fait que de planches</h3>
     <figure class="capture">
       <img src="{{RACINE}}logiciels/captures/chutier-chutes.webp"
-           alt="L'onglet Stock du chutier : trois lignes dont deux cochées « Chute », et à droite un plan dont la troisième planche est une chute d'étagère"
+           alt="Les pièces et le stock du chutier l'un sous l'autre : trois lignes de stock dont deux cochées « Chute », une colonne Atelier, une colonne Défauts, et à droite un plan dont la deuxième planche est une chute d'étagère au nœud hachuré"
            data-agrandir>
       <figcaption>
         Une ligne de stock cochée <b>Chute</b> est un morceau déjà en atelier :
-        jamais compté à l'achat, et servi <b>en priorité</b>. Ici la troisième
+        jamais compté à l'achat, et servi <b>en priorité</b>. Ici la deuxième
         planche du plan est une chute d'étagère de 800 × 180, entamée avant
-        qu'on touche au bois neuf. Une ligne cochée <b>Catalogue</b> fait
-        l'inverse : c'est une section qu'on peut acheter, sa quantité ne borne
-        plus rien, et le programme compte ensuite combien en prendre.
+        qu'on touche au bois neuf — avec, en bout, un nœud <b>écarté</b>,
+        hachuré. Une ligne cochée <b>Catalogue</b> fait l'inverse : c'est une
+        section qu'on peut acheter, sa quantité ne borne plus rien, et le
+        programme compte ensuite combien en prendre. Une ligne cochée
+        <b>Atelier</b> vit dans un fichier commun à tous les projets.
       </figcaption>
     </figure>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>L'atelier, un fichier hors du projet</h3>
+        <p>
+          C'était la raison d'être du programme, et elle a mis un mois à
+          exister : les chutes rangées dormaient dans le projet qui les avait
+          produites. Les lignes cochées <b>Atelier</b> vivent maintenant dans
+          un fichier commun, rechargé à chaque projet ouvert. « Ranger ces
+          chutes au stock » y écrit <b>aussitôt</b> — une chute existe sur
+          l'étagère que le projet soit enregistré ou non.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Les défauts du bois</h3>
+        <p>
+          Une planche de sapin n'est pas son rectangle. La colonne
+          <b>Défauts</b> se tape en une ligne : <code>bouts 30 ; rives 8 ;
+          1200-1280 ; 600,140,60,40</code> — trente millimètres à ôter à chaque
+          bout fendu, huit sur chaque rive avec flache, un nœud traversant de
+          1200 à 1280, une poche de résine. Le programme les retire par des
+          coupes ordinaires avant de poser quoi que ce soit, le trait de scie
+          tombant dans le bon bois ; ce qu'on déclare défaut est perdu en
+          entier.
+        </p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Corriger le plan sans tricher</h3>
+        <p>
+          Le plan calculé n'est jamais tout à fait celui qu'on veut. Clic droit
+          sur une planche : elle est <b>épinglée</b>, reprise telle quelle au
+          prochain calcul, le reste se range autour. Clic droit sur une pièce :
+          <b>la tailler dans</b> une autre ligne de stock. Aucun des deux ne
+          touche aux quantités — c'était l'ancienne façon, et elle mentait.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Le bois, ou le temps de scie</h3>
+        <p>
+          Entre deux plans qui placent tout dans le même bois neuf, l'un perd
+          un peu moins de matière, l'autre demande moins de coupes. À la
+          circulaire, des pièces de même largeur rangées en bandes se scient
+          deux fois plus vite : un réglage dit lequel des deux compte. Le
+          nombre de coupes est au bilan, et chaque trait porte son numéro sur
+          le papier.
+        </p>
+      </div>
+    </div>
 
     <div class="cols">
       <div class="panel">
@@ -174,9 +231,12 @@
     </figure>
 
     <p>
-      Le programme sort aussi le plan en image à résolution d'impression, et
-      une <b>fiche d'atelier</b> en texte : les poses et les coupes planche par
-      planche, dans l'ordre où on les passe, à cocher au fur et à mesure.
+      Sous le dessin, la liste des <b>coupes numérotées</b> de chaque planche,
+      celle qu'on suit à la scie. Le programme sort aussi le plan en image à
+      résolution d'impression, une <b>fiche d'atelier</b> en texte, et des
+      <b>étiquettes</b> à coller sur les pièces : référence, cotes, planche
+      d'origine, exemplaire, et la couleur qu'elle a sur le plan — vingt-quatre
+      par page A4, les planches d'étiquettes du commerce.
     </p>
 
     <div class="callout note">
@@ -205,8 +265,10 @@
       Entre deux plans, le programme préfère, <b>dans cet ordre</b> : moins de
       pièces non placées ; moins cher, quand les prix sont renseignés ; moins de
       bois <b>neuf</b> entamé — c'est là que le déstockage se joue ; moins de
-      pertes ; et enfin la plus grande chute subsistante la plus grande possible,
-      parce qu'un reste de 800 mm vaut mieux que deux de 400.
+      pertes, puis moins de coupes (ou l'inverse, si l'on privilégie le temps
+      de scie) ; et enfin des chutes <b>concentrées</b> — une grande plutôt que
+      trois moyennes de même surface, parce qu'un reste de 800 mm vaut mieux
+      que deux de 400.
     </p>
 
     <p>
@@ -220,13 +282,121 @@
 
     <div class="chiffres">
       <div class="chiffre"><span class="v">{{chutier.tests}}</span><span class="l">contrôles automatiques,<br>dont {{chutier.tests_coeur}} sur le seul cœur</span></div>
-      <div class="chiffre"><span class="v">0,33 s</span><span class="l">pour 150 pièces<br>et 22 planches</span></div>
+      <div class="chiffre"><span class="v">0,7 s</span><span class="l">pour 150 pièces<br>et 23 planches, à la scie</span></div>
+      <div class="chiffre"><span class="v">1,1 s</span><span class="l">pour 60 formes imbriquées<br>sur 32 cœurs (3,6 s sur un seul)</span></div>
     </div>
 
     <p class="muted">
       Le résultat est <b>déterministe</b> : mêmes entrées, même plan. Le solveur
-      essaie quarante-huit stratégies réglées et quelques ordres tirés au sort,
-      mais le sort est à graine fixe — deux calculs ne peuvent pas se contredire.
+      guillotine essaie quatre-vingts stratégies — quarante-huit réglées, les
+      autres tirées au sort à graine fixe — puis travaille la meilleure par
+      recherche locale : vider une planche, replacer ses pièces dans les trous
+      des autres. C'est ainsi qu'une planche de trop disparaît. Deux calculs ne
+      peuvent pas se contredire, en parallèle ou non.
+    </p>
+  </div>
+</section>
+
+<section id="cnc">
+  <div class="wrap">
+    <div class="sec-tag">La CNC</div>
+    <h2>Les formes qui ne sont pas des rectangles</h2>
+    <p class="sec-lede">
+      Une équerre débitée dans son rectangle englobant gaspille son échancrure.
+      À la fraise, deux équerres tête-bêche tiennent dans la place d'une.
+    </p>
+
+    <figure class="capture">
+      <img src="{{RACINE}}logiciels/captures/chutier-formes.webp"
+           alt="Une chute de contreplaqué de 400 × 300 vue seule : un cadre évidé avec un cœur posé dans son trou, deux équerres emboîtées, deux anneaux, deux étoiles, une flèche, un second cœur — dix pièces imbriquées"
+           data-agrandir>
+      <figcaption>
+        L'exemple des formes biscornues, sur la chute de 400 × 300 que le
+        programme entame avant le panneau neuf : un cadre évidé qui reçoit un
+        <b>cœur dans son trou</b>, deux équerres emboîtées, des anneaux, des
+        étoiles, une flèche. Dix pièces sur une chute, rendement 49,6 % — et
+        les quatre restantes sur un coin du panneau, qui garde deux grandes
+        chutes rectangulaires.
+      </figcaption>
+    </figure>
+
+    <p>
+      Fichier → <b>Importer des contours</b> lit un SVG (Inkscape, FreeCAD…) :
+      chaque tracé fermé devient une pièce, un tracé contenu dans un autre
+      devient son <b>trou</b>. Dès qu'une matière compte un contour, tout ce
+      lot est imbriqué au lieu d'être scié, avec les mêmes planches, les mêmes
+      chutes et les mêmes défauts. Fichier → <b>Exporter la découpe</b> rend
+      chaque planche en SVG à l'échelle 1, pour la chaîne CNC.
+    </p>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Le no-fit polygon, et pourquoi pas un raccourci</span>
+        <span class="s">la méthode de SVGnest et Deepnest</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Pour une pièce déjà posée A et une pièce à poser B, le <b>no-fit
+          polygon</b> est la région des positions de B qui recouvrent A : la
+          somme de Minkowski de A et de B retournée, élargie de l'écart de
+          fraise. Le bord de la planche, recoupes et défauts compris, est un
+          obstacle comme un autre. Les positions valides sont « la planche
+          moins l'union des NFP », et les seules à essayer en sont les
+          <b>sommets</b> — toutes en contact avec un voisin ou le bord. On
+          garde celle qui serre le plus les pièces, puis la plus basse et la
+          plus à gauche.
+        </p>
+        <p>
+          Le NFP de deux formes concaves se calcule par triangulation : la
+          somme de deux triangles est l'enveloppe convexe de leurs neuf sommes
+          de sommets, et l'union de ces enveloppes est le NFP — exact, sans
+          l'algorithme d'orbite et ses cas dégénérés. Un polygone à trou se
+          triangule sur sa seule matière, si bien que le NFP laisse libre, de
+          lui-même, l'intérieur d'un trou où une pièce plus petite tient.
+        </p>
+        <p class="muted">
+          Le premier moteur posait les pièces par contacts sommet à sommet
+          projetés au sol : correct, mais une approximation, et soixante
+          pièces prenaient une demi-minute. Le NFP les fait en une seconde
+          sur les cœurs de la machine — les stratégies se répartissent en
+          processus, le résultat ne dépend pas de leur nombre.
+        </p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="navigateur">
+  <div class="wrap">
+    <div class="sec-tag">Dans le navigateur</div>
+    <h2>La même application, sans rien installer</h2>
+    <p class="sec-lede">
+      Pour la partager : une page, pas un serveur. Le cœur Python entier tourne
+      dans le navigateur, et rien n'est envoyé nulle part.
+    </p>
+
+    <figure class="capture">
+      <img src="{{RACINE}}logiciels/captures/chutier-web.webp"
+           alt="La version web du chutier dans Chrome, thème sombre : les tables de pièces et de stock à gauche, les tuiles de bilan et le plan des formes imbriquées à droite"
+           data-agrandir>
+      <figcaption>
+        <a href="https://atelierduverdier.github.io/chutier/">atelierduverdier.github.io/chutier</a>
+        — les mêmes tables, le même plan, les mêmes fichiers (projet, CSV,
+        SVG) que l'application de bureau, dans les deux sens. Python,
+        <code>numpy</code> et <code>shapely</code> se chargent une fois
+        (une quinzaine de Mo, en cache ensuite) et calculent dans un
+        <b>Web Worker</b> : la page reste vive pendant le calcul. Le stock de
+        l'atelier vit dans le stockage local du navigateur.
+      </figcaption>
+    </figure>
+
+    <p>
+      Le cœur n'a pas changé d'une ligne pour y arriver — c'est ce que la
+      règle des deux couches garantissait. Un seul obstacle : le
+      <code>shapely</code> du navigateur ne sait pas trianguler un polygone
+      à trous ; un découpage en oreilles en Python pur, vérifié contre la
+      triangulation en C du bureau, prend le relais. Pas de multicœur ni
+      d'étiquettes imprimées dans cette version : pour ces deux-là, le bureau.
     </p>
   </div>
 </section>
@@ -346,16 +516,23 @@
       </summary>
       <div class="corps">
         <p>
-          Toute la géométrie et le solveur vivent dans un module <b>sans aucune
-          dépendance</b>, éprouvé sans écran. L'interface se construit par-dessus
-          en quatre modules et n'y touche jamais : elle assemble les entrées,
-          appelle le solveur, affiche ce qui revient.
+          Toute la géométrie et le solveur guillotine vivent dans un module
+          <b>sans aucune dépendance</b>, éprouvé sans écran ; l'imbrication CNC
+          à côté, sur <code>shapely</code>, chargée seulement quand un contour
+          est demandé. Deux interfaces se construisent par-dessus et n'y
+          touchent jamais — Qt sur le bureau, HTML dans le navigateur : elles
+          assemblent les entrées, appellent le solveur, affichent ce qui
+          revient. C'est cette règle qui a permis la version web sans changer
+          une ligne du cœur.
         </p>
         <p>
           Les contrôles vérifient des <b>propriétés</b> sur des cas tirés au sort
-          à graine fixe : aucune pièce hors de sa planche, aucun recouvrement, le
-          trait de scie respecté entre toute paire de rectangles, et la
-          conservation — planche = pièces + chutes + pertes, au millimètre carré.
+          à graine fixe : aucune pièce hors de sa planche ni sur un défaut,
+          aucun recouvrement, le trait de scie respecté entre toute paire de
+          rectangles, l'écart de fraise entre toute paire de contours, la
+          conservation — planche = pièces + chutes + pertes, au millimètre
+          carré —, et pour le NFP, sur mille cinq cents positions tirées au
+          hasard, « dans le NFP » et « recouvre » ne diffèrent jamais.
         </p>
         <p class="muted">
           Les {{chutier.tests}} contrôles tournent sans écran, et détournent les
@@ -371,19 +548,17 @@
   <div class="wrap">
     <h2>Ce que le chutier ne fait pas</h2>
     <ul>
-      <li>Pas d'imbriquement libre : les coupes sont <b>guillotine</b>, de bord à
-      bord. C'est un choix, pas une limite technique — voir plus haut.</li>
-      <li>Le stock de chutes vit dans le <b>fichier de projet</b>. « Ranger les
-      chutes au stock » met l'atelier à jour dans la saisie courante ; il manque
-      le fichier commun qu'on retrouverait d'un projet à l'autre sans le
-      recopier.</li>
+      <li>À la scie, les coupes sont <b>guillotine</b>, de bord à bord. C'est
+      un choix, pas une limite technique : un plan qu'on ne peut pas exécuter
+      ne vaut rien. L'imbrication libre existe, mais pour la fraise.</li>
       <li>Pas encore d'import direct depuis la feuille de calcul FreeCAD d'un
       projet. Le CSV fait le lien en attendant, dans les deux sens.</li>
-      <li>Les pièces sont des <b>rectangles</b>. Une pièce chantournée se débite
-      dans son rectangle englobant, comme à l'atelier.</li>
-      <li>Aucune notion de défaut du bois : ni nœud, ni gerce, ni flache. Le
-      plan suppose une planche saine sur toute sa surface — c'est à l'œil de
-      décaler une pièce devant l'établi.</li>
+      <li>Ce qui reste d'une planche imbriquée n'est compté chute que pour ses
+      deux bandes rectangulaires, à droite et au-dessus des pièces : le
+      chutier range des rectangles. Le reste, biscornu, est compté perte même
+      s'il en reste des morceaux.</li>
+      <li>Le nœud qu'on déclare est un rectangle, pas une tache : c'est à
+      l'œil de le mesurer large.</li>
     </ul>
 
     <div class="callout note">
@@ -391,8 +566,8 @@
       <p>
         Sous <b>LGPL-2.1</b>, sur
         <a href="https://github.com/atelierduverdier/chutier">github.com/atelierduverdier/chutier</a> —
-        le cœur sans dépendance, l'interface PySide6, et les {{chutier.tests}}
-        contrôles.
+        le cœur sans dépendance, l'imbrication, l'interface PySide6, la page
+        web, et les {{chutier.tests}} contrôles.
       </p>
     </div>
   </div>
