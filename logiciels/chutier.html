@@ -1,0 +1,940 @@
+<!-- =========================================================================
+     entete.html — haut de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/entete.html
+
+     Marques à remplacer par le générateur — NOMMÉES SANS LEURS ACCOLADES,
+     et ce n'est pas une coquetterie : `remplir` fait un remplacement de
+     texte sur tout le fichier, commentaire compris. Écrites en toutes
+     lettres ici, ces sept marques étaient donc REMPLIES elles aussi, et
+     chaque page servait 1 918 octets de commentaire portant son propre
+     titre, sa description et ses cinq liens de menu — un bloc de
+     documentation qui s'effaçait en expliquant, sur les dix-sept documents
+     des quatre sites. Relevé le 29/08/2026.
+       TITRE        titre de l'onglet
+       DESCRIPTION  méta description (une phrase, pour les moteurs)
+       RACINE       préfixe vers le kit depuis la page : "" ou "../"
+       SOUS_TITRE   « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       NAV          les <a> de navigation
+       LOCAL_CSS    <link> vers la feuille propre au site, ou vide
+
+     IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
+     Le site laser écrivait data-theme="light" : comme
+     :root[data-theme="light"] est plus spécifique que le bloc
+     @media (prefers-color-scheme: dark), un visiteur dont le système est
+     en sombre recevait quand même la page blanche (vérifié le 11/08/2026 :
+     fond rendu rgb(255,255,255) système en sombre). Son thème sombre
+     existait bel et bien — #14171b — mais seul le bouton ◐ y donnait accès.
+     ========================================================================= -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LE CANEVAS AVANT LA FEUILLE DE STYLE. Sans cette ligne, le navigateur
+     peint la page en BLANC jusqu'à ce que verdier.css arrive — une seconde
+     requête, mesurée à 143 ms au premier appel pour 40 Ko. Sur un poste
+     réglé en sombre, ça fait un éclair blanc plein écran à CHAQUE
+     navigation. Le script anti-clignotement plus bas ne suffisait pas : il
+     pose `data-theme`, ce qui ne dit rien au navigateur sur la couleur du
+     fond avant que la feuille ne soit lue. Elle vaut aussi pour l'ascenseur
+     et les widgets natifs, qui restaient en livrée claire le long d'une
+     page sombre. Déclarée AVANT le <link>, sinon elle arrive trop tard. -->
+<meta name="color-scheme" content="light dark">
+<title>Chutier — débiter dans le bois qu'on a déjà</title>
+<meta name="description" content="Optimiseur de débit qui place les pièces dans un stock de planches ET de chutes, en coupes guillotine : le reste réutilisable passe avant le bois neuf, et le plan s'imprime avec ses cotes.">
+<link rel="icon" type="image/svg+xml" href="../chapeau.svg">
+<link rel="canonical" href="https://atelierduverdier.fr/logiciels/chutier.html">
+
+<!-- CE QUE VOIT UN RÉSEAU SOCIAL. Sans ces lignes, Facebook ne trouvait
+     ni image ni description : il affichait le domaine, le titre, et un
+     cadre vide. Vu par Christophe le 23/08/2026 en partageant la fiche de
+     la dust shoe.
+
+     L'image est un JPEG de 1200 x 630 fabriqué par generer.py — PAS le
+     WebP servi à la page. Le robot de Facebook ne lit pas le WebP, et
+     tout le site est en WebP : c'est le piège qu'il fallait éviter.
+     Elle porte l'empreinte de son contenu dans son nom, pour la même
+     raison que les captures : Facebook garde longtemps ce qu'il a vu,
+     et une adresse qui ne change pas lui ferait ressservir l'ancienne. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Atelier du Verdier">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Chutier — débiter dans le bois qu'on a déjà">
+<meta property="og:description" content="Optimiseur de débit qui place les pièces dans un stock de planches ET de chutes, en coupes guillotine : le reste réutilisable passe avant le bois neuf, et le plan s'imprime avec ses cotes.">
+<meta property="og:url" content="https://atelierduverdier.fr/logiciels/chutier.html">
+<meta property="og:image" content="https://atelierduverdier.fr/partage/logiciels-chutier.5a27b505.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="chutier">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Anti-clignotement : pose le thème choisi AVANT que la feuille de style
+     ne peigne. Placé ici et pas dans verdier.js, qui est chargé en fin de
+     page — sinon le visiteur voit le thème clair une fraction de seconde
+     avant la bascule. Volontairement minuscule et en ligne. -->
+<script>
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
+  var v=m?m[1]:localStorage.getItem('verdier-theme');
+  // `colorScheme` en plus de `data-theme` : la balise <meta> ci-dessus
+  // annonce « les deux », donc le navigateur suit l'OS. Quand le visiteur a
+  // choisi le CONTRAIRE de son OS, il faut le lui dire ici — sans quoi le
+  // fond et l'ascenseur partiraient dans le mauvais sens le temps du
+  // chargement, et l'éclair reviendrait pour ceux-là seulement.
+  if(v){var r=document.documentElement;r.setAttribute('data-theme',v);
+        r.style.colorScheme=v;}
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="../verdier.css">
+
+</head>
+<body>
+<a id="top"></a>
+
+<header class="topbar">
+  <div class="wrap">
+    <!-- Le logo est COLLÉ ici, pas chargé en <img> : en ligne, son
+         mot-symbole suit `currentColor`, donc le bouton de thème. En <img>
+         il ne suivrait que le réglage du système. -->
+    <a class="brand" href="https://atelierduverdier.fr/" aria-label="Atelier du Verdier">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      <span class="brand-sub">chutier</span>
+    </a>
+    <button class="nav-btn" type="button" aria-label="Ouvrir le menu"
+            aria-controls="menu-principal">☰</button>
+    <nav class="navlinks" id="menu-principal">
+      <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels" aria-current="true">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/">Projets</a>
+      <a href="../modeles-3d.html">Modèles 3D</a>
+    </nav>
+    <!-- Le contraste, DESSINÉ et non écrit. Le caractère « ◐ » était rendu
+         par la police du système : maigre, minuscule, et lu comme un
+         chevron. Le tracé ci-dessous est le même trait que les pictos des
+         cartes, et le demi-disque plein dit ce que fait le bouton. -->
+    <button class="theme-btn" type="button" title="Thème clair / sombre"
+            aria-label="Basculer entre le thème clair et le thème sombre">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8.6"/>
+        <path d="M12 3.4a8.6 8.6 0 0 1 0 17.2Z" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- Chutier — feuille de débit et stock de chutes.
+
+     Tous les faits et tous les chiffres viennent du dépôt du projet
+     (~/Projets/logiciels/chutier) et de mesures faites dessus. Rien n'est
+     inventé ici, rien n'est arrondi dans un sens flatteur : le compte de
+     tests est LU dans tests/ à la génération (334), pas
+     recopié.
+
+     ORDRE DE LA PAGE, comme le visualiseur et le pupitre : ce qu'on voit à
+     l'écran D'ABORD, le raisonnement et les pièges ENSUITE et REPLIÉS.
+
+     Les captures sont engendrées par site/outils/capturer_chutier.py, qui
+     lance l'interface hors écran et lui fait charger ses propres exemples.
+     Celle de l'impression n'est pas une capture de fenêtre : elle est
+     peinte par le programme aux dimensions d'une A4 paysage.
+
+     Bases de police : 9,9 px pour le héros (échelle 1,21), 12 px pour un
+     viewBox de 640 (échelle 1). Mesuré, comme sur les autres pages. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">Coupe <b>guillotine</b></span>
+          <span class="badge">Imbrication <b>CNC</b></span>
+          <span class="badge">Bureau <b>et</b> navigateur</span>
+          <span class="badge">LGPL-2.1</span>
+        </div>
+        <h1>Débiter dans le bois qu'on a déjà</h1>
+        <p class="lede">
+          Les optimiseurs de débit rangent des pièces dans des planches neuves.
+          Un atelier, lui, a d'abord un tas de chutes — et c'est dedans qu'il
+          faut tailler en premier. À la scie circulaire, ou à la fraise pour
+          les formes qui ne sont pas des rectangles.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://atelierduverdier.github.io/chutier/"
+             target="_blank" rel="noopener">L'essayer dans le navigateur</a>
+          <a class="btn btn-github" href="https://github.com/atelierduverdier/chutier"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            Le code sur GitHub
+          </a>
+          <a class="btn btn-ghost" href="#voir">Ce qu'on voit</a>
+          <a class="btn btn-ghost" href="#cnc">La CNC</a>
+          <a class="btn btn-ghost" href="#freecad">Depuis FreeCAD</a>
+          <a class="btn btn-ghost" href="#capot">Sous le capot</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <!-- La boucle : ce qui reste d'un débit revient au stock du suivant.
+             C'est tout le programme en une image, et la raison de son nom. -->
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="Le cycle du chutier : les chutes de l'atelier servent en premier, les planches neuves ensuite, et les restes retournent au tas de chutes">
+          <g class="figure">
+            <rect x="96" y="10" width="148" height="30" rx="9"
+                  fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="29" text-anchor="middle" class="fort">les pièces à débiter</text>
+
+            <path d="M 140 40 L 78 76" class="accent"/>
+            <path d="M 200 40 L 262 76" class="cote"/>
+
+            <rect x="10" y="78" width="136" height="50" rx="9"
+                  fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.8"/>
+            <text x="78" y="97" text-anchor="middle" class="orange">le tas de chutes</text>
+            <text x="78" y="111" text-anchor="middle" class="petit">déjà payé, déjà là</text>
+            <text x="78" y="123" text-anchor="middle" class="petit">on l'écoule d'ABORD</text>
+
+            <rect x="194" y="78" width="136" height="50" rx="9"
+                  fill="none" stroke="var(--fg)" stroke-width="1.5" stroke-dasharray="5 3"/>
+            <text x="262" y="97" text-anchor="middle" class="fort">les planches neuves</text>
+            <text x="262" y="111" text-anchor="middle" class="petit">seulement ce que</text>
+            <text x="262" y="123" text-anchor="middle" class="petit">les chutes ne prennent pas</text>
+
+            <path d="M 78 128 L 78 152 L 170 152 L 170 168" class="accent"/>
+            <path d="M 262 128 L 262 152 L 170 152" class="cote"/>
+
+            <rect x="96" y="170" width="148" height="30" rx="9"
+                  fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="189" text-anchor="middle" class="fort">le plan de coupe</text>
+
+            <!-- le retour : ce que le débit laisse repart au tas -->
+            <path d="M 96 185 L 40 185 L 40 132" class="accent" stroke-dasharray="4 3"/>
+            <text x="170" y="217" text-anchor="middle" class="petit">ce qui reste d'assez grand</text>
+            <text x="170" y="230" text-anchor="middle" class="petit orange">retourne au tas de chutes</text>
+            <text x="170" y="245" text-anchor="middle" class="petit">— d'où le nom</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="voir">
+  <div class="wrap">
+    <div class="sec-tag">Ce qu'on voit</div>
+    <h2>Le débit entier, d'un coup d'œil</h2>
+    <p class="sec-lede">
+      Toutes les planches empilées sous leur cartouche, les pièces colorées par
+      référence, les chutes hachurées. Ce qui n'est ni l'un ni l'autre est la perte.
+    </p>
+
+    <figure class="capture">
+      <img src="../logiciels/captures/chutier-plan.05aa8e47.webp"
+           alt="Le chutier affichant le débit d'une paire de volets battants : cinq brins de douglas empilés, seize pièces colorées, chutes hachurées, et une rangée de chiffres-clés au-dessus"
+           data-agrandir>
+      <figcaption>
+        Le débit <b>réel</b> d'une paire de volets battants, tiré du modèle FreeCAD
+        du projet : seize références, dix-huit pièces, cinq brins de douglas
+        150 × 30 de 3 et 4 m. <b>18/18 posées</b>, rendement 72,1 %, dix chutes
+        réutilisables mises de côté. Une planche seule affichée dans un panneau
+        haut ne remplit rien — un brin de 4 m sur 150 tient dans un filet de
+        quarante pixels ; empilées, elles occupent la hauteur et se lisent
+        ensemble.
+      </figcaption>
+    </figure>
+
+    <h3>Le stock, et pourquoi il n'est pas fait que de planches</h3>
+    <figure class="capture">
+      <img src="../logiciels/captures/chutier-chutes.c17aac42.webp"
+           alt="Les pièces et le stock du chutier l'un sous l'autre : trois lignes de stock dont deux cochées « Chute », une colonne Atelier, une colonne Défauts, et à droite un plan dont la deuxième planche est une chute d'étagère au nœud hachuré"
+           data-agrandir>
+      <figcaption>
+        Une ligne de stock cochée <b>Chute</b> est un morceau déjà en atelier :
+        jamais compté à l'achat, et servi <b>en priorité</b>. Ici la deuxième
+        planche du plan est une chute d'étagère de 800 × 180, entamée avant
+        qu'on touche au bois neuf — avec, en bout, un nœud <b>écarté</b>,
+        hachuré. Une ligne cochée <b>Catalogue</b> fait l'inverse : c'est une
+        section qu'on peut acheter, sa quantité ne borne plus rien, et le
+        programme compte ensuite combien en prendre. Une ligne cochée
+        <b>Atelier</b> vit dans un fichier commun à tous les projets.
+      </figcaption>
+    </figure>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>L'atelier, un fichier hors du projet</h3>
+        <p>
+          C'était la raison d'être du programme, et elle a mis un mois à
+          exister : les chutes rangées dormaient dans le projet qui les avait
+          produites. Les lignes cochées <b>Atelier</b> vivent maintenant dans
+          un fichier commun, rechargé à chaque projet ouvert. « Ranger ces
+          chutes au stock » y écrit <b>aussitôt</b> — une chute existe sur
+          l'étagère que le projet soit enregistré ou non.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Les défauts du bois</h3>
+        <p>
+          Une planche de sapin n'est pas son rectangle. La colonne
+          <b>Défauts</b> se tape en une ligne : <code>bouts 30 ; rives 8 ;
+          1200-1280 ; 600,140,60,40</code> — trente millimètres à ôter à chaque
+          bout fendu, huit sur chaque rive avec flache, un nœud traversant de
+          1200 à 1280, une poche de résine. Le programme les retire par des
+          coupes ordinaires avant de poser quoi que ce soit, le trait de scie
+          tombant dans le bon bois ; ce qu'on déclare défaut est perdu en
+          entier.
+        </p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Corriger le plan sans tricher</h3>
+        <p>
+          Le plan calculé n'est jamais tout à fait celui qu'on veut. Clic droit
+          sur une planche : elle est <b>épinglée</b>, reprise telle quelle au
+          prochain calcul, le reste se range autour. Clic droit sur une pièce :
+          <b>la tailler dans</b> une autre ligne de stock. Aucun des deux ne
+          touche aux quantités — c'était l'ancienne façon, et elle mentait.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Le bois, ou le temps de scie</h3>
+        <p>
+          Entre deux plans qui placent tout dans le même bois neuf, l'un perd
+          un peu moins de matière, l'autre demande moins de coupes. À la
+          circulaire, des pièces de même largeur rangées en bandes se scient
+          deux fois plus vite : un réglage dit lequel des deux compte. Le
+          nombre de coupes est au bilan, et chaque trait porte son numéro sur
+          le papier.
+        </p>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Une teinte par référence, et jamais deux pareilles</h3>
+        <p>
+          La couleur d'une pièce ne dépend que de son <b>nom</b> : la même garde
+          sa teinte d'une séance à l'autre, sans table à tenir. Deux références
+          d'un même débit ne partagent jamais une teinte — les collisions se
+          résolvent en cherchant une couleur libre, parce que deux verts
+          voisins sur un plan valent moins qu'un plan en noir et blanc.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>La saisie se lit comme un tableur</h3>
+        <p>
+          Une feuille de débit existe presque toujours ailleurs avant d'arriver
+          ici : <kbd>Ctrl+V</kbd> colle un bloc venu d'un tableur,
+          <kbd>Ctrl+D</kbd> duplique une ligne — cinq lames identiques se
+          saisissent une fois. Un nombre illisible rougit à la frappe, pas au
+          moment du calcul. L'import et l'export CSV sont le contrat d'échange
+          avec les autres projets de l'atelier.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="bandes">
+  <div class="wrap">
+    <div class="sec-tag">La scie qu'on a</div>
+    <h2>Une scie à panneaux ne coupe pas n'importe où</h2>
+    <p class="sec-lede">
+      Elle déligne le panneau en bandes pleine longueur, puis tronçonne chaque
+      bande. Un plan guillotine libre, elle l'exécute mal.
+    </p>
+    <p>
+      La case <b>coupe en bandes</b> restreint le solveur à ces coupes en deux
+      étapes : une recoupe de largeur dans la bande à la rigueur, jamais une
+      recoupe de longueur. Ça coûte en général un peu de bois — et fait gagner
+      le temps qu'on aurait passé à se battre avec la machine.
+    </p>
+  </div>
+</section>
+
+<section id="etabli">
+  <div class="wrap">
+    <div class="sec-tag">À l'établi</div>
+    <h2>La page qu'on emporte à la scie</h2>
+    <p class="sec-lede">
+      Un plan qu'on ne lit pas debout devant la machine n'est pas un plan.
+    </p>
+
+    <figure class="capture">
+      <img src="../logiciels/captures/chutier-impression.c2eaa052.webp"
+           alt="Une page A4 paysage imprimée : titre, bilan du débit, les cinq planches dessinées avec le nom des pièces, et sous le dessin les cotes de débit planche par planche"
+           data-agrandir>
+      <figcaption>
+        L'impression est <b>paginée</b> : une poignée de planches par page selon
+        leur format, pas soixante écrasées sur une. Sous le dessin, les
+        <b>cotes de débit</b> planche par planche — les étiquettes du plan ne
+        portent que les noms quand les pièces sont étroites, et c'est justement
+        les cotes qu'on va chercher à la scie.
+      </figcaption>
+    </figure>
+
+    <p>
+      Sous le dessin, la liste des <b>coupes numérotées</b> de chaque planche,
+      celle qu'on suit à la scie. Le programme sort aussi le plan en image à
+      résolution d'impression, une <b>fiche d'atelier</b> en texte, et des
+      <b>étiquettes</b> à coller sur les pièces : référence, cotes, planche
+      d'origine, exemplaire, et la couleur qu'elle a sur le plan — vingt-quatre
+      par page A4, les planches d'étiquettes du commerce.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Un chiffre relevé sur le papier, pas dans le code</span>
+      <p>
+        Les tailles de texte du plan étaient réglées en <b>pixels</b>. Sur une
+        page à 1200 points par pouce, les noms des pièces sortaient hauts de
+        <b>0,4 mm</b> — illisibles. Le code ne le disait pas ; le PDF, si. Elles
+        se grossissent maintenant à proportion de la résolution demandée.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="freecad">
+  <div class="wrap">
+    <div class="sec-tag">Depuis le dessin</div>
+    <h2>La feuille de débit sort du modèle</h2>
+    <p class="sec-lede">
+      Un projet dessiné dans FreeCAD porte déjà ses cotes dans un tableur.
+      Les retaper à la main, c'est se donner l'occasion de se tromper.
+    </p>
+    <p>
+      Fichier → <b>Importer des pièces (FreeCAD .FCStd)</b> lit la feuille de
+      calcul <i>dans le document</i>, sans lancer FreeCAD. Il y faut une ligne
+      d'en-tête (Rep. ou Désignation, Longueur, Largeur, et à volonté Qté,
+      Épaisseur, Matière, Fil), une pièce par ligne dessous ; les titres de
+      section sont sautés. Les <b>formules sont calculées</b> — alias,
+      références d'une feuille à l'autre comme
+      <code>Parametres.HautVantail</code>, unités, <code>round</code> — parce
+      qu'une feuille de débit réelle n'est faite que de cela. Ce que
+      l'évaluateur ne sait pas, il le refuse <b>en nommant la cellule</b> :
+      un nombre faux dans un débit se paye en bois.
+    </p>
+  </div>
+</section>
+
+<section id="pourquoi">
+  <div class="wrap">
+    <div class="sec-tag">Pourquoi</div>
+    <h2>Ce que le programme cherche vraiment</h2>
+    <p class="sec-lede">
+      Un débit n'est pas un problème de surface. Deux solutions qui posent
+      toutes les pièces ne se valent pas, et l'ordre dans lequel on les
+      départage est une décision d'atelier, pas de mathématiques.
+    </p>
+
+    <p>
+      Entre deux plans, le programme préfère, <b>dans cet ordre</b> : moins de
+      pièces non placées ; moins cher, quand les prix sont renseignés ; moins de
+      bois <b>neuf</b> entamé — c'est là que le déstockage se joue ; moins de
+      pertes, puis moins de coupes (ou l'inverse, si l'on privilégie le temps
+      de scie) ; et enfin des chutes <b>concentrées</b> — une grande plutôt que
+      trois moyennes de même surface, parce qu'un reste de 800 mm vaut mieux
+      que deux de 400.
+    </p>
+
+    <p>
+      « Neuf » et « perte » comptent un <b>volume</b>, pas une surface. Une
+      planche deux fois plus épaisse, c'est deux fois plus de bois pour la même
+      surface de face — l'ignorer faisait gagner le brut le plus épais dès qu'il
+      était un peu moins large qu'un brut plus mince pourtant suffisant. Relevé
+      sur un cas réel : une pièce de 11,5 mm taillée dans du 65 alors qu'un 32
+      suffisait largement.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">334</span><span class="l">contrôles automatiques,<br>dont 76 sur le seul cœur</span></div>
+      <div class="chiffre"><span class="v">0,7 s</span><span class="l">pour 150 pièces<br>et 23 planches, à la scie</span></div>
+      <div class="chiffre"><span class="v">1,1 s</span><span class="l">pour 60 formes imbriquées<br>sur 32 cœurs (3,6 s sur un seul)</span></div>
+    </div>
+
+    <p class="muted">
+      Le résultat est <b>déterministe</b> : mêmes entrées, même plan. Le solveur
+      guillotine essaie quatre-vingts stratégies — quarante-huit réglées, les
+      autres tirées au sort à graine fixe — puis travaille la meilleure par
+      recherche locale : vider une planche, replacer ses pièces dans les trous
+      des autres. C'est ainsi qu'une planche de trop disparaît. Deux calculs ne
+      peuvent pas se contredire, en parallèle ou non.
+    </p>
+  </div>
+</section>
+
+<section id="cnc">
+  <div class="wrap">
+    <div class="sec-tag">La CNC</div>
+    <h2>Les formes qui ne sont pas des rectangles</h2>
+    <p class="sec-lede">
+      Une équerre débitée dans son rectangle englobant gaspille son échancrure.
+      À la fraise, deux équerres tête-bêche tiennent dans la place d'une.
+    </p>
+
+    <figure class="capture">
+      <img src="../logiciels/captures/chutier-formes.1e4d9115.webp"
+           alt="Une chute de contreplaqué de 400 × 300 vue seule : une étoile, un cœur, deux clés, deux équerres emboîtées, deux croissants, un anneau et une flèche imbriqués, chacun serré contre ses voisins"
+           data-agrandir>
+      <figcaption>
+        L'exemple des formes biscornues, sur la chute de 400 × 300 que le
+        programme entame avant le panneau neuf : deux équerres emboîtées
+        l'une dans l'autre, des croissants glissés dans les creux d'une
+        étoile et d'un cœur, une flèche calée contre un anneau. Dix pièces
+        sur une chute, <b>3,8 m de fraisage</b>, et les quatre autres sur le
+        panneau — dont un cadre évidé qui reçoit un <b>cœur dans son
+        trou</b>. Le tout laisse 0,028 m² de perte : le reste du panneau
+        part au stock en chute biscornue.
+      </figcaption>
+    </figure>
+
+    <p>
+      Fichier → <b>Importer des contours</b> lit un SVG (Inkscape, FreeCAD…) :
+      chaque tracé fermé devient une pièce, un tracé contenu dans un autre
+      devient son <b>trou</b>. Dès qu'une matière compte un contour, tout ce
+      lot est imbriqué au lieu d'être scié, avec les mêmes planches, les mêmes
+      chutes et les mêmes défauts. Fichier → <b>Exporter la découpe</b> rend
+      chaque planche à l'échelle 1 en <b>SVG</b>, en <b>DXF</b> pour la
+      fraiseuse ou en projet <b>LightBurn</b> pour le laser.
+    </p>
+
+    <p>
+      Ce qui reste de la planche <b>garde sa forme</b> : le panneau moins les
+      pièces élargies du passage de la fraise, morceau par morceau. Un
+      morceau rectangulaire redevient un rectangle qu'une scie saura
+      reprendre ; les autres sont des <b>chutes biscornues</b>, rangées au
+      stock avec leur polygone et leurs trous. Au débit suivant, on imbrique
+      dedans — dans le bois, pas dans sa boîte. Le cartouche de chaque
+      planche imbriquée annonce sa <b>longueur de fraisage</b>, et le bilan
+      le temps que cela demande à l'avance réglée.
+    </p>
+
+    <p>
+      Ces trois formats décrivent des <b>contours</b> : il faut encore une
+      chaîne CAM pour en tirer un parcours. Fichier → <b>Exporter le
+      G-code</b> saute l'étape et écrit le programme lui-même, un
+      <code>.ngc</code> par planche : décalé du <b>rayon de la fraise</b>
+      (vers l'extérieur pour le tour d'une pièce, vers l'intérieur pour
+      ses trous — sans quoi la pièce sort trop petite d'un diamètre
+      entier), en <b>passes</b> jusqu'à mordre le martyr, avec des
+      <b>attaches</b> pour que la pièce ne se libère pas sous la fraise,
+      des <b>rampes</b> au lieu de plongées droites, et les trous percés
+      <b>avant</b> le tour. LinuxCNC ou GRBL. Le fichier dit en tête, en
+      commentaires, si la fraise mord dans une pièce voisine ou sort de la
+      planche.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Un programme se rejoue, il ne se relit pas</span>
+      <p>
+        Les contrôles automatiques n'examinent pas le texte du G-code :
+        ils le <b>rejouent</b> dans un simulateur qui tient l'état de la
+        machine, et vérifient ce que la fraise fait — le décalage, le sens
+        de rotation, l'ordre des contours, les profondeurs, les attaches,
+        et qu'aucun déplacement rapide ne traverse le bois. Un parcours se
+        regarde aussi : le tracer a montré du premier coup que le décalage
+        en onglet dessinait des pointes qu'une fraise ronde ne peut pas
+        atteindre.
+      </p>
+    </div>
+
+    <p>
+      Un plan ne se subit pas : sur une planche imbriquée, <b>glisser une
+      pièce à la souris</b> la déplace. Le programme vérifie qu'elle reste
+      dans le bois et à l'écart des autres, refait les chutes, et épingle la
+      planche — sinon le calcul suivant déferait le geste.
+    </p>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Le no-fit polygon, et pourquoi pas un raccourci</span>
+        <span class="s">la méthode de SVGnest et Deepnest</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Pour une pièce déjà posée A et une pièce à poser B, le <b>no-fit
+          polygon</b> est la région des positions de B qui recouvrent A : la
+          somme de Minkowski de A et de B retournée, élargie de l'écart de
+          fraise. Le bord de la planche, recoupes et défauts compris, est un
+          obstacle comme un autre. Les positions valides sont « la planche
+          moins l'union des NFP », et les seules à essayer en sont les
+          <b>sommets</b> — toutes en contact avec un voisin ou le bord. On
+          garde celle qui serre le plus les pièces, puis la plus basse et la
+          plus à gauche.
+        </p>
+        <p>
+          Le NFP de deux formes concaves se calcule par triangulation : la
+          somme de deux triangles est l'enveloppe convexe de leurs neuf sommes
+          de sommets, et l'union de ces enveloppes est le NFP — exact, sans
+          l'algorithme d'orbite et ses cas dégénérés. Un polygone à trou se
+          triangule sur sa seule matière, si bien que le NFP laisse libre, de
+          lui-même, l'intérieur d'un trou où une pièce plus petite tient.
+        </p>
+        <p class="muted">
+          Le premier moteur posait les pièces par contacts sommet à sommet
+          projetés au sol : correct, mais une approximation, et soixante
+          pièces prenaient une demi-minute. Le NFP les fait en une seconde
+          sur les cœurs de la machine — les stratégies se répartissent en
+          processus, le résultat ne dépend pas de leur nombre.
+        </p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="navigateur">
+  <div class="wrap">
+    <div class="sec-tag">Dans le navigateur</div>
+    <h2>La même application, sans rien installer</h2>
+    <p class="sec-lede">
+      Pour la partager : une page, pas un serveur. Le cœur Python entier tourne
+      dans le navigateur, et rien n'est envoyé nulle part.
+    </p>
+
+    <figure class="capture">
+      <img src="../logiciels/captures/chutier-web.aab00364.webp"
+           alt="La version web du chutier dans Chrome, thème sombre : la pastille de version et le bouton EN dans la barre du haut, les tables de pièces et de stock à gauche, les tuiles de bilan et le plan des formes imbriquées à droite, dont une chute biscornue de 1200 × 600"
+           data-agrandir>
+      <figcaption>
+        <a href="https://atelierduverdier.github.io/chutier/">atelierduverdier.github.io/chutier</a>
+        — les mêmes tables, le même plan, les mêmes fichiers (projet, CSV,
+        SVG) que l'application de bureau, dans les deux sens. Python,
+        <code>numpy</code> et <code>shapely</code> se chargent une fois
+        (une quinzaine de Mo, en cache ensuite) et calculent dans un
+        <b>Web Worker</b> : la page reste vive pendant le calcul. Le stock de
+        l'atelier vit dans le stockage local du navigateur.
+      </figcaption>
+    </figure>
+
+    <p>
+      Le cœur n'a pas changé d'une ligne pour y arriver — c'est ce que la
+      règle des deux couches garantissait. Un seul obstacle : le
+      <code>shapely</code> du navigateur ne sait pas trianguler un polygone
+      à trous ; un découpage en oreilles en Python pur, vérifié contre la
+      triangulation en C du bureau, prend le relais. Pas de multicœur ni
+      d'étiquettes imprimées dans cette version : pour ces deux-là, le bureau.
+    </p>
+
+    <p>
+      La page s'<b>installe</b> et fonctionne <b>hors-ligne</b> après une
+      première visite, Python compris. Une <b>pastille de version</b> près du
+      titre dit si c'est bien la dernière : verte à jour, orange avec ⟳ quand
+      une plus récente est en ligne — la toucher recharge tout ; hors-ligne
+      elle reste neutre, elle ne peut pas savoir. Un bouton
+      <b>EN / FR</b> bascule toute l'interface : le dictionnaire a pour clé
+      le texte français, et un contrôle refuse qu'une phrase reste sans
+      traduction. L'application de bureau, elle, reste en français.
+    </p>
+  </div>
+</section>
+
+<section id="capot">
+  <div class="wrap">
+    <div class="sec-tag">Sous le capot</div>
+    <h2>Les règles du bois, écrites une fois</h2>
+    <p class="sec-lede">
+      Cinq décisions qui n'ont rien d'informatique et tout de la menuiserie.
+      Elles sont dépliables : le détail n'est pas retiré, il est rangé.
+    </p>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">La coupe guillotine, et ce qu'elle interdit</span>
+        <span class="s">la scie circulaire d'abord</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Chaque trait traverse le morceau <b>de bord à bord</b>, comme à la scie
+          circulaire ou sur une scie à format. C'est une contrainte forte : un
+          imbriquement libre rangerait mieux, sur le papier.
+        </p>
+        <p>
+          Mais un plan qu'on ne peut pas exécuter ne vaut rien. Les coupes sortent
+          numérotées dans un ordre <b>réellement exécutable</b> : à chaque trait,
+          le morceau courant est traversé entier. On peut les afficher sur le
+          plan, elles se lisent dans cet ordre-là.
+        </p>
+        <p class="muted">
+          Le trait de scie est retiré de la matière à chaque coupe, du côté
+          opposé à la pièce. Il est réglable, et retenu d'une séance à l'autre :
+          c'est une propriété de la scie, pas du projet.
+        </p>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">L'épaisseur se rabote, elle ne s'épaissit jamais</span>
+        <span class="s">une règle à sens unique</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Une planche convient à une pièce si elle est <b>au moins aussi
+          épaisse</b>. Plus épaisse : toujours bon, on rabotera. Plus mince : rien
+          à faire. Un même brut peut donc fournir des pièces de finitions
+          différentes, chacune rabotée à sa cote après le débit en
+          longueur et largeur.
+        </p>
+        <p>
+          La tolérance réglable n'absorbe que le <b>bruit de mesure</b> — 18,0
+          relevé au pied à coulisse contre 18,05 demandé. Elle ne sert pas à
+          faire passer une pièce plus épaisse que le stock : ce serait
+          transformer un réglage de confort en mensonge.
+        </p>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Les pièces composables : trop larges pour tout brut</span>
+        <span class="s">des lames à coller</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Un panneau de 422 mm de large n'entre dans aucune planche de 200. Coché
+          <b>composable</b>, il se décompose en lames à coller côte à côte (ou à
+          assembler tenon-rainure) — chacune devient une pièce ordinaire pour le
+          solveur, qui n'a rien à savoir de plus. La largeur perdue à chaque
+          collage est réglable.
+        </p>
+        <p>
+          Une pièce qui <b>logerait déjà</b> telle quelle n'est jamais
+          décomposée : moins de joints, plus solide.
+        </p>
+        <div class="callout note">
+          <span class="ci">Un piège trouvé en mesurant</span>
+          <p>
+            La décomposition taillait des lames larges d'exactement la planche.
+            Dès qu'on demandait une surcote de recoupe, elles ne rentraient plus
+            — et la pièce ressortait « trop grande », précisément ce qu'être
+            composable devait éviter. Mesuré : 397 mm de large sur un brut de
+            200, deux lames sans surcote, <b>zéro pièce posée</b> avec 5 mm. Ce
+            qui borne une lame, c'est la largeur du brut <b>moins</b> la surcote.
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Profils de catalogue : ce qu'on peut acheter</span>
+        <span class="s">et ce que ça coûte</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Une ligne cochée <b>Catalogue</b> n'est pas un stock : c'est une
+          section disponible chez le fournisseur. Sa quantité ne borne plus rien,
+          le programme en prend autant que le débit demande, et rend ensuite la
+          liste de ce qu'il faut acheter — par profil, avec le coût si les prix
+          sont renseignés.
+        </p>
+        <p>
+          Entre deux profils compatibles, c'est le <b>prix d'une planche</b> qui
+          départage — pas le prix au mètre, celui du morceau tel qu'on l'achète.
+          Sans prix, c'est le moins de rabotage perdu qui décide.
+        </p>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Deux couches, et un cœur qui ne connaît pas Qt</span>
+        <span class="s">un contrôle y veille</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Toute la géométrie et le solveur guillotine vivent dans un module
+          <b>sans aucune dépendance</b>, éprouvé sans écran ; l'imbrication CNC
+          à côté, sur <code>shapely</code>, chargée seulement quand un contour
+          est demandé. Deux interfaces se construisent par-dessus et n'y
+          touchent jamais — Qt sur le bureau, HTML dans le navigateur : elles
+          assemblent les entrées, appellent le solveur, affichent ce qui
+          revient. C'est cette règle qui a permis la version web sans changer
+          une ligne du cœur.
+        </p>
+        <p>
+          Les contrôles vérifient des <b>propriétés</b> sur des cas tirés au sort
+          à graine fixe : aucune pièce hors de sa planche ni sur un défaut,
+          aucun recouvrement, le trait de scie respecté entre toute paire de
+          rectangles, l'écart de fraise entre toute paire de contours, la
+          conservation — planche = pièces + chutes + pertes, au millimètre
+          carré —, et pour le NFP, sur mille cinq cents positions tirées au
+          hasard, « dans le NFP » et « recouvre » ne diffèrent jamais.
+        </p>
+        <p class="muted">
+          Les 334 contrôles tournent sans écran, et détournent les
+          réglages Qt vers un dossier jetable : un contrôle ne touche jamais la
+          configuration de l'atelier.
+        </p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Ce que le chutier ne fait pas</h2>
+    <ul>
+      <li>À la scie, les coupes sont <b>guillotine</b>, de bord à bord. C'est
+      un choix, pas une limite technique : un plan qu'on ne peut pas exécuter
+      ne vaut rien. L'imbrication libre existe, mais pour la fraise.</li>
+      <li>Le nœud qu'on déclare est un rectangle, pas une tache : c'est à
+      l'œil de le mesurer large.</li>
+      <li>Le temps de fraisage annoncé est celui de la coupe seule : la
+      longueur des contours divisée par l'avance réglée. Les déplacements à
+      vide entre deux pièces n'y sont pas.</li>
+      <li>Le G-code sort des contours, pas des poches ni des chanfreins :
+      c'est un découpeur de pièces, pas une chaîne CAM. Et pas de laser —
+      sur la machine de l'atelier il demande la broche, l'armement,
+      l'échelle de puissance et l'air, dont LaserAtelier se charge.</li>
+      <li>Dans le navigateur, le calcul n'a qu'un cœur — le bureau les prend
+      tous. Les étiquettes imprimées restent au bureau elles aussi.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="ci">Le code est public</span>
+      <p>
+        Sous <b>LGPL-2.1</b>, sur
+        <a href="https://github.com/atelierduverdier/chutier">github.com/atelierduverdier/chutier</a> —
+        le cœur sans dépendance, l'imbrication, l'interface PySide6, la page
+        web, et les 334 contrôles.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     pied.html — bas de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/pied.html
+
+     Marques à remplacer par le générateur :
+       ../     préfixe vers le kit depuis la page : "" ou "../"
+       chutier nom du site dans la marque du pied
+       Feuille de débit et stock de chutes : les restes passent avant les planches neuves. Code public, LGPL-2.1.     une ou deux phrases sur ce qu'est ce site-là
+       <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>      les <a> du pied
+       2026      année du copyright
+          <script> propre au site, ou vide
+     ========================================================================= -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+        <span class="brand-sub">chutier</span>
+      </div>
+      <p class="muted" style="margin:.2em 0 0">
+        Feuille de débit et stock de chutes : les restes passent avant les planches neuves. Code public, LGPL-2.1.<br>
+        © 2026 Atelier du Verdier.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>
+      <a href="#top">Haut de page ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Visionneuse : présente sur toutes les pages, verdier.js ne s'y accroche
+     que s'il trouve des images à agrandir. -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Fermer">×</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-hint">Cliquer n'importe où, ou Échap, pour fermer</div>
+</div>
+
+<script src="../verdier.js"></script>
+
+
+<!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
+     tous les sous-domaines remontent au même endroit. Pas de cookie, pas
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+<script>
+  window.goatcounter = {
+    path: function (p) { return '/portail' + p }
+  };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>

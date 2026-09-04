@@ -1,0 +1,756 @@
+<!-- =========================================================================
+     entete.html — haut de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/entete.html
+
+     Marques à remplacer par le générateur — NOMMÉES SANS LEURS ACCOLADES,
+     et ce n'est pas une coquetterie : `remplir` fait un remplacement de
+     texte sur tout le fichier, commentaire compris. Écrites en toutes
+     lettres ici, ces sept marques étaient donc REMPLIES elles aussi, et
+     chaque page servait 1 918 octets de commentaire portant son propre
+     titre, sa description et ses cinq liens de menu — un bloc de
+     documentation qui s'effaçait en expliquant, sur les dix-sept documents
+     des quatre sites. Relevé le 29/08/2026.
+       TITRE        titre de l'onglet
+       DESCRIPTION  méta description (une phrase, pour les moteurs)
+       RACINE       préfixe vers le kit depuis la page : "" ou "../"
+       SOUS_TITRE   « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       NAV          les <a> de navigation
+       LOCAL_CSS    <link> vers la feuille propre au site, ou vide
+
+     IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
+     Le site laser écrivait data-theme="light" : comme
+     :root[data-theme="light"] est plus spécifique que le bloc
+     @media (prefers-color-scheme: dark), un visiteur dont le système est
+     en sombre recevait quand même la page blanche (vérifié le 11/08/2026 :
+     fond rendu rgb(255,255,255) système en sombre). Son thème sombre
+     existait bel et bien — #14171b — mais seul le bouton ◐ y donnait accès.
+     ========================================================================= -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LE CANEVAS AVANT LA FEUILLE DE STYLE. Sans cette ligne, le navigateur
+     peint la page en BLANC jusqu'à ce que verdier.css arrive — une seconde
+     requête, mesurée à 143 ms au premier appel pour 40 Ko. Sur un poste
+     réglé en sombre, ça fait un éclair blanc plein écran à CHAQUE
+     navigation. Le script anti-clignotement plus bas ne suffisait pas : il
+     pose `data-theme`, ce qui ne dit rien au navigateur sur la couleur du
+     fond avant que la feuille ne soit lue. Elle vaut aussi pour l'ascenseur
+     et les widgets natifs, qui restaient en livrée claire le long d'une
+     page sombre. Déclarée AVANT le <link>, sinon elle arrive trop tard. -->
+<meta name="color-scheme" content="light dark">
+<title>Attache de descente Ø 80 — un collier qui ne serre pas</title>
+<meta name="description" content="Collier de descente de gouttière Ø 80 imprimé en PETG, monté sur un insert récupéré des attaches cassées. Ses oreilles viennent en butée : l'alésage reste à Ø 81 et le tube coulisse pour se dilater.">
+<link rel="icon" type="image/svg+xml" href="../chapeau.svg">
+<link rel="canonical" href="https://atelierduverdier.fr/projets/attache-gouttiere.html">
+
+<!-- CE QUE VOIT UN RÉSEAU SOCIAL. Sans ces lignes, Facebook ne trouvait
+     ni image ni description : il affichait le domaine, le titre, et un
+     cadre vide. Vu par Christophe le 23/08/2026 en partageant la fiche de
+     la dust shoe.
+
+     L'image est un JPEG de 1200 x 630 fabriqué par generer.py — PAS le
+     WebP servi à la page. Le robot de Facebook ne lit pas le WebP, et
+     tout le site est en WebP : c'est le piège qu'il fallait éviter.
+     Elle porte l'empreinte de son contenu dans son nom, pour la même
+     raison que les captures : Facebook garde longtemps ce qu'il a vu,
+     et une adresse qui ne change pas lui ferait ressservir l'ancienne. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Atelier du Verdier">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Attache de descente Ø 80 — un collier qui ne serre pas">
+<meta property="og:description" content="Collier de descente de gouttière Ø 80 imprimé en PETG, monté sur un insert récupéré des attaches cassées. Ses oreilles viennent en butée : l'alésage reste à Ø 81 et le tube coulisse pour se dilater.">
+<meta property="og:url" content="https://atelierduverdier.fr/projets/attache-gouttiere.html">
+<meta property="og:image" content="https://atelierduverdier.fr/partage/projets-attache-gouttiere.38a9e756.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="attache de descente">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Anti-clignotement : pose le thème choisi AVANT que la feuille de style
+     ne peigne. Placé ici et pas dans verdier.js, qui est chargé en fin de
+     page — sinon le visiteur voit le thème clair une fraction de seconde
+     avant la bascule. Volontairement minuscule et en ligne. -->
+<script>
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
+  var v=m?m[1]:localStorage.getItem('verdier-theme');
+  // `colorScheme` en plus de `data-theme` : la balise <meta> ci-dessus
+  // annonce « les deux », donc le navigateur suit l'OS. Quand le visiteur a
+  // choisi le CONTRAIRE de son OS, il faut le lui dire ici — sans quoi le
+  // fond et l'ascenseur partiraient dans le mauvais sens le temps du
+  // chargement, et l'éclair reviendrait pour ceux-là seulement.
+  if(v){var r=document.documentElement;r.setAttribute('data-theme',v);
+        r.style.colorScheme=v;}
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="../verdier.css">
+
+</head>
+<body>
+<a id="top"></a>
+
+<header class="topbar">
+  <div class="wrap">
+    <!-- Le logo est COLLÉ ici, pas chargé en <img> : en ligne, son
+         mot-symbole suit `currentColor`, donc le bouton de thème. En <img>
+         il ne suivrait que le réglage du système. -->
+    <a class="brand" href="https://atelierduverdier.fr/" aria-label="Atelier du Verdier">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      <span class="brand-sub">attache de descente</span>
+    </a>
+    <button class="nav-btn" type="button" aria-label="Ouvrir le menu"
+            aria-controls="menu-principal">☰</button>
+    <nav class="navlinks" id="menu-principal">
+      <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/" aria-current="true">Projets</a>
+      <a href="../modeles-3d.html">Modèles 3D</a>
+    </nav>
+    <!-- Le contraste, DESSINÉ et non écrit. Le caractère « ◐ » était rendu
+         par la police du système : maigre, minuscule, et lu comme un
+         chevron. Le tracé ci-dessous est le même trait que les pictos des
+         cartes, et le demi-disque plein dit ce que fait le bouton. -->
+    <button class="theme-btn" type="button" title="Thème clair / sombre"
+            aria-label="Basculer entre le thème clair et le thème sombre">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8.6"/>
+        <path d="M12 3.4a8.6 8.6 0 0 1 0 17.2Z" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- Attache de descente Ø 80. TOUS les nombres sortent de valeurs.json, que
+     `construire_attache.py` écrit à chaque construction — voir
+     valeurs_attache.py pour pourquoi ce modèle-là n'a pas de tableur. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">descente Ø 80 mm</span>
+          <span class="badge">PETG, 20 g + 13 g</span>
+          <span class="badge">insert récupéré</span>
+          <span class="badge">posé sur la descente</span>
+        </div>
+        <h1>Un collier qui ne serre pas</h1>
+        <p class="lede">
+          Les attaches d'origine ont cassé. Celles-ci les remplacent, sur
+          <b>l'insert récupéré dans les anciennes</b> — et elles ne serrent pas
+          la descente : c'est exprès. Elles sont posées, et le tube coulisse.
+        </p>
+        <div class="cta">
+      <a class="btn btn-ghost" href="../modeles-3d.html">Le tourner en 3D</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="Le collier vu de dessus : les deux oreilles viennent en butée">
+          <g class="figure">
+            <circle cx="180" cy="120" r="72" fill="var(--bg-3)" stroke="var(--fg-3)"
+                    stroke-width="1.2" stroke-dasharray="5 4"/>
+            <path d="M180 44 A76 76 0 0 0 180 196" fill="none" stroke="var(--fg)"
+                  stroke-width="9" stroke-linecap="butt"/>
+            <path d="M180 44 A76 76 0 0 1 180 196" fill="none" stroke="var(--orange)"
+                  stroke-width="9" stroke-linecap="butt"/>
+            <rect x="150" y="188" width="28" height="15" fill="var(--fg)"/>
+            <rect x="182" y="188" width="28" height="15" fill="var(--orange)"/>
+            <line x1="180" y1="182" x2="180" y2="212" stroke="var(--orange-encre)"
+                  stroke-width="1.6"/>
+            <text x="216" y="200" class="orange">butée</text>
+            <rect x="60" y="104" width="16" height="32" fill="var(--fg)"/>
+            <line x1="40" y1="90" x2="40" y2="150" stroke="var(--fg-3)" stroke-width="4"/>
+            <text x="46" y="86" class="petit">mur</text>
+            <text x="180" y="124" text-anchor="middle" class="petit">Ø 81</text>
+            <text x="180" y="238" text-anchor="middle" class="petit">jeu 1 mm au diamètre — le tube coulisse</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>Posées, et le tube coulisse</h2>
+    <p>
+      Toute la descente est équipée. Les photos qui suivent sont celles de la
+      pose, pas des rendus&nbsp;: pour une pièce dont on prétend qu'elle tient
+      <em>sans serrer</em>, c'est la seule preuve qui vaille.
+    </p>
+
+    <div class="figure-row">
+      <figure class="capture">
+        <img src="../logiciels/captures/photo-attache-pose.fdc2477e.webp"
+             alt="Le collier gris imprimé en place sur la descente blanche, juste au-dessus du coude, contre un mur de pierre couvert de lierre"
+             loading="lazy" data-agrandir>
+        <figcaption>
+          <b>Au-dessus de l'emboîture.</b> Le collier tient la descente sans la
+          pincer&nbsp;: le tube passe au travers et va chercher sa dilatation
+          dans le coude, en dessous.
+        </figcaption>
+      </figure>
+
+      <figure class="capture">
+        <img src="../logiciels/captures/photo-attache-patte.262ea36d.webp"
+             alt="Vue de trois quarts : la patte du collier vient en appui contre le mur de pierre, et la vis inox traverse les deux oreilles"
+             loading="lazy" data-agrandir>
+        <figcaption>
+          <b>Ce qui le tient.</b> La patte porte contre le mur sur l'insert
+          récupéré, et la vis inox referme les deux oreilles — qui viennent en
+          butée l'une contre l'autre, jamais sur le tube.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>La pose a trouvé ce qu'aucun contrôle ne cherchait</h2>
+    <p>
+      Christophe, la descente équipée&nbsp;: «&nbsp;l'écrou est du mauvais côté,
+      car j'ai dû visser la vis qui était contre le mur et c'était pas
+      évident&nbsp;». L'empreinte hexagonale était creusée dans la face
+      <em>extérieure</em> de la bride, donc la tête de vis venait porter sur la
+      face <em>murale</em> de l'oreille. Pour serrer, il fallait glisser le
+      tournevis entre le collier et le mur — à l'aveugle, à bout de bras, sur
+      une échelle. Les deux sont intervertis&nbsp;: <b>l'écrou côté mur</b>, où
+      il n'a jamais besoin qu'on le tourne, <b>la tête dehors</b>.
+    </p>
+    <div class="callout warn">
+      <span class="ci">Rien dans la géométrie ne pouvait le dire</span>
+      <p>
+        Les deux oreilles sont symétriques, l'assemblage se refermait à
+        <b>0,000 mm</b> de jeu, aucune interpénétration, et les
+        <b>51 contrôles</b> passaient. Le défaut n'était pas dans la pièce, il
+        était dans le <b>geste</b> — et un geste ne se mesure pas sur un
+        solide. Il se contrôle une fois qu'on sait le nommer&nbsp;: on sonde un
+        point entre l'axe de la vis et un plat de l'écrou, qui doit être
+        <b>vide côté mur</b> et <b>plein dehors</b>. Éprouvé à rebours sur une
+        copie portant l'ancienne disposition&nbsp;: les deux lignes rougissent.
+      </p>
+    </div>
+    <p>
+      <b>Les colliers des photos ci-dessus portent l'ancienne disposition</b>,
+      et les fichiers publiés plus bas ne sont donc plus ceux qui sont sur le
+      mur. Rien à reprendre sur la descente&nbsp;: ils tiennent, ils sont
+      seulement pénibles à serrer. Le corps perd 198,6&nbsp;mm³ dans
+      l'échange, la bride en gagne 161,8.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Pourquoi il ne serre pas</h2>
+    <p>
+      Le PVC se dilate de <b>0,7 mm par mètre et par 10 degrés</b>. Sur une
+      descente de six mètres, entre le gel du matin et le plein soleil, cela
+      fait <b>vingt-trois millimètres</b> de course. Un collier serré ne
+      l'empêche pas : il fait travailler les emboîtures jusqu'à ce qu'elles
+      fuient ou se déboîtent. Le fabricant le dit d'ailleurs lui-même —
+      <i>« sauf cas particuliers, les colliers ne doivent pas être serrant afin
+      de permettre le glissement de la canalisation lors des dilatations »</i>.
+    </p>
+    <p>
+      D'où le parti pris : les <b>deux oreilles de serrage viennent en butée
+      franche</b> l'une contre l'autre. On peut serrer la vis à fond, l'alésage
+      reste à Ø 81 — soit
+      1 mm de jeu au diamètre autour du tube Ø
+      80. Le réglage n'est plus dans le poignet du poseur, il
+      est dans la géométrie.
+    </p>
+
+    <h3>Pourquoi le trou de la vis est en goutte d'eau</h3>
+    <p>
+      C'est une histoire de <b>couches</b>. L'imprimante pose des tranches
+      horizontales, l'une sur l'autre, et chaque nouvelle tranche doit trouver
+      quelque chose dessous où s'appuyer.
+    </p>
+    <p>
+      Dans un trou rond couché, ça se passe bien tant qu'on monte le long du
+      flanc. Mais près du sommet la paroi devient horizontale&nbsp;: une couche
+      devrait avancer de plusieurs millimètres <em>vers l'intérieur, en
+      l'air</em>. Elle pend, elle s'affaisse dans le trou — et le trancheur
+      réclame du support.
+    </p>
+    <p>
+      La goutte remplace cette calotte par <b>deux pentes à 45°</b>. Sur une
+      pente à 45°, chaque couche n'avance que de sa propre épaisseur&nbsp;: elle
+      repose toujours à moitié sur celle d'en dessous. Rien ne pend.
+    </p>
+
+    <figure class="figure">
+      <!-- 18 couches sur le diametre. Surplombs : rond 3, goutte 0. -->
+      <svg viewBox="-4 -100.1 550.0 215.4" role="img"
+           aria-label="Un trou rond couché et un trou en goutte d'eau, tranchés en couches : trois couches débordent dans le vide au sommet du trou rond, aucune dans la goutte">
+        <g class="figure">
+            <rect class="couche" x="0.0" y="61.1" width="250.0" height="4.9"/>
+            <rect class="couche" x="0.0" y="55.0" width="250.0" height="4.9"/>
+            <rect class="couche" x="0.0" y="48.9" width="250.0" height="4.9"/>
+            <rect class="couche" x="0.0" y="42.8" width="90.4" height="4.9"/>
+            <rect class="couche" x="159.6" y="42.8" width="90.4" height="4.9"/>
+            <rect class="couche" x="0.0" y="36.7" width="84.0" height="4.9"/>
+            <rect class="couche" x="166.0" y="36.7" width="84.0" height="4.9"/>
+            <rect class="couche" x="0.0" y="30.6" width="79.3" height="4.9"/>
+            <rect class="couche" x="170.7" y="30.6" width="79.3" height="4.9"/>
+            <rect class="couche" x="0.0" y="24.4" width="75.7" height="4.9"/>
+            <rect class="couche" x="174.3" y="24.4" width="75.7" height="4.9"/>
+            <rect class="couche" x="0.0" y="18.3" width="73.1" height="4.9"/>
+            <rect class="couche" x="176.9" y="18.3" width="73.1" height="4.9"/>
+            <rect class="couche" x="0.0" y="12.2" width="71.4" height="4.9"/>
+            <rect class="couche" x="178.6" y="12.2" width="71.4" height="4.9"/>
+            <rect class="couche" x="0.0" y="6.1" width="70.3" height="4.9"/>
+            <rect class="couche" x="179.7" y="6.1" width="70.3" height="4.9"/>
+            <rect class="couche" x="0.0" y="-0.0" width="70.0" height="4.9"/>
+            <rect class="couche" x="180.0" y="-0.0" width="70.0" height="4.9"/>
+            <rect class="couche" x="0.0" y="-6.1" width="70.3" height="4.9"/>
+            <rect class="couche" x="179.7" y="-6.1" width="70.3" height="4.9"/>
+            <rect class="couche" x="0.0" y="-12.2" width="71.4" height="4.9"/>
+            <rect class="couche" x="178.6" y="-12.2" width="71.4" height="4.9"/>
+            <rect class="couche" x="0.0" y="-18.3" width="73.1" height="4.9"/>
+            <rect class="couche" x="176.9" y="-18.3" width="73.1" height="4.9"/>
+            <rect class="couche" x="0.0" y="-24.4" width="75.7" height="4.9"/>
+            <rect class="couche" x="174.3" y="-24.4" width="75.7" height="4.9"/>
+            <rect class="couche" x="0.0" y="-30.6" width="79.3" height="4.9"/>
+            <rect class="couche" x="170.7" y="-30.6" width="79.3" height="4.9"/>
+            <rect class="couche" x="0.0" y="-36.7" width="84.0" height="4.9"/>
+            <rect class="couche" x="166.0" y="-36.7" width="84.0" height="4.9"/>
+            <rect class="couche-surplomb" x="0.0" y="-42.8" width="90.4" height="4.9"/>
+            <rect class="couche-surplomb" x="159.6" y="-42.8" width="90.4" height="4.9"/>
+            <rect class="couche-surplomb" x="0.0" y="-48.9" width="99.8" height="4.9"/>
+            <rect class="couche-surplomb" x="150.2" y="-48.9" width="99.8" height="4.9"/>
+            <rect class="couche-surplomb" x="0.0" y="-55.0" width="250.0" height="4.9"/>
+            <rect class="couche" x="0.0" y="-61.1" width="250.0" height="4.9"/>
+            <rect class="couche" x="0.0" y="-67.2" width="250.0" height="4.9"/>
+            <circle class="vise" cx="125.0" cy="0" r="55.0"/>
+            <rect class="couche" x="292.0" y="61.1" width="250.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="55.0" width="250.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="48.9" width="250.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="42.8" width="90.4" height="4.9"/>
+            <rect class="couche" x="451.6" y="42.8" width="90.4" height="4.9"/>
+            <rect class="couche" x="292.0" y="36.7" width="84.0" height="4.9"/>
+            <rect class="couche" x="458.0" y="36.7" width="84.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="30.6" width="79.3" height="4.9"/>
+            <rect class="couche" x="462.7" y="30.6" width="79.3" height="4.9"/>
+            <rect class="couche" x="292.0" y="24.4" width="75.7" height="4.9"/>
+            <rect class="couche" x="466.3" y="24.4" width="75.7" height="4.9"/>
+            <rect class="couche" x="292.0" y="18.3" width="73.1" height="4.9"/>
+            <rect class="couche" x="468.9" y="18.3" width="73.1" height="4.9"/>
+            <rect class="couche" x="292.0" y="12.2" width="71.4" height="4.9"/>
+            <rect class="couche" x="470.6" y="12.2" width="71.4" height="4.9"/>
+            <rect class="couche" x="292.0" y="6.1" width="70.3" height="4.9"/>
+            <rect class="couche" x="471.7" y="6.1" width="70.3" height="4.9"/>
+            <rect class="couche" x="292.0" y="-0.0" width="70.0" height="4.9"/>
+            <rect class="couche" x="472.0" y="-0.0" width="70.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="-6.1" width="70.3" height="4.9"/>
+            <rect class="couche" x="471.7" y="-6.1" width="70.3" height="4.9"/>
+            <rect class="couche" x="292.0" y="-12.2" width="71.4" height="4.9"/>
+            <rect class="couche" x="470.6" y="-12.2" width="71.4" height="4.9"/>
+            <rect class="couche" x="292.0" y="-18.3" width="73.1" height="4.9"/>
+            <rect class="couche" x="468.9" y="-18.3" width="73.1" height="4.9"/>
+            <rect class="couche" x="292.0" y="-24.4" width="75.7" height="4.9"/>
+            <rect class="couche" x="466.3" y="-24.4" width="75.7" height="4.9"/>
+            <rect class="couche" x="292.0" y="-30.6" width="79.3" height="4.9"/>
+            <rect class="couche" x="462.7" y="-30.6" width="79.3" height="4.9"/>
+            <rect class="couche" x="292.0" y="-36.7" width="84.0" height="4.9"/>
+            <rect class="couche" x="458.0" y="-36.7" width="84.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="-42.8" width="90.0" height="4.9"/>
+            <rect class="couche" x="452.0" y="-42.8" width="90.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="-48.9" width="96.1" height="4.9"/>
+            <rect class="couche" x="445.9" y="-48.9" width="96.1" height="4.9"/>
+            <rect class="couche" x="292.0" y="-55.0" width="102.2" height="4.9"/>
+            <rect class="couche" x="439.8" y="-55.0" width="102.2" height="4.9"/>
+            <rect class="couche" x="292.0" y="-61.1" width="108.3" height="4.9"/>
+            <rect class="couche" x="433.7" y="-61.1" width="108.3" height="4.9"/>
+            <rect class="couche" x="292.0" y="-67.2" width="114.4" height="4.9"/>
+            <rect class="couche" x="427.6" y="-67.2" width="114.4" height="4.9"/>
+            <rect class="couche" x="292.0" y="-73.3" width="120.6" height="4.9"/>
+            <rect class="couche" x="421.4" y="-73.3" width="120.6" height="4.9"/>
+            <rect class="couche" x="292.0" y="-79.4" width="250.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="-85.6" width="250.0" height="4.9"/>
+            <rect class="couche" x="292.0" y="-91.7" width="250.0" height="4.9"/>
+            <path class="vise" d="M 378.1 -38.9 A 55.0 55.0 0 1 0 455.9 -38.9 L 417.0 -77.8 Z"/>
+          <text class="fort" x="125.0" y="91.3" text-anchor="middle">trou rond</text>
+          <text class="orange" x="125.0" y="109.3" text-anchor="middle">3 couches dans le vide</text>
+          <text class="fort" x="417.0" y="91.3" text-anchor="middle">goutte d'eau</text>
+          <text x="417.0" y="109.3" text-anchor="middle">aucune</text>
+        </g>
+      </svg>
+      <figcaption>
+        Les couches en <b>orange</b> sont celles qui avancent plus que leur
+        propre épaisseur. Le dessin n'est pas illustratif&nbsp;: les couches y
+        sont empilées et mesurées une à une, et c'est ce calcul qui les colore.
+        Sur le siège réel, Ø&nbsp;12,4 mm à 0,2 mm de couche, il y en a
+        <b>neuf</b> dans le trou rond et <b>aucune</b> dans la goutte.
+      </figcaption>
+    </figure>
+
+    <p>
+      C'est pour ça que <b>la pointe n'a aucune fonction mécanique</b>&nbsp;:
+      c'est du vide de plus, au-dessus de la tête de vis, là où rien ne
+      travaille. Elle ne sert qu'à donner aux couches un endroit où se poser.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">81</span><span class="l">alésage,<br>Ø en mm</span></div>
+      <div class="chiffre"><span class="v">25</span><span class="l">écart au mur,<br>en mm</span></div>
+      <div class="chiffre"><span class="v">22</span><span class="l">bandeau,<br>hauteur</span></div>
+      <div class="chiffre"><span class="v">5</span><span class="l">bandeau,<br>épaisseur</span></div>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Ce qui retient la descente, c'est l'emboîture</span>
+      <p>
+        Un collier tous les deux mètres au plus, et <b>un sous chaque
+        emboîture</b> : l'emboîture, plus grosse que le tube, repose sur le
+        collier et la descente ne peut plus glisser. Là où il n'y en a pas à
+        portée, une cale de 0,8 mm se clipse sur le tube et le collier se
+        referme dessus avec <b>0,6 mm de serrage</b> —
+        une valeur figée par la butée, pas estimée.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>L'insert vient des attaches cassées</h2>
+    <p>
+      Il ne s'achète pas : il se dévisse des anciennes. Base carrée
+      10 × 10 × 3,
+      surmontée d'un bossage fileté Ø 8 ×
+      3, au pas 7 × 150 — le standard couverture français.
+      Ce sont donc <b>ses cotes qui commandent</b> tout le dessin de l'embase,
+      et pas l'inverse&nbsp;: on n'en commande pas, on les récupère. Qui n'en a
+      pas — ou dont les inserts ont cassé eux aussi — prendra la variante à
+      <b>vis ordinaire</b>, plus bas.
+    </p>
+    <p>
+      La patte à vis n'offre que <b>5 mm de filet</b>
+      au-delà de sa collerette. Il faut donc que le taraudage attaque tout de
+      suite : l'insert est monté <b>bossage vers le mur</b>, ce qui en prend
+      <b>4,7 mm sur 5</b>. Monté dans
+      l'autre sens, on n'en prendrait qu'un peu plus d'un millimètre.
+    </p>
+    <p>
+      Il se glisse par le côté, en retrait, et c'est la vis qui l'amène
+      ensuite en butée toute seule — dans un assemblage boulonné, l'écrou est
+      tiré vers la tête, pas poussé. Deux lèvres de 0,45 mm
+      l'empêchent de retomber pendant qu'on prépare les colliers à l'établi.
+    </p>
+    <figure class="capture">
+      <img src="../logiciels/captures/photo-attache-etabli.0fa2c988.webp"
+           alt="Sur l'établi : le collier posé autour d'une chute de descente, son logement carré visible en haut, la visserie inox et un second collier autour"
+           loading="lazy" data-agrandir>
+      <figcaption>
+        <b>Le logement, vu de dessus.</b> Le carré qui reçoit l'insert est
+        moulé dans le bossage — c'est lui qui fixe toutes les cotes de
+        l'embase, puisqu'on ne peut pas commander d'autre insert.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Imprimé sans aucun support</h2>
+    <p>
+      Deux formes ont été corrigées pour ça, et chacune après mesure. La
+      charnière est passée de trois nœuds à <b>deux</b> : à trois, le nœud
+      supérieur du corps démarrait en l'air, à quinze millimètres du plateau,
+      et son support se retrouvait coincé dans l'articulation. Et le dessous
+      de l'oreille de serrage, qui accusait 56 mm² de surplomb au-delà de 45°,
+      se raccorde maintenant par deux pans à 45° tangents au bossage.
+    </p>
+    <p>
+      Reste 279 mm² au-delà de 45° sur les trois pièces, et ce sont tous des
+      <b>ponts</b> — un pont FDM passe sans support jusqu'à une dizaine de
+      millimètres. Le corps et la cale se posent à plat, la bride
+      <b>retournée</b> ; les fichiers sortent déjà orientés, il n'y a rien à
+      tourner.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">20</span><span class="l">corps,<br>en grammes</span></div>
+      <div class="chiffre"><span class="v">13</span><span class="l">bride,<br>en grammes</span></div>
+      <div class="chiffre"><span class="v">4,7</span><span class="l">prise de filet,<br>en mm</span></div>
+      <div class="chiffre"><span class="v">0,60</span><span class="l">jeu de l'insert,<br>en mm</span></div>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Le jeu de l'insert absorbe l'affaissement du pont</span>
+      <p>
+        Le plafond du logement de l'insert est un pont de 6,5 mm, et un pont
+        PETG s'affaisse couramment de 0,1 à 0,3 mm — affaissement qui se
+        retranche <b>directement</b> du jeu de l'insert. À 0,40 mm il n'en
+        restait que 0,10 dans le pire cas, intenable sur une cote imprimée.
+        Le jeu est donc à <b>0,60 mm</b>, et les lèvres
+        épaissies d'autant pour que le clipsage ne change pas.
+      </p>
+    </div>
+    <figure class="capture">
+      <img src="../logiciels/captures/photo-attache-collier.83e312bd.webp"
+           alt="Le collier tenu en main, ouvert : les deux demi-anneaux imprimés s'emboîtent par leur charnière à deux nœuds, la vis inox du côté opposé"
+           loading="lazy" data-agrandir>
+      <figcaption>
+        <b>Sorti du plateau, sans une seule touche de support.</b> La charnière
+        à deux nœuds et la vis inox de l'autre côté&nbsp;: rien d'autre. Les
+        couches se lisent à l'œil sur toute la circonférence.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Trois diamètres, et une version sans insert</h2>
+    <p>
+      Le modèle se pilote par <b>deux valeurs, et rien d'autre</b>&nbsp;: le
+      diamètre de la descente et le mode de fixation. Il est engendré en
+      <b>Ø 63, Ø 80 et Ø 100</b>, et au choix sur l'<b>insert récupéré</b> ou
+      sur une <b>vis ordinaire de 6 × 70</b> — pour qui n'a
+      pas d'anciennes attaches à dévisser, ou dont les inserts sont cassés eux
+      aussi.
+    </p>
+    <div class="callout tip">
+      <span class="ci">« Valide » ne veut pas dire « bon »</span>
+      <p>
+        Mesure faite avant d'écrire quoi que ce soit&nbsp;: le modèle
+        construisait <b>déjà</b> des solides valides de Ø 40 à Ø 125, sans
+        jamais lever d'erreur. Cinq grandeurs y étaient pourtant écrites en
+        millimètres alors qu'elles expriment des <b>rapports</b> — à bandeau
+        figé à 5&nbsp;mm, le Ø 63 est <b>1,86 fois plus raide</b> et le Ø 100
+        1,82 fois plus mou&nbsp;; l'oreille passait <b>0,337 mm sous le
+        bandeau</b> à Ø 63, si bien que la pièce se serait imprimée en
+        équilibre sur une génératrice&nbsp;; et à petit évasement le couloir de
+        l'insert se bouchait <b>sans qu'aucun contrôle le voie</b>. Elles se
+        dérivent désormais du diamètre.
+      </p>
+    </div>
+    <p>
+      <b>Le Ø 80 à insert sort inchangé</b>, et c'est vérifié plutôt
+      qu'espéré&nbsp;: sur les trois pièces, deux fichiers sont identiques
+      <b>octet pour octet</b> avant et après, et le troisième a les mêmes
+      1&nbsp;462 sommets et 2&nbsp;930 facettes rigoureusement identiques sur
+      2&nbsp;932 — les deux restantes étant un même quadrilatère plat
+      retriangulé sur l'autre diagonale.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>La planche et les fichiers</h2>
+    <figure class="plan">
+      <img src="../projets/plans/planche_collier.png"
+           alt="Planche A3 de l'attache de descente : rendu, éclaté numéroté, vue de dessus cotée"
+           loading="lazy" data-agrandir>
+      <figcaption>
+        A3, engendrée par le modèle : rendu ombré, éclaté numéroté, schéma de
+        pose et vue de dessus cotée. Hors tout 71 × 120,5 × 22 mm.
+      </figcaption>
+    </figure>
+
+    <div class="cta">
+      <a class="btn btn-primary" href="../projets/plans/planche_collier.pdf"
+         target="_blank" rel="noopener">La planche en PDF</a>
+    </div>
+
+    <h3>Les pièces à imprimer</h3>
+    <p>
+      Trois pièces par collier, <b>déjà orientées comme elles se posent sur le
+      plateau</b> — rien à retourner, et aucun support. Le tableau donne les
+      3 diamètres et les deux fixations&nbsp;; prenez la
+      ligne qui correspond à votre descente.
+    </p>
+
+    <div class="twrap"><table>
+<thead><tr><th>descente</th><th>fixation</th><th>les trois pièces</th></tr></thead>
+<tbody>
+<tr><td><b>Ø&nbsp;63</b></td><td>insert récupéré</td><td><a href="../projets/stl/63-insert_recupere/corps.stl">corps</a> <span class="muted">141&nbsp;Ko</span> · <a href="../projets/stl/63-insert_recupere/bride.stl">bride</a> <span class="muted">78&nbsp;Ko</span> · <a href="../projets/stl/63-insert_recupere/cale_point_fixe.stl">cale_point_fixe</a> <span class="muted">19&nbsp;Ko</span></td></tr>
+<tr><td><b>Ø&nbsp;80</b></td><td>insert récupéré</td><td><a href="../projets/stl/80-insert_recupere/corps.stl">corps</a> <span class="muted">144&nbsp;Ko</span> · <a href="../projets/stl/80-insert_recupere/bride.stl">bride</a> <span class="muted">82&nbsp;Ko</span> · <a href="../projets/stl/80-insert_recupere/cale_point_fixe.stl">cale_point_fixe</a> <span class="muted">22&nbsp;Ko</span></td></tr>
+<tr><td><b>Ø&nbsp;80</b></td><td>vis 6 × 70</td><td><a href="../projets/stl/80-vis_6x70/corps.stl">corps</a> <span class="muted">140&nbsp;Ko</span> · <a href="../projets/stl/80-vis_6x70/bride.stl">bride</a> <span class="muted">82&nbsp;Ko</span> · <a href="../projets/stl/80-vis_6x70/cale_point_fixe.stl">cale_point_fixe</a> <span class="muted">22&nbsp;Ko</span></td></tr>
+<tr><td><b>Ø&nbsp;100</b></td><td>vis 6 × 70</td><td><a href="../projets/stl/100-vis_6x70/corps.stl">corps</a> <span class="muted">144&nbsp;Ko</span> · <a href="../projets/stl/100-vis_6x70/bride.stl">bride</a> <span class="muted">85&nbsp;Ko</span> · <a href="../projets/stl/100-vis_6x70/cale_point_fixe.stl">cale_point_fixe</a> <span class="muted">24&nbsp;Ko</span></td></tr>
+</tbody></table></div>
+
+    <p class="muted" style="margin-top:14px">
+      La <b>cale</b> ne se pose qu'à un seul collier de la descente, celui qui
+      fait point fixe&nbsp;: c'est elle qui empêche le tube de descendre tout
+      seul. Les autres le laissent coulisser, et c'est le but.
+    </p>
+
+    <div class="callout tip">
+      <span class="ci">Ce que la pose a dit</span>
+      <p>
+        Imprimé le 28 août 2026, et <b>toute la descente en est équipée</b>.
+        Les trois paris du dessin ont tenu du premier coup : le tube
+        <b>coulisse</b> dans l'alésage à Ø 81 une fois les
+        oreilles en butée franche — c'est toute la thèse du collier —,
+        l'insert récupéré <b>clipse et tient</b> dans ses
+        0,60 mm de jeu, et la vis M5 inox <b>taille son
+        filet</b> dans le PETG sur 10,8 mm de prise, sans
+        écrou ni insert laiton.
+      </p>
+      <p>
+        Ce sont des verdicts d'usage, pas des relevés. Les
+        53 contrôles de <code>verifier.py</code> mesurent
+        les solides ; la pose, elle, n'a rien mesuré. Restent donc sans
+        chiffre le Ø du lamage de collerette — il reçoit bien la patte à vis,
+        puisque les colliers sont au mur — et le serrage réel de la cale, qui
+        attend la première descente sans emboîture à portée.
+      </p>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Ce qu'il faut en plus</span>
+      <p>
+        Une patte à vis à collerette avec sa cheville, l'insert récupéré, et
+        deux vis inox M5 × 25 avec un écrou — l'une sert d'axe de charnière et
+        se taraude dans le corps, l'autre serre. Axe retenu :
+        vis M5 inox, avec 10,8 mm de prise dans chaque nœud.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     pied.html — bas de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/pied.html
+
+     Marques à remplacer par le générateur :
+       ../     préfixe vers le kit depuis la page : "" ou "../"
+       attache de descente nom du site dans la marque du pied
+       Collier de descente Ø 80 imprimé, non serrant, sur insert récupéré. Modèle FreeCAD paramétrique.     une ou deux phrases sur ce qu'est ce site-là
+       <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>      les <a> du pied
+       2026      année du copyright
+          <script> propre au site, ou vide
+     ========================================================================= -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+        <span class="brand-sub">attache de descente</span>
+      </div>
+      <p class="muted" style="margin:.2em 0 0">
+        Collier de descente Ø 80 imprimé, non serrant, sur insert récupéré. Modèle FreeCAD paramétrique.<br>
+        © 2026 Atelier du Verdier.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>
+      <a href="#top">Haut de page ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Visionneuse : présente sur toutes les pages, verdier.js ne s'y accroche
+     que s'il trouve des images à agrandir. -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Fermer">×</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-hint">Cliquer n'importe où, ou Échap, pour fermer</div>
+</div>
+
+<script src="../verdier.js"></script>
+
+
+<!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
+     tous les sous-domaines remontent au même endroit. Pas de cookie, pas
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+<script>
+  window.goatcounter = {
+    path: function (p) { return '/portail' + p }
+  };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>

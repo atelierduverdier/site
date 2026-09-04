@@ -1,0 +1,779 @@
+<!-- =========================================================================
+     entete.html — haut de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/entete.html
+
+     Marques à remplacer par le générateur — NOMMÉES SANS LEURS ACCOLADES,
+     et ce n'est pas une coquetterie : `remplir` fait un remplacement de
+     texte sur tout le fichier, commentaire compris. Écrites en toutes
+     lettres ici, ces sept marques étaient donc REMPLIES elles aussi, et
+     chaque page servait 1 918 octets de commentaire portant son propre
+     titre, sa description et ses cinq liens de menu — un bloc de
+     documentation qui s'effaçait en expliquant, sur les dix-sept documents
+     des quatre sites. Relevé le 29/08/2026.
+       TITRE        titre de l'onglet
+       DESCRIPTION  méta description (une phrase, pour les moteurs)
+       RACINE       préfixe vers le kit depuis la page : "" ou "../"
+       SOUS_TITRE   « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       NAV          les <a> de navigation
+       LOCAL_CSS    <link> vers la feuille propre au site, ou vide
+
+     IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
+     Le site laser écrivait data-theme="light" : comme
+     :root[data-theme="light"] est plus spécifique que le bloc
+     @media (prefers-color-scheme: dark), un visiteur dont le système est
+     en sombre recevait quand même la page blanche (vérifié le 11/08/2026 :
+     fond rendu rgb(255,255,255) système en sombre). Son thème sombre
+     existait bel et bien — #14171b — mais seul le bouton ◐ y donnait accès.
+     ========================================================================= -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LE CANEVAS AVANT LA FEUILLE DE STYLE. Sans cette ligne, le navigateur
+     peint la page en BLANC jusqu'à ce que verdier.css arrive — une seconde
+     requête, mesurée à 143 ms au premier appel pour 40 Ko. Sur un poste
+     réglé en sombre, ça fait un éclair blanc plein écran à CHAQUE
+     navigation. Le script anti-clignotement plus bas ne suffisait pas : il
+     pose `data-theme`, ce qui ne dit rien au navigateur sur la couleur du
+     fond avant que la feuille ne soit lue. Elle vaut aussi pour l'ascenseur
+     et les widgets natifs, qui restaient en livrée claire le long d'une
+     page sombre. Déclarée AVANT le <link>, sinon elle arrive trop tard. -->
+<meta name="color-scheme" content="light dark">
+<title>LaserAtelier — graver ce qui n'est pas plat</title>
+<meta name="description" content="Atelier FreeCAD de G-code laser : suivi de surfaces courbes, gravure remplie, photo tramée, découpe multi-passes. Pourquoi un point ne peut pas être une temporisation, et pourquoi tout se vérifie sur le bois.">
+<link rel="icon" type="image/svg+xml" href="../chapeau.svg">
+<link rel="canonical" href="https://atelierduverdier.fr/logiciels/laseratelier.html">
+
+<!-- CE QUE VOIT UN RÉSEAU SOCIAL. Sans ces lignes, Facebook ne trouvait
+     ni image ni description : il affichait le domaine, le titre, et un
+     cadre vide. Vu par Christophe le 23/08/2026 en partageant la fiche de
+     la dust shoe.
+
+     L'image est un JPEG de 1200 x 630 fabriqué par generer.py — PAS le
+     WebP servi à la page. Le robot de Facebook ne lit pas le WebP, et
+     tout le site est en WebP : c'est le piège qu'il fallait éviter.
+     Elle porte l'empreinte de son contenu dans son nom, pour la même
+     raison que les captures : Facebook garde longtemps ce qu'il a vu,
+     et une adresse qui ne change pas lui ferait ressservir l'ancienne. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Atelier du Verdier">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="LaserAtelier — graver ce qui n'est pas plat">
+<meta property="og:description" content="Atelier FreeCAD de G-code laser : suivi de surfaces courbes, gravure remplie, photo tramée, découpe multi-passes. Pourquoi un point ne peut pas être une temporisation, et pourquoi tout se vérifie sur le bois.">
+<meta property="og:url" content="https://atelierduverdier.fr/logiciels/laseratelier.html">
+<meta property="og:image" content="https://atelierduverdier.fr/partage/logiciels-laseratelier.f1faa783.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LaserAtelier">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Anti-clignotement : pose le thème choisi AVANT que la feuille de style
+     ne peigne. Placé ici et pas dans verdier.js, qui est chargé en fin de
+     page — sinon le visiteur voit le thème clair une fraction de seconde
+     avant la bascule. Volontairement minuscule et en ligne. -->
+<script>
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
+  var v=m?m[1]:localStorage.getItem('verdier-theme');
+  // `colorScheme` en plus de `data-theme` : la balise <meta> ci-dessus
+  // annonce « les deux », donc le navigateur suit l'OS. Quand le visiteur a
+  // choisi le CONTRAIRE de son OS, il faut le lui dire ici — sans quoi le
+  // fond et l'ascenseur partiraient dans le mauvais sens le temps du
+  // chargement, et l'éclair reviendrait pour ceux-là seulement.
+  if(v){var r=document.documentElement;r.setAttribute('data-theme',v);
+        r.style.colorScheme=v;}
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="../verdier.css">
+
+</head>
+<body>
+<a id="top"></a>
+
+<header class="topbar">
+  <div class="wrap">
+    <!-- Le logo est COLLÉ ici, pas chargé en <img> : en ligne, son
+         mot-symbole suit `currentColor`, donc le bouton de thème. En <img>
+         il ne suivrait que le réglage du système. -->
+    <a class="brand" href="https://atelierduverdier.fr/" aria-label="Atelier du Verdier">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      <span class="brand-sub">LaserAtelier</span>
+    </a>
+    <button class="nav-btn" type="button" aria-label="Ouvrir le menu"
+            aria-controls="menu-principal">☰</button>
+    <nav class="navlinks" id="menu-principal">
+      <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels" aria-current="true">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/">Projets</a>
+      <a href="../modeles-3d.html">Modèles 3D</a>
+    </nav>
+    <!-- Le contraste, DESSINÉ et non écrit. Le caractère « ◐ » était rendu
+         par la police du système : maigre, minuscule, et lu comme un
+         chevron. Le tracé ci-dessous est le même trait que les pictos des
+         cartes, et le demi-disque plein dit ce que fait le bouton. -->
+    <button class="theme-btn" type="button" title="Thème clair / sombre"
+            aria-label="Basculer entre le thème clair et le thème sombre">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8.6"/>
+        <path d="M12 3.4a8.6 8.6 0 0 1 0 17.2Z" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- LaserAtelier — page de PORTAIL.
+
+     ATTENTION AU PÉRIMÈTRE. LaserAtelier est le seul des quatre logiciels
+     qui a DÉJÀ son site complet, laser.atelierduverdier.fr : installation,
+     les modes un par un, calibration, préférences, G-code, LinuxCNC, FAQ,
+     plus un manuel de 8 chapitres en PDF. Refaire tout ça ici serait du
+     travail perdu et deux vérités à tenir à jour.
+
+     Cette page raconte donc ce que le site de doc ne raconte pas : POURQUOI
+     l'atelier existe, la contrainte matérielle qui commande toute la
+     génération du G-code, et la discipline de mesure sur bois. Pour le
+     comment-faire, elle renvoie.
+
+     Tous les faits viennent du README, du CLAUDE.md et des .claude/rules
+     du dépôt LaserAtelier. La version est lue à la génération dans
+     laser_core.py — jamais recopiée.
+
+     Le chiffre « ≈ N heures » du site laser n'est VOLONTAIREMENT pas repris :
+     il est recalculé par outils/chiffrer_effort.py et vit déjà dans trois
+     fichiers. Un quatrième à la main, c'est le piège de la ligne VERSION.
+
+     Bases de police : 9,9 px pour le héros, 12 px pour un viewBox de 640,
+     10,1 px pour 540. Mesuré. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">FreeCAD 1.1</span>
+          <span class="badge">v<b>2.99.50</b></span>
+          <span class="badge">LGPL-2.1-or-later</span>
+        </div>
+        <h1>Graver ce qui n'est pas plat</h1>
+        <p class="lede">
+          Un atelier FreeCAD qui transforme de la géométrie en G-code laser. Sa raison
+          d'être tient en une phrase : suivre une surface courbe sans perdre le foyer.
+        </p>
+        <div class="cta">
+          <a class="btn btn-github" href="https://github.com/atelierduverdier/LaserAtelier"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            Le code sur GitHub
+          </a>
+          <a class="btn btn-primary" href="https://laser.atelierduverdier.fr">La documentation</a>
+          <a class="btn btn-ghost" href="#contrainte">Ce qui commande tout</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <!-- La tête suit la surface à distance de foyer constante. Le bec est
+             dessiné à l'échelle du vrai : pointe Ø5, sommet Ø16, cône 18 mm. -->
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="La tête laser suit une surface courbe en gardant une distance de foyer constante">
+          <g class="figure">
+            <!-- la surface : une quadratique dont l'apex est calculé -->
+            <path d="M 30 201 Q 170 119 310 201" fill="none" stroke="var(--fg)" stroke-width="2.2"/>
+            <path d="M 30 201 Q 170 119 310 201 L 310 240 L 30 240 Z"
+                  fill="var(--bg-3)" stroke="none" opacity="0.75"/>
+
+            <!-- trois positions du bec, tip à 55 au-dessus de la surface -->
+            <g stroke="var(--fg)" stroke-width="1.4" fill="var(--slate)">
+              <polygon points="56,130.3 64,130.3 72.8,101.5 47.2,101.5"/>
+              <polygon points="166,105 174,105 182.8,76.2 157.2,76.2"/>
+              <polygon points="276,130.3 284,130.3 292.8,101.5 267.2,101.5"/>
+            </g>
+            <g stroke="var(--orange)" stroke-width="1.8" stroke-dasharray="3 2">
+              <line x1="60" y1="130.3" x2="60" y2="185.3"/>
+              <line x1="170" y1="105" x2="170" y2="160"/>
+              <line x1="280" y1="130.3" x2="280" y2="185.3"/>
+            </g>
+            <g fill="var(--orange)">
+              <circle cx="60" cy="185.3" r="3"/>
+              <circle cx="170" cy="160" r="3"/>
+              <circle cx="280" cy="185.3" r="3"/>
+            </g>
+
+            <text x="170" y="42" text-anchor="middle" class="orange">distance de foyer constante</text>
+            <text x="170" y="228" text-anchor="middle" class="petit">la pièce, elle, ne l'est pas</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Ce que ça fait</div>
+    <h2>Marquer, graver, tramer, découper</h2>
+    <p class="sec-lede">
+      Marquage, gravure remplie, photo tramée, découpe multi-passes, projection sur
+      surface 3D, grilles de test et planches de calibration. Le détail de chaque mode
+      est sur <a href="https://laser.atelierduverdier.fr">le site de l'atelier</a> — cette
+      page-ci raconte plutôt <b>pourquoi</b> il est fait comme ça.
+    </p>
+
+    <p>
+      <b>Vingt-deux panneaux</b>, un par mode. En voici six — cliquer pour agrandir.
+    </p>
+
+    <div class="panneaux">
+      <figure class="capture panneau">
+        <img src="../logiciels/captures/laser-p-grille-test.a97075bb.webp"
+             alt="Le panneau Grille de test : plages de puissance et de vitesse, nombre de cases, étiquettes"
+             data-agrandir>
+        <figcaption><b>Grille de test</b><br>mesurer avant de calculer</figcaption>
+      </figure>
+      <figure class="capture panneau">
+        <img src="../logiciels/captures/laser-p-marquage.6cbbb4a5.webp"
+             alt="Le panneau Marquage sur surface courbe : suivi de relief, défocus, contrôle anti-collision"
+             data-agrandir>
+        <figcaption><b>Marquage sur surface courbe</b><br>la raison d'être du projet</figcaption>
+      </figure>
+      <figure class="capture panneau">
+        <img src="../logiciels/captures/laser-p-photo.7f3ab431.webp"
+             alt="Le panneau Gravure photo : image, tramage, résolution, plages de puissance"
+             data-agrandir>
+        <figcaption><b>Gravure photo</b><br>et ses huit tramages</figcaption>
+      </figure>
+      <figure class="capture panneau">
+        <img src="../logiciels/captures/laser-p-defocus.da8f9a9d.webp"
+             alt="Le panneau Calibration défocus : bande de test, puis saisie des deux largeurs de point mesurées"
+             data-agrandir>
+        <figcaption><b>Calibration du défocus</b><br>où l'on saisit les deux mesures</figcaption>
+      </figure>
+      <figure class="capture panneau">
+        <img src="../logiciels/captures/laser-p-nuancier.7ec647ca.webp"
+             alt="Le panneau Nuancier : génération d'une planche de tons, puis saisie des noirceurs jugées"
+             data-agrandir>
+        <figcaption><b>Nuancier</b><br>la planche qui nourrit la courbe</figcaption>
+      </figure>
+      <figure class="capture panneau">
+        <img src="../logiciels/captures/laser-p-calligraphie.e4810758.webp"
+             alt="Le panneau Calligraphie : police, plume, contraste, épaisseur de trait"
+             data-agrandir>
+        <figcaption><b>Calligraphie</b><br>le plus récent des modes</figcaption>
+      </figure>
+    </div>
+
+    <p>
+      Quatre ajouts de l'été disent assez bien la ligne de conduite. L'atelier <b>lit les
+      limites de la machine dans son propre <code>.ini</code> LinuxCNC</b> au lieu de les
+      demander : ce que la machine sait déjà, on ne le retape pas. L'assistance d'air se
+      commande en <code>M8</code>/<code>M9</code>, d'après un fichier qui a réellement
+      gravé et non d'après une documentation. Les projets <b>LightBurn</b> s'importent par
+      la même icône que les SVG, pour n'avoir pas à choisir son camp. Et une machine
+      <b>sans axe Z</b> — un graveur de table — est désormais un cas prévu, plus un cas
+      qui plante.
+    </p>
+
+    <p>
+      Un audit ajouté au passage rattrape le pire genre de défaut : une face invalide
+      gravait <b>blanc, en silence</b>. Une erreur qui se voit vaut mieux qu'une planche
+      vierge découverte à la fin.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Ces captures ne sont pas prises à la main</span>
+      <p>
+        Elles sortent du dépôt LaserAtelier, où un script les régénère toutes en une
+        commande. Il passe par le <b>harnais des tests</b> : la configuration est
+        redirigée vers une copie jetable, si bien que capturer ne peut pas écrire dans les
+        mesures au pied à coulisse accumulées sur l'établi.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="contrainte">
+  <div class="wrap">
+    <div class="sec-tag">La contrainte</div>
+    <h2>À l'arrêt, le laser ne grave rien</h2>
+    <p class="sec-lede">
+      Une particularité de la machine commande toute la génération du G-code, et elle
+      n'est écrite nulle part dans les manuels de laser.
+    </p>
+
+    <p>
+      Sur cette PrintNC, la couche HAL met la puissance du laser à l'échelle du rapport
+      entre vitesse <b>réelle</b> et vitesse demandée — c'est ce qui évite de brûler dans
+      les angles, où la machine ralentit. Conséquence directe : <b>à l'arrêt, la puissance
+      est forcée à zéro</b>.
+    </p>
+
+    <p>
+      Un point obtenu par une temporisation — la façon naturelle de faire un pointillé —
+      ne grave donc <b>rien du tout</b>, et le travail sort silencieusement blanc. Chaque
+      marque ponctuelle est un <b>micro-trait</b> : un court déplacement dont la vitesse
+      reproduit le temps d'exposition voulu.
+    </p>
+
+    <figure class="figure">
+      <svg style="font-size:12px" viewBox="0 0 640 280" role="img"
+           aria-label="Une temporisation met la vitesse à zéro et donc la puissance à zéro ; un micro-déplacement garde les deux non nulles">
+        <!-- panneau gauche : la temporisation -->
+        <text x="160" y="24" text-anchor="middle" class="petit" fill="var(--warn-b)">un point par temporisation</text>
+        <text x="40" y="62" text-anchor="end" class="petit">vitesse</text>
+        <line x1="46" y1="120" x2="290" y2="120" class="trait-fin"/>
+        <polyline points="46,70 116,70 116,120 196,120 196,70 290,70"
+                  fill="none" stroke="var(--fg)" stroke-width="2.2"/>
+        <text x="156" y="112" text-anchor="middle" class="petit" fill="var(--warn-b)">0</text>
+
+        <text x="40" y="152" text-anchor="end" class="petit">puissance</text>
+        <line x1="46" y1="210" x2="290" y2="210" class="trait-fin"/>
+        <polyline points="46,160 116,160 116,210 196,210 196,160 290,160"
+                  fill="none" stroke="var(--warn-b)" stroke-width="2.2"/>
+        <rect x="116" y="200" width="80" height="10" fill="var(--warn-b)" opacity="0.35"/>
+        <text x="156" y="234" text-anchor="middle" class="petit" fill="var(--warn-b)">rien n'est gravé</text>
+        <text x="156" y="250" text-anchor="middle" class="petit" fill="var(--warn-b)">et rien ne le signale</text>
+
+        <!-- separateur -->
+        <line x1="320" y1="30" x2="320" y2="250" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <!-- panneau droit : le micro-trait -->
+        <text x="480" y="24" text-anchor="middle" class="orange">un point par micro-trait</text>
+        <line x1="366" y1="120" x2="610" y2="120" class="trait-fin"/>
+        <polyline points="366,70 436,70 436,103 516,103 516,70 610,70"
+                  fill="none" stroke="var(--fg)" stroke-width="2.2"/>
+        <text x="476" y="97" text-anchor="middle" class="petit">lente, mais &gt; 0</text>
+
+        <line x1="366" y1="210" x2="610" y2="210" class="trait-fin"/>
+        <polyline points="366,160 436,160 436,188 516,188 516,160 610,160"
+                  fill="none" stroke="var(--orange)" stroke-width="2.2"/>
+        <rect x="436" y="188" width="80" height="22" fill="var(--orange)" opacity="0.28"/>
+        <text x="476" y="234" text-anchor="middle" class="orange">le point est gravé</text>
+        <text x="476" y="250" text-anchor="middle" class="petit">la vitesse porte le temps d'exposition</text>
+      </svg>
+      <figcaption>
+        Le même point, obtenu de deux façons. À gauche, la vitesse tombe à zéro et emporte
+        la puissance avec elle. À droite, un court déplacement garde les deux non nulles.
+      </figcaption>
+    </figure>
+
+    <div class="callout warn">
+      <span class="ci">Et un <code>S</code> entre deux <code>G1</code> arrête la machine</span>
+      <p>
+        Toujours sous LinuxCNC, changer la puissance par le mot <code>S</code> entre deux
+        mouvements force un arrêt : <b>76 ms par bloc contre 22,5</b>, mesurés. Sur un
+        tramage modulé, où la puissance change à chaque trait, cela saccade tout le travail
+        et le rallonge d'un facteur trois. La puissance voyage donc par
+        <code>M67 E0 Q&lt;v&gt;</code>, une sortie <b>synchronisée avec le mouvement</b>.
+        Sans effet en GRBL, qui ignore <code>M67</code> et n'a pas le problème.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">La méthode</div>
+    <h2>Le bois a toujours raison</h2>
+    <p class="sec-lede">
+      Les défauts les plus coûteux de ce projet n'ont jamais été trouvés par un test ni par
+      une relecture de code. Ils ont été trouvés en regardant une planche — ou en écoutant
+      la tête bouger.
+    </p>
+
+    <div class="cartes">
+      <div class="carte">
+        <div class="head"><span class="ci"><svg class="picto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="6" width="5.5" height="12" rx="1.2"/><rect x="9.25" y="6" width="5.5" height="12" rx="1.2"/><rect x="15.5" y="6" width="5.5" height="12" rx="1.2"/><path d="M9.25 12h5.5"/><path d="M15.5 9h5.5"/><path d="M15.5 12h5.5"/><path d="M15.5 15h5.5"/></svg></span><h3>Six tons jugés identiques</h3></div>
+        <p>
+          Une planche de nuancier a montré six tons notés « 100 % de noirceur » — dont
+          <b>un qui ne gravait rien du tout</b>. La courbe calibrée rendait la même recette
+          pour toutes les noirceurs demandées, en silence. Un nuancier bien rempli
+          <b>n'est pas une preuve</b> que la chaîne fonctionne.
+        </p>
+      </div>
+      <div class="carte">
+        <div class="head"><span class="ci"><svg class="picto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M6 6v12"/><path d="M10 6v12"/><path d="M13 6v12"/><path d="M15.4 6v12"/><path d="M17.3 6v12"/><path d="M18.8 6v12"/></svg></span><h3>Un dégradé sorti tout noir</h3></div>
+        <p>
+          Un dégradé qui aurait dû aller du clair au foncé est sorti uniformément noir : la
+          chaîne photo était fausse d'un bout à l'autre. Et la mire censée la valider
+          portait <b>le même défaut</b> — elle ne pouvait donc pas le détecter.
+        </p>
+      </div>
+      <div class="carte">
+        <div class="head"><span class="ci"><svg class="picto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.4 1.8"/><path d="M9.7 2.5h4.6"/><path d="M12 2.5V6"/></svg></span><h3>Quatre bandes, quatre vitesses</h3></div>
+        <p>
+          Quatre bandes à énergie identique mais à quatre vitesses différentes ont donné
+          quatre noirceurs différentes. La noirceur ne dépend donc pas que de l'énergie,
+          mais aussi du <b>temps de séjour</b> — ce qu'aucune correction de formule ne
+          pouvait rattraper.
+        </p>
+      </div>
+      <div class="carte">
+        <div class="head"><span class="ci"><svg class="picto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="12" r="1.8"/><path d="M10.5 8.2a6 6 0 0 1 0 7.6"/><path d="M14.4 5.2a10.5 10.5 0 0 1 0 13.6"/></svg></span><h3>Entendu, pas vu</h3></div>
+        <p>
+          Deux fois, c'est le <b>bruit de la tête</b> qui a trahi des déplacements inutiles
+          dans les tramages à points — la seconde fois un mois entier après le
+          « correctif ». Aucun test ne regardait cette propriété-là.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">La règle qui en découle</span>
+      <p>
+        « Cette plage est plus foncée que celle-là alors qu'elle devrait être plus claire »
+        est une <b>mesure</b>, et elle tranche. Quand une hypothèse et le bois ne sont pas
+        d'accord, c'est le bois qui a raison — et mieux vaut demander une petite planche de
+        contrôle que théoriser : trois mécanismes faux ont été proposés en un après-midi
+        avant qu'une gravure ne tranche.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="capot">
+  <div class="wrap">
+    <div class="sec-tag">Sous le capot</div>
+    <h2>Comment c'est fait</h2>
+    <p class="sec-lede">
+      La partie technique, repliée : à dérouler seulement si le sujet intéresse.
+    </p>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Le modèle de défocus, calibré sur deux mesures</span>
+        <span class="s">jamais deviné</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Pour noircir une surface en un seul passage, le remplissage <b>éloigne le bec du
+          foyer</b> : le point s'élargit et des hachures espacées se recouvrent. Le modèle
+          est un cône de divergence linéaire calibré à partir de <b>deux mesures réelles</b>
+          du point — au foyer, puis à un défocus connu. Une bande de calibration les
+          fournit ; on les saisit une fois, et tous les modes concernés les réutilisent.
+        </p>
+
+        <figure class="figure">
+          <svg style="font-size:10.1px" viewBox="0 0 540 280" role="img"
+               aria-label="Le faisceau converge vers un point au foyer puis diverge ; deux largeurs de point sont mesurées pour calibrer le cône">
+            <!-- le bec -->
+            <polygon points="256,30 284,30 276,58 264,58"
+                     fill="var(--slate)" stroke="var(--fg)" stroke-width="1.4"/>
+            <!-- le faisceau : converge au foyer (y=150), diverge ensuite -->
+            <path d="M 265 58 L 267 150 L 250 254 L 290 254 L 273 150 L 275 58 Z"
+                  fill="var(--orange)" opacity="0.22"/>
+            <path d="M 265 58 L 267 150 L 250 254" fill="none" stroke="var(--orange)" stroke-width="1.6"/>
+            <path d="M 275 58 L 273 150 L 290 254" fill="none" stroke="var(--orange)" stroke-width="1.6"/>
+
+            <!-- surface 1 : au foyer -->
+            <line x1="110" y1="150" x2="430" y2="150" stroke="var(--fg)" stroke-width="2"/>
+            <g class="cote">
+              <line x1="267" y1="136" x2="273" y2="136"/>
+              <line x1="267" y1="131" x2="267" y2="141"/>
+              <line x1="273" y1="131" x2="273" y2="141"/>
+            </g>
+            <text x="300" y="134" class="fort">d₀ — point au foyer</text>
+            <text x="300" y="148" class="petit">mesuré au pied à coulisse</text>
+
+            <!-- surface 2 : defocalise -->
+            <line x1="110" y1="254" x2="430" y2="254" stroke="var(--fg)" stroke-width="2" stroke-dasharray="6 3"/>
+            <g class="cote">
+              <line x1="250" y1="240" x2="290" y2="240"/>
+              <line x1="250" y1="235" x2="250" y2="245"/>
+              <line x1="290" y1="235" x2="290" y2="245"/>
+            </g>
+            <text x="300" y="238" class="fort">d — à un défocus connu</text>
+            <text x="300" y="252" class="petit">mesuré aussi</text>
+
+            <!-- la hauteur de defocus -->
+            <g class="cote">
+              <line x1="150" y1="150" x2="150" y2="254"/>
+              <line x1="145" y1="150" x2="155" y2="150"/>
+              <line x1="145" y1="254" x2="155" y2="254"/>
+            </g>
+            <text x="140" y="206" text-anchor="end" class="orange">défocus</text>
+
+            <text x="270" y="22" text-anchor="middle" class="petit">deux points suffisent : le cône est linéaire</text>
+          </svg>
+          <figcaption>
+            Aucune constante optique absolue n'est supposée — seulement des rapports à un
+            point <b>mesuré</b>.
+          </figcaption>
+        </figure>
+
+        <p>
+          Défocaliser étale la <b>même</b> puissance sur un point plus large : l'énergie par
+          unité de surface baisse, et sous un seuil le trait ne marque plus.
+        </p>
+
+        <div class="formule">
+          F ∝ P / (d · v)
+          <span class="ou">l'aire du point grossit en d², mais le temps de séjour grossit en d — d'où le 1/d net</span>
+        </div>
+
+        <p>
+          Les modes concernés demandent donc un réglage de <b>référence</b> connu bon sur le
+          matériau, et compensent la puissance pour retrouver la même fluence à la largeur
+          de point et à la vitesse courantes.
+        </p>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Suivre une surface 3D sans y passer la matinée</span>
+        <span class="s">×1200</span>
+      </summary>
+      <div class="corps">
+        <p>
+          La sonde de hauteur Z faisait à l'origine une intersection géométrique
+          OpenCascade <b>par point sondé</b>, environ 5 ms chacune. Sur un remplissage
+          dense, cela fait des dizaines de milliers d'intersections et plusieurs minutes
+          d'attente.
+        </p>
+        <p>
+          Elle repose maintenant sur une <b>tessellation unique</b> de la surface, suivie
+          d'une interpolation barycentrique par point. On paie une fois un petit coût de
+          préparation — le maillage — pour rendre ensuite chaque requête quasi gratuite,
+          au lieu de payer le prix fort à chacune des dizaines de milliers de requêtes.
+        </p>
+
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Calcul</th><th class="num">avant</th><th class="num">après</th><th class="num">gain</th></tr></thead>
+            <tbody>
+              <tr><td>Projection du motif sur la surface 3D</td><td class="num">66,2 s</td><td class="num">0,06 s</td><td class="num gain">×1200</td></tr>
+              <tr><td>G-code marquage courbe (1<sup>er</sup> calcul)</td><td class="num">107,0 s</td><td class="num">0,18 s</td><td class="num gain">×600</td></tr>
+              <tr><td>G-code marquage courbe (recalcul)</td><td class="num">11,8 s</td><td class="num">0,18 s</td><td class="num gain">×65</td></tr>
+              <tr><td>Hachures 0,2 mm sur 24 faces à trou</td><td class="num">2,6 s</td><td class="num">0,08 s</td><td class="num gain">×33</td></tr>
+              <tr><td>Grille de test 6×6, hachures 0,2 mm</td><td class="num">1,1 s</td><td class="num">0,06 s</td><td class="num gain">×17</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout tip">
+          <span class="ci">La précision, vérifiée et non supposée</span>
+          <p>
+            L'écart Z entre le maillage et la vraie surface est <b>borné à 0,05 mm</b>, et
+            validé contre l'ancien calcul exact sur <b>300 points au hasard</b> : erreur
+            maximale mesurée <b>0,046 mm</b>. Négligeable devant la tolérance de foyer du
+            laser, de l'ordre du dixième.
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Le bec, et pourquoi il a été amputé</span>
+        <span class="s">anti-collision</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Le module est un <b>LT-80W-AA-PRO</b>, diode 10 W optiques. La pièce carrée qui
+          entourait son nez a été <b>retirée</b> : sans elle, la tête peut plonger vers une
+          surface courbe sans heurter la pièce. C'est cette modification matérielle qui
+          rend possibles les modes sur surface 3D.
+        </p>
+        <p>
+          Le contrôle anti-collision ne modélise donc que le cône restant :
+        </p>
+
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Dimension</th><th class="num">valeur</th></tr></thead>
+            <tbody>
+              <tr><td>Diamètre à la pointe (point le plus bas)</td><td class="num">5 mm</td></tr>
+              <tr><td>Diamètre au sommet du cône</td><td class="num">16 mm</td></tr>
+              <tr><td>Hauteur du cône</td><td class="num">18 mm</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout warn">
+          <span class="ci">Un autre laser demande un autre profil</span>
+          <p>
+            Ces trois cotes viennent de <b>ce</b> module. Sur un bec de géométrie
+            différente, le contrôle sous-estimerait ou surestimerait les collisions. Le
+            profil s'édite depuis les préférences de l'atelier, sans toucher au code —
+            mais il <b>doit</b> être adapté avant d'utiliser les modes sur surface courbe.
+          </p>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Pour aller plus loin</div>
+    <h2>La documentation est ailleurs</h2>
+    <p class="sec-lede">
+      LaserAtelier est le seul de ces logiciels à avoir déjà son site complet. Cette page
+      ne le remplace pas : elle raconte ce qu'il ne raconte pas.
+    </p>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Sur le site de l'atelier</h3>
+        <ul class="clean">
+          <li>Installation et prérequis</li>
+          <li>Les modes un par un, avec leurs captures</li>
+          <li>Calibration et préférences</li>
+          <li>Le contrat G-code, ses trois dialectes</li>
+          <li>Réglages LinuxCNC, et une FAQ</li>
+        </ul>
+        <div class="liens" style="margin-top:14px">
+          <a class="btn btn-primary" href="https://laser.atelierduverdier.fr">laser.atelierduverdier.fr</a>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Ailleurs</h3>
+        <ul class="clean">
+          <li><a href="https://laser.atelierduverdier.fr/Manuel-LaserAtelier.pdf">Le manuel de l'atelier</a>, en PDF</li>
+          <li><a href="https://github.com/atelierduverdier/LaserAtelier">Le dépôt</a> — code public, LGPL-2.1-or-later</li>
+          <li><a href="https://youtu.be/KP4F4Cd287A">Une démonstration en vidéo</a></li>
+        </ul>
+        <p class="muted">
+          Version 2.99.50 au moment où cette page a été engendrée — lue dans
+          <code>laser_core.py</code>, jamais recopiée à la main.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     pied.html — bas de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/pied.html
+
+     Marques à remplacer par le générateur :
+       ../     préfixe vers le kit depuis la page : "" ou "../"
+       LaserAtelier nom du site dans la marque du pied
+       Atelier FreeCAD pour le marquage et la découpe laser sur CNC, surfaces courbes comprises. Code public, LGPL-2.1-or-later.     une ou deux phrases sur ce qu'est ce site-là
+       <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>      les <a> du pied
+       2026      année du copyright
+          <script> propre au site, ou vide
+     ========================================================================= -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+        <span class="brand-sub">LaserAtelier</span>
+      </div>
+      <p class="muted" style="margin:.2em 0 0">
+        Atelier FreeCAD pour le marquage et la découpe laser sur CNC, surfaces courbes comprises. Code public, LGPL-2.1-or-later.<br>
+        © 2026 Atelier du Verdier.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>
+      <a href="#top">Haut de page ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Visionneuse : présente sur toutes les pages, verdier.js ne s'y accroche
+     que s'il trouve des images à agrandir. -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Fermer">×</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-hint">Cliquer n'importe où, ou Échap, pour fermer</div>
+</div>
+
+<script src="../verdier.js"></script>
+
+
+<!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
+     tous les sous-domaines remontent au même endroit. Pas de cookie, pas
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+<script>
+  window.goatcounter = {
+    path: function (p) { return '/portail' + p }
+  };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>
