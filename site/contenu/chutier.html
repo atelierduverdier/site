@@ -44,6 +44,7 @@
           </a>
           <a class="btn btn-ghost" href="#voir">Ce qu'on voit</a>
           <a class="btn btn-ghost" href="#cnc">La CNC</a>
+          <a class="btn btn-ghost" href="#freecad">Depuis FreeCAD</a>
           <a class="btn btn-ghost" href="#capot">Sous le capot</a>
         </div>
       </div>
@@ -209,6 +210,23 @@
   </div>
 </section>
 
+<section id="bandes">
+  <div class="wrap">
+    <div class="sec-tag">La scie qu'on a</div>
+    <h2>Une scie à panneaux ne coupe pas n'importe où</h2>
+    <p class="sec-lede">
+      Elle déligne le panneau en bandes pleine longueur, puis tronçonne chaque
+      bande. Un plan guillotine libre, elle l'exécute mal.
+    </p>
+    <p>
+      La case <b>coupe en bandes</b> restreint le solveur à ces coupes en deux
+      étapes : une recoupe de largeur dans la bande à la rigueur, jamais une
+      recoupe de longueur. Ça coûte en général un peu de bois — et fait gagner
+      le temps qu'on aurait passé à se battre avec la machine.
+    </p>
+  </div>
+</section>
+
 <section id="etabli">
   <div class="wrap">
     <div class="sec-tag">À l'établi</div>
@@ -248,6 +266,29 @@
         se grossissent maintenant à proportion de la résolution demandée.
       </p>
     </div>
+  </div>
+</section>
+
+<section id="freecad">
+  <div class="wrap">
+    <div class="sec-tag">Depuis le dessin</div>
+    <h2>La feuille de débit sort du modèle</h2>
+    <p class="sec-lede">
+      Un projet dessiné dans FreeCAD porte déjà ses cotes dans un tableur.
+      Les retaper à la main, c'est se donner l'occasion de se tromper.
+    </p>
+    <p>
+      Fichier → <b>Importer des pièces (FreeCAD .FCStd)</b> lit la feuille de
+      calcul <i>dans le document</i>, sans lancer FreeCAD. Il y faut une ligne
+      d'en-tête (Rep. ou Désignation, Longueur, Largeur, et à volonté Qté,
+      Épaisseur, Matière, Fil), une pièce par ligne dessous ; les titres de
+      section sont sautés. Les <b>formules sont calculées</b> — alias,
+      références d'une feuille à l'autre comme
+      <code>Parametres.HautVantail</code>, unités, <code>round</code> — parce
+      qu'une feuille de débit réelle n'est faite que de cela. Ce que
+      l'évaluateur ne sait pas, il le refuse <b>en nommant la cellule</b> :
+      un nombre faux dans un débit se paye en bois.
+    </p>
   </div>
 </section>
 
@@ -308,15 +349,16 @@
 
     <figure class="capture">
       <img src="{{RACINE}}logiciels/captures/chutier-formes.webp"
-           alt="Une chute de contreplaqué de 400 × 300 vue seule : un cadre évidé avec un cœur posé dans son trou, deux équerres emboîtées, deux anneaux, deux étoiles, une flèche, un second cœur — dix pièces imbriquées"
+           alt="Une chute de contreplaqué de 400 × 300 vue seule : deux étoiles, un cœur, deux clés, une flèche, une équerre, un anneau et deux croissants imbriqués, chacun serré contre ses voisins"
            data-agrandir>
       <figcaption>
         L'exemple des formes biscornues, sur la chute de 400 × 300 que le
-        programme entame avant le panneau neuf : un cadre évidé qui reçoit un
-        <b>cœur dans son trou</b>, deux équerres emboîtées, des anneaux, des
-        étoiles, une flèche. Dix pièces sur une chute, rendement 49,6 % — et
-        les quatre restantes sur un coin du panneau, qui garde deux grandes
-        chutes rectangulaires.
+        programme entame avant le panneau neuf : deux étoiles emboîtées dans
+        les creux d'un cœur, des croissants glissés entre une flèche et une
+        équerre. Dix pièces sur une chute, <b>3,7 m de fraisage</b>, et les
+        quatre autres sur le panneau — dont un cadre évidé qui reçoit un
+        <b>cœur dans son trou</b>. Le tout laisse 0,028 m² de perte : le reste
+        du panneau part au stock en chute biscornue.
       </figcaption>
     </figure>
 
@@ -328,6 +370,24 @@
       chutes et les mêmes défauts. Fichier → <b>Exporter la découpe</b> rend
       chaque planche à l'échelle 1 en <b>SVG</b>, en <b>DXF</b> pour la
       fraiseuse ou en projet <b>LightBurn</b> pour le laser.
+    </p>
+
+    <p>
+      Ce qui reste de la planche <b>garde sa forme</b> : le panneau moins les
+      pièces élargies du passage de la fraise, morceau par morceau. Un
+      morceau rectangulaire redevient un rectangle qu'une scie saura
+      reprendre ; les autres sont des <b>chutes biscornues</b>, rangées au
+      stock avec leur polygone et leurs trous. Au débit suivant, on imbrique
+      dedans — dans le bois, pas dans sa boîte. Le cartouche de chaque
+      planche imbriquée annonce sa <b>longueur de fraisage</b>, et le bilan
+      le temps que cela demande à l'avance réglée.
+    </p>
+
+    <p>
+      Un plan ne se subit pas : sur une planche imbriquée, <b>glisser une
+      pièce à la souris</b> la déplace. Le programme vérifie qu'elle reste
+      dans le bois et à l'écart des autres, refait les chutes, et épingle la
+      planche — sinon le calcul suivant déferait le geste.
     </p>
 
     <details class="pliable">
@@ -378,7 +438,7 @@
 
     <figure class="capture">
       <img src="{{RACINE}}logiciels/captures/chutier-web.webp"
-           alt="La version web du chutier dans Chrome, thème sombre : les tables de pièces et de stock à gauche, les tuiles de bilan et le plan des formes imbriquées à droite"
+           alt="La version web du chutier dans Chrome, thème sombre : la pastille de version et le bouton EN dans la barre du haut, les tables de pièces et de stock à gauche, les tuiles de bilan et le plan des formes imbriquées à droite, dont une chute biscornue de 1200 × 600"
            data-agrandir>
       <figcaption>
         <a href="https://atelierduverdier.github.io/chutier/">atelierduverdier.github.io/chutier</a>
@@ -398,6 +458,17 @@
       à trous ; un découpage en oreilles en Python pur, vérifié contre la
       triangulation en C du bureau, prend le relais. Pas de multicœur ni
       d'étiquettes imprimées dans cette version : pour ces deux-là, le bureau.
+    </p>
+
+    <p>
+      La page s'<b>installe</b> et fonctionne <b>hors-ligne</b> après une
+      première visite, Python compris. Une <b>pastille de version</b> près du
+      titre dit si c'est bien la dernière : verte à jour, orange avec ⟳ quand
+      une plus récente est en ligne — la toucher recharge tout ; hors-ligne
+      elle reste neutre, elle ne peut pas savoir. Un bouton
+      <b>EN / FR</b> bascule toute l'interface : le dictionnaire a pour clé
+      le texte français, et un contrôle refuse qu'une phrase reste sans
+      traduction. L'application de bureau, elle, reste en français.
     </p>
   </div>
 </section>
@@ -552,14 +623,13 @@
       <li>À la scie, les coupes sont <b>guillotine</b>, de bord à bord. C'est
       un choix, pas une limite technique : un plan qu'on ne peut pas exécuter
       ne vaut rien. L'imbrication libre existe, mais pour la fraise.</li>
-      <li>Pas encore d'import direct depuis la feuille de calcul FreeCAD d'un
-      projet. Le CSV fait le lien en attendant, dans les deux sens.</li>
-      <li>Ce qui reste d'une planche imbriquée n'est compté chute que pour ses
-      deux bandes rectangulaires, à droite et au-dessus des pièces : le
-      chutier range des rectangles. Le reste, biscornu, est compté perte même
-      s'il en reste des morceaux.</li>
       <li>Le nœud qu'on déclare est un rectangle, pas une tache : c'est à
       l'œil de le mesurer large.</li>
+      <li>Le temps de fraisage annoncé est celui de la coupe seule : la
+      longueur des contours divisée par l'avance réglée. Les déplacements à
+      vide entre deux pièces n'y sont pas.</li>
+      <li>Dans le navigateur, le calcul n'a qu'un cœur — le bureau les prend
+      tous. Les étiquettes imprimées restent au bureau elles aussi.</li>
     </ul>
 
     <div class="callout note">

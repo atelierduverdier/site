@@ -65,6 +65,9 @@ def main() -> None:
     jetable = tempfile.mkdtemp(prefix='chutier-captures-')
     os.environ['XDG_CONFIG_HOME'] = jetable
     os.environ['CHUTIER_ATELIER'] = os.path.join(jetable, 'atelier.json')
+    # Pas de pastille verte ou orange au hasard du réseau sur une capture
+    # publiée : elle changerait d'un tirage à l'autre.
+    os.environ['CHUTIER_SANS_RESEAU'] = '1'
     sys.path.insert(0, str(PROJET))
 
     from PySide6.QtCore import Qt
@@ -72,6 +75,13 @@ def main() -> None:
     from PySide6.QtWidgets import QApplication
 
     import interface
+
+    # Le calcul dans un fil ne rend pas la main avant le grab : la capture
+    # montrait alors le plan de l'exemple PRÉCÉDENT sous la saisie du
+    # nouveau (vu le 04/09/2026 sur chutier-formes.png, un débit de sapin
+    # sous une table de formes biscornues). En synchrone, chaque
+    # `_calculer()` est fini quand il rend la main.
+    interface.SYNCHRONE = True
 
     app = QApplication(sys.argv)
     fenetre = interface.FenetrePrincipale()
@@ -118,6 +128,7 @@ def main() -> None:
     fenetre._chemin = None
     fenetre._modifie = False
     fenetre._charger_exemple()
+    fenetre._calculer()
     # Douze colonnes de stock : on donne sa place à la saisie pour cette
     # image-là, c'est elle qu'on vient y lire.
     fenetre._splitter.setSizes([760, FENETRE[0] - 760])
@@ -130,6 +141,7 @@ def main() -> None:
     #    tenait dans un timbre-poste.
     fenetre._modifie = False
     fenetre._charger_exemple_formes()
+    fenetre._calculer()
     fenetre._splitter.setSizes([560, FENETRE[0] - 560])
     fenetre.choix_vue.setCurrentIndex(1)
     fenetre.liste_planches.setCurrentRow(0)
