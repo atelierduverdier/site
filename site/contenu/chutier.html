@@ -384,6 +384,35 @@
     </p>
 
     <p>
+      Ces trois formats décrivent des <b>contours</b> : il faut encore une
+      chaîne CAM pour en tirer un parcours. Fichier → <b>Exporter le
+      G-code</b> saute l'étape et écrit le programme lui-même, un
+      <code>.ngc</code> par planche : décalé du <b>rayon de la fraise</b>
+      (vers l'extérieur pour le tour d'une pièce, vers l'intérieur pour
+      ses trous — sans quoi la pièce sort trop petite d'un diamètre
+      entier), en <b>passes</b> jusqu'à mordre le martyr, avec des
+      <b>attaches</b> pour que la pièce ne se libère pas sous la fraise,
+      des <b>rampes</b> au lieu de plongées droites, et les trous percés
+      <b>avant</b> le tour. LinuxCNC ou GRBL. Le fichier dit en tête, en
+      commentaires, si la fraise mord dans une pièce voisine ou sort de la
+      planche.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Un programme se rejoue, il ne se relit pas</span>
+      <p>
+        Les contrôles automatiques n'examinent pas le texte du G-code :
+        ils le <b>rejouent</b> dans un simulateur qui tient l'état de la
+        machine, et vérifient ce que la fraise fait — le décalage, le sens
+        de rotation, l'ordre des contours, les profondeurs, les attaches,
+        et qu'aucun déplacement rapide ne traverse le bois. Un parcours se
+        regarde aussi : le tracer a montré du premier coup que le décalage
+        en onglet dessinait des pointes qu'une fraise ronde ne peut pas
+        atteindre.
+      </p>
+    </div>
+
+    <p>
       Un plan ne se subit pas : sur une planche imbriquée, <b>glisser une
       pièce à la souris</b> la déplace. Le programme vérifie qu'elle reste
       dans le bois et à l'écart des autres, refait les chutes, et épingle la
@@ -628,6 +657,10 @@
       <li>Le temps de fraisage annoncé est celui de la coupe seule : la
       longueur des contours divisée par l'avance réglée. Les déplacements à
       vide entre deux pièces n'y sont pas.</li>
+      <li>Le G-code sort des contours, pas des poches ni des chanfreins :
+      c'est un découpeur de pièces, pas une chaîne CAM. Et pas de laser —
+      sur la machine de l'atelier il demande la broche, l'armement,
+      l'échelle de puissance et l'air, dont LaserAtelier se charge.</li>
       <li>Dans le navigateur, le calcul n'a qu'un cœur — le bureau les prend
       tous. Les étiquettes imprimées restent au bureau elles aussi.</li>
     </ul>
