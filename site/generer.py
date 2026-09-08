@@ -1213,12 +1213,17 @@ def injecter_pendante(corps: str, nom: str) -> str:
     main dans la page l'aurait condamné à diverger du dépôt à la première
     correction — c'est la faute que ce générateur combat partout ailleurs.
     """
-    if '{{pendante:hal}}' not in corps:
+    if '{{pendante:' not in corps:
         return corps
     if not chemins.PENDANTE_HAL.exists():
         sys.exit(f"{nom} : {chemins.PENDANTE_HAL} est introuvable — "
                  "le câblage de la pendante ne peut pas être injecté.")
     hal = chemins.PENDANTE_HAL.read_text(encoding='utf-8').rstrip()
+    # Le nombre de liaisons se COMPTE. Ecrit a la main dans le titre, il
+    # aurait vieilli des la premiere correction du cablage — quatre pins
+    # ont deja disparu le jour meme.
+    nb = sum(1 for l in hal.splitlines() if l.strip().startswith('net '))
+    corps = corps.replace('{{pendante:nb_net}}', str(nb))
     return corps.replace('{{pendante:hal}}', html.escape(hal))
 
 

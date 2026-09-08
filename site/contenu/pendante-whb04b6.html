@@ -225,16 +225,76 @@
       </table>
     </div>
 
-    <div class="callout note">
-      <span class="ci">Sur cette config, les macros ne sont branchées sur rien</span>
+    <p>
+      Sur cette machine, huit gestes sont câblés — et chaque touche garde sa
+      famille : seule elle fait le geste courant, avec <code>Fn</code> elle fait
+      le réglage correspondant.
+    </p>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Touche</th><th>Seule</th><th>Avec <code>Fn</code></th></tr></thead>
+        <tbody>
+          <tr><td><b>M-HOME</b></td><td>prise d'origine</td><td>aller au zéro machine</td></tr>
+          <tr><td><b>Safe-Z</b></td><td>dégager en haut de course</td><td>mode Z sur le martyre</td></tr>
+          <tr><td><b>W-HOME</b></td><td>aller au zéro pièce, Z d'abord</td><td>mode Z sur la pièce</td></tr>
+          <tr><td><b>Probe-Z</b></td><td>palper l'outil courant</td><td>remettre la référence à zéro</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">halui n'exécute qu'<b>une seule</b> commande par bouton</span>
       <p>
-        Les seize macros remontent bien jusqu'à HAL — on les voit réagir dans
-        <code>halshow</code> sous <code>pdnt.button.*</code> — mais elles ne
-        déclenchent aucune action, faute de <code>MDI_COMMAND</code> déclarés
-        dans la section <code>[HALUI]</code> du fichier <code>.ini</code>. Tant
-        qu'il n'y en a pas, <b>il ne faut surtout pas câbler les pins
-        <code>halui.mdi-command-NN</code></b> : elles n'existent pas, et HAL
-        refuse alors de charger.
+        Les <code>MDI_COMMAND</code> se déclarent dans <code>[HALUI]</code>, et
+        <code>halui</code> exporte une pin <code>halui.mdi-command-XX</code> par
+        ligne — <b>XX suivant l'ordre des lignes</b>, à partir de 00. Déplacer
+        une ligne déplace le bouton qui l'appelle, sans que rien ne proteste.
+      </p>
+      <p>
+        Attention, ce n'est <b>pas</b> la section <code>[MDI_COMMAND_LIST]</code>
+        des boutons de l'écran, et le <code>;</code> n'y sépare rien : en G-code
+        il ouvre un <b>commentaire</b>. Une ligne comme
+        <code>G0 Z25;X0 Y0;Z0</code> monterait le Z et ne rejoindrait jamais
+        X&nbsp;Y — un demi-geste, silencieux. Les gestes en plusieurs temps
+        passent donc par un sous-programme.
+      </p>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">RESET réarme, il ne déclenche pas</span>
+      <p>
+        Il est câblé sur <code>halui.estop.reset</code>. La différence est le
+        sens de la panne : <b>déclencher</b> un arrêt d'urgence depuis une
+        pendante sans fil est une fausse sécurité — liaison tombée, le bouton ne
+        fait plus rien, et le réflexe s'est pris sur un objet mort. <b>Réarmer</b>
+        tombe du bon côté : sans liaison on ne réarme pas, la machine reste à
+        l'arrêt. Le champignon câblé demeure le seul organe pour arrêter.
+      </p>
+      <p>
+        Et surtout pas la remise à zéro des références sur cette touche, malgré
+        le nom : RESET est le bouton du réflexe, celui que la main trouve sans
+        regarder quand ça part de travers. Il effacerait la référence de longueur
+        d'outil <b>en plein travail</b>. Ce geste-là est derrière
+        <code>Fn</code>&nbsp;+&nbsp;<code>Probe-Z</code>, la touche qui a posé
+        cette référence.
+      </p>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">La pendante arrête et regarde, elle ne lance pas</span>
+      <p>
+        <code>halui.program.{run, pause, resume, is-idle}</code> ne sont
+        <b>pas</b> câblées : sur la machine réelle elles sont déjà portées par
+        les boutons physiques <code>FEED_HOLD</code> et <code>CYCLE_START</code>,
+        et deux sources sur un même signal font refuser HAL — la config ne
+        chargerait plus. En simulation ces pins sont libres, donc la faute ne se
+        serait vue qu'à l'établi.
+      </p>
+      <p>
+        Ce n'est pas qu'un contournement : lancer un cycle au bout d'une liaison
+        radio qui tombe est le geste à ne pas offrir. <b>STOP</b>, lui, fonctionne
+        — c'est le sens sûr.
       </p>
     </div>
   </div>
@@ -315,9 +375,38 @@ sudo udevadm control --reload &amp;&amp; sudo udevadm trigger</code></pre></div>
     <p>
       Côté <code>.ini</code>, la section <code>[HAL]</code> doit déclarer
       <code>HALUI = halui</code> — c'est <code>halui</code> qui expose la moitié
-      des signaux utilisés. Le fichier de câblage se charge ensuite depuis le
-      post-GUI.
+      des signaux utilisés.
     </p>
+
+    <p>
+      Le câblage se charge depuis le <b>post-GUI</b>, et la ligne y est laissée
+      <b>commentée</b> exprès. Pour l'activer, retirer le <code>#</code> devant
+      <code>source pendant-whb04b6.hal</code> :
+    </p>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Config</th><th>Fichier où décommenter</th></tr></thead>
+        <tbody>
+          <tr><td>Machine réelle</td><td><code>postgui_call_list.hal</code></td></tr>
+          <tr><td>Simulation</td><td><code>postgui_call_list_sim.hal</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">Une fois cette ligne active, LinuxCNC exige la pendante</span>
+      <p>
+        <code>loadusr -W</code> attend que le composant soit prêt : <b>pendante
+        éteinte ou dongle absent, LinuxCNC ne démarre plus</b>. Sur la machine
+        de production, c'est un vrai risque d'atelier — d'où la ligne laissée
+        commentée par défaut. Remettre le <code>#</code> suffit à retrouver un
+        démarrage sans pendante.
+      </p>
+      <p>
+        Et dans cet ordre : <b>la règle udev d'abord</b>, la ligne ensuite.
+      </p>
+    </div>
 
     <div class="callout tip">
       <span class="ci">Le dongle qui clignote n'est pas en panne</span>
@@ -337,7 +426,7 @@ sudo udevadm control --reload &amp;&amp; sudo udevadm trigger</code></pre></div>
 <section id="cablage">
   <div class="wrap">
     <div class="sec-tag">Le câblage HAL</div>
-    <h2>81 liaisons, vérifiées pin par pin</h2>
+    <h2>{{pendante:nb_net}} liaisons, vérifiées pin par pin</h2>
     <p class="sec-lede">
       Ce fichier vit dans le dépôt <code>printnc-config</code>. Il est écrit pour
       la configuration de simulation, mais rien n'y est propre à la simulation :
@@ -360,9 +449,11 @@ sudo udevadm control --reload &amp;&amp; sudo udevadm trigger</code></pre></div>
         deux signaux.
       </p>
       <p>
-        <b>Trois.</b> Aucune commande MDI n'étant déclarée, les liaisons vers
-        <code>halui.mdi-command-NN</code> ont été retirées et les boutons laissés
-        en signaux nus.
+        <b>Trois.</b> Quatre pins de l'exemple ont été retirées après contrôle
+        contre la config <b>réelle</b>, et non contre la simulation :
+        <code>halui.program.{run, pause, resume, is-idle}</code> y sont déjà
+        portées par les boutons physiques de la carte. La simulation les laisse
+        libres — la faute n'aurait éclaté qu'au moment de démarrer la machine.
       </p>
     </div>
 
