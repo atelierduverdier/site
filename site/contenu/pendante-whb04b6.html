@@ -1,0 +1,436 @@
+<!-- Pendante sans fil XHC WHB04B-6 sur LinuxCNC. La table des touches, celle des
+     deux sélecteurs et l'avertissement sur le nommage viennent du README du
+     composant xhc-whb04b-6 livré avec LinuxCNC 2.9.10 (src/hal/user_comps/), pas
+     de la notice du fabricant, qui ne documente que Mach3. Le .hal reproduit en
+     fin de page est celui du dépôt printnc-config, inséré à la génération. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">XHC WHB04B-6</span>
+          <span class="badge">6 axes, sans fil</span>
+          <span class="badge">LinuxCNC 2.9.10</span>
+          <span class="badge">validée sur la simulation</span>
+        </div>
+        <h1>La pendante, et ses touches qui mentent</h1>
+        <p class="lede">
+          Seize touches, deux sélecteurs, une molette — et un mode d'emploi
+          d'origine qui ne parle que de Mach3. Voici ce que fait réellement
+          chaque commande sous LinuxCNC, y compris les trois endroits où
+          <b>l'inscription sur le bouton dit le contraire de ce qu'il fait</b>.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#pieges">Les trois pièges</a>
+          <a class="btn btn-ghost" href="#fn">La table des touches</a>
+          <a class="btn btn-github" href="https://github.com/atelierduverdier/printnc-config"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            La config sur GitHub
+          </a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <svg style="font-size:8.5px" viewBox="0 0 300 380" role="img"
+             aria-label="Façade de la pendante WHB04B-6 : quatre rangées de touches, deux sélecteurs rotatifs et la molette">
+          <g class="figure">
+            <rect x="18" y="10" width="264" height="360" rx="22" fill="var(--bg-3)"
+                  stroke="var(--fg-3)" stroke-width="1.4"/>
+
+            <rect x="34" y="24" width="200" height="46" rx="5" fill="var(--bg-2)"
+                  stroke="var(--fg-3)" stroke-width="1"/>
+            <text x="42" y="38" class="petit">antenne · pile</text>
+            <text x="42" y="52" class="orange">X: +1234.4561</text>
+            <text x="42" y="64" class="petit">Y: −1470.9632</text>
+            <text x="182" y="38" class="petit">CON:10%</text>
+
+            <rect x="34" y="84" width="46" height="26" rx="5" fill="var(--bg-2)"
+                  stroke="var(--orange)" stroke-width="2"/>
+            <text x="57" y="100" text-anchor="middle" class="petit orange">RESET</text>
+            <rect x="88" y="84" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="111" y="100" text-anchor="middle" class="petit">STOP</text>
+            <rect x="142" y="84" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="165" y="100" text-anchor="middle" class="petit">Start</text>
+            <circle cx="248" cy="97" r="13" fill="none" stroke="var(--fg-3)" stroke-width="1.6"/>
+            <text x="248" y="100" text-anchor="middle" class="petit">⏻</text>
+
+            <rect x="34" y="118" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="57" y="134" text-anchor="middle" class="petit">Feed+</text>
+            <rect x="88" y="118" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="111" y="134" text-anchor="middle" class="petit">Feed−</text>
+            <rect x="142" y="118" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="165" y="134" text-anchor="middle" class="petit">Spin+</text>
+            <rect x="196" y="118" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="219" y="134" text-anchor="middle" class="petit">Spin−</text>
+
+            <rect x="34" y="152" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="57" y="168" text-anchor="middle" class="petit">M-HOME</text>
+            <rect x="88" y="152" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="111" y="168" text-anchor="middle" class="petit">Safe-Z</text>
+            <rect x="142" y="152" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="165" y="168" text-anchor="middle" class="petit">W-HOME</text>
+            <rect x="196" y="152" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="219" y="168" text-anchor="middle" class="petit">S-ON/OFF</text>
+
+            <rect x="142" y="186" width="46" height="26" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="165" y="202" text-anchor="middle" class="petit">Probe-Z</text>
+            <rect x="196" y="186" width="46" height="26" rx="5" fill="var(--bg-2)"
+                  stroke="var(--orange)" stroke-width="2"/>
+            <text x="219" y="202" text-anchor="middle" class="petit orange">Fn</text>
+
+            <circle cx="62" cy="248" r="30" fill="var(--bg-2)" stroke="var(--fg)" stroke-width="1.6"/>
+            <line x1="62" y1="248" x2="62" y2="224" stroke="var(--orange)" stroke-width="2.4"/>
+            <text x="62" y="292" text-anchor="middle" class="petit">axe</text>
+            <text x="62" y="303" text-anchor="middle" class="petit">OFF X Y Z A B C</text>
+
+            <circle cx="238" cy="248" r="30" fill="var(--bg-2)" stroke="var(--fg)" stroke-width="1.6"/>
+            <line x1="238" y1="248" x2="256" y2="232" stroke="var(--orange)" stroke-width="2.4"/>
+            <text x="238" y="292" text-anchor="middle" class="petit">vitesse</text>
+            <text x="238" y="303" text-anchor="middle" class="petit">pas · % · Lead</text>
+
+            <rect x="128" y="232" width="44" height="24" rx="5" fill="var(--bg-2)" stroke="var(--fg-3)"/>
+            <text x="150" y="247" text-anchor="middle" class="petit">Macro-10</text>
+
+            <circle cx="150" cy="330" r="30" fill="var(--bg-2)" stroke="var(--fg)" stroke-width="2.4"/>
+            <circle cx="150" cy="330" r="5" fill="var(--orange)"/>
+            <text x="150" y="368" text-anchor="middle" class="petit">molette</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="pieges">
+  <div class="wrap">
+    <div class="sec-tag">À lire en premier</div>
+    <h2>Trois inscriptions qui disent le contraire du vrai</h2>
+    <p class="sec-lede">
+      Les développeurs du composant LinuxCNC le disent sans détour : la
+      sérigraphie et la notice du fabricant sont mal traduites. Trois pièges en
+      découlent, et ils suffisent à croire l'appareil en panne.
+    </p>
+
+    <div class="callout warn">
+      <span class="ci">MPG et Step sont inversés</span>
+      <p>
+        Le bouton marqué <b>MPG</b> met la pendante en mode <b>continu</b>, et le
+        bouton marqué <b>Step/Continuous</b> la met en mode <b>pas à pas</b>.
+        En continu, chaque cran de molette veut dire « déplace l'axe à la vitesse
+        choisie » ; en pas à pas, « déplace-le d'un pas ».
+      </p>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">« CON: 10% » n'est pas un indicateur de connexion</span>
+      <p>
+        C'est le mode <b>Continuous</b> à <b>10 %</b> de la vitesse maximale.
+        Selon le firmware, le même état s'écrit <code>CONT 30%</code>,
+        <code>CON:30%</code> ou <code>STEP: 1.0</code>. La liaison radio, elle, a
+        son propre pictogramme d'antenne, en haut à gauche de l'écran, à côté de
+        la pile.
+      </p>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">Sélecteur d'axe sur OFF : l'écran se fige</span>
+      <p>
+        Ce n'est pas seulement que rien ne bouge — <b>la pendante cesse de
+        rafraîchir les coordonnées</b>. Un écran qui affiche des chiffres figés
+        avec le sélecteur sur OFF est un écran qui fonctionne normalement.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="selecteurs">
+  <div class="wrap">
+    <div class="sec-tag">Les deux molettes crantées</div>
+    <h2>Le sélecteur de vitesse se lit de deux façons</h2>
+    <p class="sec-lede">
+      Une seule couronne, deux graduations imprimées l'une sous l'autre. Celle
+      qui compte dépend du mode : les millimètres en pas à pas, les pourcentages
+      en continu.
+    </p>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Position</th><th class="num">en pas à pas</th><th class="num">en continu</th><th>ce que fait la molette</th></tr></thead>
+        <tbody>
+          <tr><td>1<sup>re</sup></td><td class="num">0.001 mm</td><td class="num">2 %</td><td>un cran = un pas, ou 2 % de la vitesse maxi</td></tr>
+          <tr><td>2<sup>e</sup></td><td class="num">0.01 mm</td><td class="num">5 %</td><td>idem</td></tr>
+          <tr><td>3<sup>e</sup></td><td class="num">0.1 mm</td><td class="num">10 %</td><td>idem</td></tr>
+          <tr><td>4<sup>e</sup></td><td class="num">1 mm</td><td class="num">30 %</td><td>idem</td></tr>
+          <tr><td>5<sup>e</sup></td><td class="num">—</td><td class="num">60 %</td><td>pourcentage seulement</td></tr>
+          <tr><td>6<sup>e</sup></td><td class="num">—</td><td class="num">100 %</td><td>pourcentage seulement</td></tr>
+          <tr><td><b>Lead</b></td><td class="num">—</td><td class="num">—</td><td>la molette règle la <b>correction de broche</b></td></tr>
+          <tr><td><b>MPG</b></td><td class="num">—</td><td class="num">—</td><td>la molette règle la <b>correction d'avance</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Pourquoi la molette ne déplace rien en MPG ni en Lead</span>
+      <p>
+        Parce que le composant est lancé avec les options <code>-s</code> et
+        <code>-f</code>, qui donnent précisément ce rôle à ces deux positions.
+        Pour déplacer un axe, il faut une position de <b>pas</b> ou de
+        <b>pourcentage</b>. L'option <code>-B</code> ajoute par ailleurs les pas
+        de 5 mm et 10 mm.
+      </p>
+    </div>
+
+    <p>
+      Le <b>sélecteur d'axe</b>, lui, est plus simple : <code>OFF</code>,
+      <code>X</code>, <code>Y</code>, <code>Z</code>, <code>A</code>,
+      <code>B</code>, <code>C</code>. Sur la PrintNC, qui est une machine XYZY
+      (le Y est en tandem sur deux moteurs), les positions <b>A, B et C ne font
+      rien</b> : ces axes n'existent pas. Ce n'est pas un défaut.
+    </p>
+  </div>
+</section>
+
+<section id="fn">
+  <div class="wrap">
+    <div class="sec-tag">La touche modificatrice</div>
+    <h2>Fn transforme n'importe quelle touche en macro</h2>
+    <p class="sec-lede">
+      <b>Fn maintenue, puis la touche</b> — dans cet ordre. La combinaison
+      fonctionne avec les seize touches, y compris celles où aucun numéro de
+      macro n'est sérigraphié.
+    </p>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Touche</th><th>seule</th><th>avec Fn</th></tr></thead>
+        <tbody>
+          <tr><td>RESET</td><td>arrêt d'urgence / réarmement</td><td class="num">Macro-11</td></tr>
+          <tr><td>STOP</td><td>arrête le programme</td><td class="num">Macro-12</td></tr>
+          <tr><td>Start/Pause</td><td>lance, met en pause, reprend</td><td class="num">Macro-13</td></tr>
+          <tr><td>Feed +</td><td>augmente la correction d'avance</td><td class="num">Macro-1</td></tr>
+          <tr><td>Feed −</td><td>diminue la correction d'avance</td><td class="num">Macro-2</td></tr>
+          <tr><td>Spindle +</td><td>augmente la correction de broche</td><td class="num">Macro-3</td></tr>
+          <tr><td>Spindle −</td><td>diminue la correction de broche</td><td class="num">Macro-4</td></tr>
+          <tr><td>M-HOME</td><td>prise d'origine machine</td><td class="num">Macro-5</td></tr>
+          <tr><td>Safe-Z</td><td>dégagement en Z</td><td class="num">Macro-6</td></tr>
+          <tr><td>W-HOME</td><td>origine pièce</td><td class="num">Macro-7</td></tr>
+          <tr><td>S-ON/OFF</td><td>broche en marche / à l'arrêt</td><td class="num">Macro-8</td></tr>
+          <tr><td>Probe-Z</td><td>palpage en Z</td><td class="num">Macro-9</td></tr>
+          <tr><td>Macro-10</td><td>bascule l'affichage machine / pièce</td><td class="num">Macro-14</td></tr>
+          <tr><td>MPG <span class="muted">(= continu)</span></td><td>passe en mode continu</td><td class="num">Macro-15</td></tr>
+          <tr><td>Step <span class="muted">(= pas à pas)</span></td><td>passe en mode pas à pas</td><td class="num">Macro-16</td></tr>
+          <tr><td><b>Fn</b></td><td colspan="2">modificateur — ne fait rien seule</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Sur cette config, les macros ne sont branchées sur rien</span>
+      <p>
+        Les seize macros remontent bien jusqu'à HAL — on les voit réagir dans
+        <code>halshow</code> sous <code>pdnt.button.*</code> — mais elles ne
+        déclenchent aucune action, faute de <code>MDI_COMMAND</code> déclarés
+        dans la section <code>[HALUI]</code> du fichier <code>.ini</code>. Tant
+        qu'il n'y en a pas, <b>il ne faut surtout pas câbler les pins
+        <code>halui.mdi-command-NN</code></b> : elles n'existent pas, et HAL
+        refuse alors de charger.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="ecran">
+  <div class="wrap">
+    <div class="sec-tag">L'écran</div>
+    <h2>Deux jeux de coordonnées, et lequel vous regardez</h2>
+
+    <p>
+      La pendante reçoit deux positions par axe et n'en affiche qu'une à la
+      fois. <code>X:</code> donne la coordonnée <b>machine</b>,
+      <code>X1:</code> la coordonnée <b>pièce</b>. Le bouton
+      <b>Macro-10</b> bascule de l'une à l'autre. Un écart entre l'écran de la
+      pendante et celui du pupitre vient presque toujours de là : les deux
+      valeurs sont justes, elles ne parlent simplement pas du même repère.
+    </p>
+
+    <p>
+      L'écran affiche aussi le niveau de pile, la force du signal, le mode et le
+      pas ou le pourcentage en cours. Il ne peut rien montrer d'autre : le
+      firmware n'accepte aucune donnée libre.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Au réveil, la pendante ne dit pas où sont ses sélecteurs</span>
+      <p>
+        C'est un défaut connu, reconnu dans le README du composant : à
+        l'allumage, l'appareil <b>n'annonce pas spontanément</b> la position de
+        ses deux couronnes. Tant qu'on n'a rien bougé, LinuxCNC croit qu'aucun
+        axe n'est choisi. <b>Tourner un sélecteur d'un cran</b> suffit à le faire
+        parler.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="installer">
+  <div class="wrap">
+    <div class="sec-tag">Installation</div>
+    <h2>La règle udev d'abord — tout le reste en dépend</h2>
+    <p class="sec-lede">
+      Le composant <code>xhc-whb04b-6</code> est livré avec LinuxCNC : il n'y a
+      rien à compiler. Mais sans droit d'accès au dongle, il démarre quand même,
+      et fait croire que tout va bien.
+    </p>
+
+    <div class="callout warn">
+      <span class="ci">Le piège qui coûte une après-midi</span>
+      <p>
+        Sans la règle udev, le composant se lance, crée ses 137 pins HAL et
+        transmet même les positions vers l'écran de la pendante — mais il
+        <b>n'ouvre jamais le dongle</b>. Rien ne remonte, et le dongle se
+        réinitialise en boucle toutes les 20 secondes faute d'être interrogé.
+        <b>Un <code>loadusr -W</code> qui réussit ne prouve donc rien</b> sur les
+        permissions : il réussit aussi quand le composant n'a aucun accès.
+      </p>
+      <p>
+        Le paquet Arch ne pose pas cette règle, et celle fournie en amont vise le
+        groupe <code>plugdev</code>, qui n'existe pas sur Arch — d'où
+        <code>TAG+="uaccess"</code> à la place.
+      </p>
+    </div>
+
+    <p>Poser la règle :</p>
+<div class="twrap" style="padding:0 14px"><pre><code>echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="10ce", ATTR{idProduct}=="eb93", MODE="0666", TAG+="uaccess"' \
+  | sudo tee /etc/udev/rules.d/99-xhc-whb04b-6.rules
+sudo udevadm control --reload &amp;&amp; sudo udevadm trigger</code></pre></div>
+
+    <p>
+      Puis <b>débrancher et rebrancher le dongle</b> : une règle udev ne
+      s'applique qu'à l'énumération suivante. Le contrôle qui ne ment pas —
+      s'il ne renvoie rien, le composant n'a pas le dongle :
+    </p>
+<div class="twrap" style="padding:0 14px"><pre><code>ls -l /proc/$(pgrep -x xhc-whb04b-6)/fd | grep /dev/bus/usb</code></pre></div>
+
+    <p>
+      Côté <code>.ini</code>, la section <code>[HAL]</code> doit déclarer
+      <code>HALUI = halui</code> — c'est <code>halui</code> qui expose la moitié
+      des signaux utilisés. Le fichier de câblage se charge ensuite depuis le
+      post-GUI.
+    </p>
+
+    <div class="callout tip">
+      <span class="ci">Le dongle qui clignote n'est pas en panne</span>
+      <p>
+        Au repos, quand aucun logiciel ne l'interroge, le dongle se réinitialise
+        toutes les 20 secondes : c'est son comportement normal. Il se stabilise
+        de lui-même dès que le composant l'a ouvert. Et si l'on a besoin de le
+        forcer à rester présent — pour lui laisser le temps d'être attrapé au
+        démarrage — il suffit de <b>maintenir une touche de la pendante
+        enfoncée</b> : la liaison tient alors plus d'une minute au lieu de dix
+        secondes.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="cablage">
+  <div class="wrap">
+    <div class="sec-tag">Le câblage HAL</div>
+    <h2>81 liaisons, vérifiées pin par pin</h2>
+    <p class="sec-lede">
+      Ce fichier vit dans le dépôt <code>printnc-config</code>. Il est écrit pour
+      la configuration de simulation, mais rien n'y est propre à la simulation :
+      la machine réelle a les mêmes axes et les mêmes joints.
+    </p>
+
+    <div class="callout note">
+      <span class="ci">Trois corrections sur l'exemple livré avec LinuxCNC</span>
+      <p>
+        <b>Un.</b> La pin <code>whb.halui.home-all</code> est décrite dans la
+        page de manuel mais <b>n'existe pas</b> dans le binaire 2.9.10 ; c'est
+        <code>whb.button.m-home</code> qui pilote <code>halui.home-all</code>.
+        La liste des pins réelles s'obtient en chargeant le composant seul :
+        <code>halrun</code> puis <code>show pin whb</code>.
+      </p>
+      <p>
+        <b>Deux.</b> <code>halui.program.is-paused</code> et
+        <code>spindle.0.on</code> portent déjà des signaux dans la configuration
+        PrintNC : il faut s'y raccrocher, HAL refusant qu'une pin appartienne à
+        deux signaux.
+      </p>
+      <p>
+        <b>Trois.</b> Aucune commande MDI n'étant déclarée, les liaisons vers
+        <code>halui.mdi-command-NN</code> ont été retirées et les boutons laissés
+        en signaux nus.
+      </p>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">La molette exige une machine prise d'origine</span>
+      <p>
+        Elle pilote <code>axis.&lt;lettre&gt;.jog-*</code>, ce qui suppose le
+        mode <b>teleop</b>. Avant la prise d'origine, LinuxCNC est en mode joint
+        et la molette reste sans effet. Ce n'est pas une panne.
+      </p>
+    </div>
+
+<div class="twrap" style="padding:0 14px"><pre><code>{{pendante:hal}}</code></pre></div>
+  </div>
+</section>
+
+<section id="depannage">
+  <div class="wrap">
+    <div class="sec-tag">Quand rien ne bouge</div>
+    <h2>Couper le problème en deux, en une commande</h2>
+    <p class="sec-lede">
+      La chaîne va de la pendante à LinuxCNC en passant par la radio, le dongle,
+      le composant et HAL. Une seule lecture dit de quel côté chercher.
+    </p>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Ce qu'on lit</th><th>Ce que ça veut dire</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>halcmd show pin whb.halui.axis</code> — les <code>pos-feedback</code> portent de vraies coordonnées</td>
+            <td>Le sens <b>LinuxCNC → pendante</b> fonctionne : le câblage HAL est bon.</td>
+          </tr>
+          <tr>
+            <td>… mais tous les <code>.select</code> et <code>selected-*</code> sont à FALSE</td>
+            <td>Le sens <b>pendante → LinuxCNC</b> ne passe pas. Chercher du côté des droits d'accès, pas du câblage.</td>
+          </tr>
+          <tr>
+            <td><code>ls -l /proc/$(pgrep -x xhc-whb04b-6)/fd</code> ne montre aucun <code>/dev/bus/usb</code></td>
+            <td>Le composant n'a jamais ouvert le dongle : <b>la règle udev manque</b>.</td>
+          </tr>
+          <tr>
+            <td><code>journalctl -k</code> montre un cycle de connexion / déconnexion régulier</td>
+            <td>Personne n'interroge le dongle. C'est un <b>symptôme</b>, jamais une cause : ni panne, ni appairage, ni hub.</td>
+          </tr>
+          <tr>
+            <td>La molette compte (<code>whb.axis.x.jog-counts</code> augmente) mais l'axe ne bouge pas</td>
+            <td>Machine non prise d'origine, ou sélecteur de vitesse sur MPG ou Lead.</td>
+          </tr>
+          <tr>
+            <td>L'écran de la pendante ne se rafraîchit plus</td>
+            <td>Sélecteur d'axe sur <code>OFF</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Ce que le fabricant documente, et ce qu'il ne documente pas</span>
+      <p>
+        La page constructeur ne couvre que <b>Mach3 sous Windows</b> ; le pilote
+        qu'elle propose est inutile ici. Tout le support LinuxCNC vient du
+        composant <code>xhc-whb04b-6</code>, écrit par rétro-ingénierie du
+        protocole USB — le fabricant ayant refusé de publier la moindre
+        spécification. C'est aussi pourquoi certaines bizarreries d'affichage
+        sont signalées comme des bugs de firmware dans son README, et non
+        corrigées.
+      </p>
+    </div>
+  </div>
+</section>

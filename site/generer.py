@@ -609,6 +609,19 @@ PAGES = [
                   "récupéré. Modèle FreeCAD paramétrique.",
     },
     {
+        'contenu': 'pendante-whb04b6.html',
+        'sortie': 'projets/pendante-whb04b6.html',
+        'titre': "Pendante XHC WHB04B-6 — le mode d'emploi qui manque",
+        'description': "Ce que fait réellement chaque touche de la pendante sans "
+                       "fil WHB04B-6 sous LinuxCNC : les trois inscriptions qui "
+                       "disent le contraire du vrai, les seize macros de la touche "
+                       "Fn, la règle udev sans laquelle rien ne remonte, et le "
+                       "câblage HAL complet.",
+        'sous_titre': 'pendante WHB04B-6',
+        'resume': "Mode d'emploi de la pendante sans fil WHB04B-6 sous LinuxCNC : "
+                  "touches, macros Fn, règle udev et câblage HAL.",
+    },
+    {
         'contenu': 'modeles-3d.html',
         'sortie': 'modeles-3d.html',
         'titre': "Les objets en 3D — Atelier du Verdier",
@@ -1193,6 +1206,22 @@ def injecter_photo_heros(corps: str, sortie: str, nom: str, servies: set) -> str
     return corps.replace('{{photo-heros}}', bloc)
 
 
+def injecter_pendante(corps: str, nom: str) -> str:
+    """Remplace `{{pendante:hal}}` par le câblage HAL, LU dans printnc-config.
+
+    Le fichier est recopié tel quel, échappé pour le HTML. Le reproduire à la
+    main dans la page l'aurait condamné à diverger du dépôt à la première
+    correction — c'est la faute que ce générateur combat partout ailleurs.
+    """
+    if '{{pendante:hal}}' not in corps:
+        return corps
+    if not chemins.PENDANTE_HAL.exists():
+        sys.exit(f"{nom} : {chemins.PENDANTE_HAL} est introuvable — "
+                 "le câblage de la pendante ne peut pas être injecté.")
+    hal = chemins.PENDANTE_HAL.read_text(encoding='utf-8').rstrip()
+    return corps.replace('{{pendante:hal}}', html.escape(hal))
+
+
 def injecter_attache(corps: str, nom: str) -> str:
     """Remplace `{{attache.cle}}` par la valeur écrite par le modèle.
 
@@ -1710,6 +1739,7 @@ def main() -> None:
         corps = injecter_fcstd(corps, page['contenu'])
         corps = injecter_coupe(corps, page['contenu'])
         corps = injecter_modeles(corps, page['contenu'], modeles)
+        corps = injecter_pendante(corps, page['contenu'])
         corps = injecter_attache(corps, page['contenu'])
         corps = injecter_stl_attache(corps, page['contenu'], stl_attache)
         corps = injecter_compte(corps, page['contenu'])

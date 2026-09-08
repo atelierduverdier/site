@@ -70,7 +70,14 @@ PAQUERETTE = (PROJETS / 'archives' / 'Conception' / 'FreeCAD' / 'Penderie'
               / 'paquerette2.ngc')
 
 # nom lisible -> chemin, pour le contrôle groupé
+# La pendante sans fil de la PrintNC : sa page reproduit le cablage HAL, qui
+# est LU dans le depot de la config machine et jamais recopie a la main.
+PRINTNC_CONFIG = PROJETS / 'machine' / 'printnc-config'
+PENDANTE_HAL = PRINTNC_CONFIG / 'pendant-whb04b6.hal'
+
 TOUT = {
+    'dépôt config PrintNC': PRINTNC_CONFIG,
+    'câblage HAL de la pendante': PENDANTE_HAL,
     'dépôt magasin ATC': MAGASIN_ATC,
     'code ATC (note de calcul)': ATC_CODE,
     'planches ATC': ATC_PLANS,
