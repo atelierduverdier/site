@@ -399,9 +399,10 @@ sudo udevadm control --reload &amp;&amp; sudo udevadm trigger</code></pre></div>
       <p>
         <code>loadusr -W</code> attend que le composant soit prêt : <b>pendante
         éteinte ou dongle absent, LinuxCNC ne démarre plus</b>. Sur la machine
-        de production, c'est un vrai risque d'atelier — d'où la ligne laissée
-        commentée par défaut. Remettre le <code>#</code> suffit à retrouver un
-        démarrage sans pendante.
+        de production, c'est un vrai risque d'atelier — il faut l'accepter en
+        connaissance de cause. La ligne est active dans la config publiée depuis
+        que la pendante est en service ; remettre le <code>#</code> suffit à
+        retrouver un démarrage sans elle.
       </p>
       <p>
         Et dans cet ordre : <b>la règle udev d'abord</b>, la ligne ensuite.
