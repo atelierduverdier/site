@@ -12,7 +12,7 @@
           <span class="badge">XHC WHB04B-6</span>
           <span class="badge">6 axes, sans fil</span>
           <span class="badge">LinuxCNC 2.9.10</span>
-          <span class="badge">validée sur la simulation</span>
+          <span class="badge">en service sur la PrintNC</span>
         </div>
         <h1>La pendante, et ses touches qui mentent</h1>
         <p class="lede">
@@ -428,9 +428,10 @@ sudo udevadm control --reload &amp;&amp; sudo udevadm trigger</code></pre></div>
     <div class="sec-tag">Le câblage HAL</div>
     <h2>{{pendante:nb_net}} liaisons, vérifiées pin par pin</h2>
     <p class="sec-lede">
-      Ce fichier vit dans le dépôt <code>printnc-config</code>. Il est écrit pour
-      la configuration de simulation, mais rien n'y est propre à la simulation :
-      la machine réelle a les mêmes axes et les mêmes joints.
+      Ce fichier vit dans le dépôt <code>printnc-config</code>. Il a été écrit
+      contre la configuration de simulation, mais rien n'y était propre à la
+      simulation : la machine réelle a les mêmes axes et les mêmes joints, et le
+      même câblage a été repris tel quel sur la PrintNC.
     </p>
 
     <div class="callout note">
