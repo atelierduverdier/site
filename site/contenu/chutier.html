@@ -42,6 +42,8 @@
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
             Le code sur GitHub
           </a>
+          <a class="btn btn-kofi" href="https://ko-fi.com/atelierduverdier"
+             target="_blank" rel="noopener">{{ico:tasse}} Soutenir sur Ko-fi</a>
           <a class="btn btn-ghost" href="#voir">Ce qu'on voit</a>
           <a class="btn btn-ghost" href="#cnc">La CNC</a>
           <a class="btn btn-ghost" href="#freecad">Depuis FreeCAD</a>
@@ -155,7 +157,9 @@
           1200 à 1280, une poche de résine. Le programme les retire par des
           coupes ordinaires avant de poser quoi que ce soit, le trait de scie
           tombant dans le bon bois ; ce qu'on déclare défaut est perdu en
-          entier.
+          entier. Un bouton <b>assistant</b> — bureau et navigateur — les
+          construit un par un, dans un menu, pour qui ne veut pas retenir la
+          syntaxe.
         </p>
       </div>
     </div>
@@ -201,9 +205,12 @@
           Une feuille de débit existe presque toujours ailleurs avant d'arriver
           ici : <kbd>Ctrl+V</kbd> colle un bloc venu d'un tableur,
           <kbd>Ctrl+D</kbd> duplique une ligne — cinq lames identiques se
-          saisissent une fois. Un nombre illisible rougit à la frappe, pas au
-          moment du calcul. L'import et l'export CSV sont le contrat d'échange
-          avec les autres projets de l'atelier.
+          saisissent une fois. Une même matière se pose sur plusieurs lignes
+          choisies d'un coup, dans une liste plutôt qu'à retaper mot pour
+          mot — une espace en trop, et deux planches ne s'apparient plus. Un
+          nombre illisible rougit à la frappe, pas au moment du calcul.
+          L'import et l'export CSV sont le contrat d'échange avec les autres
+          projets de l'atelier.
         </p>
       </div>
     </div>
@@ -483,12 +490,26 @@
 
     <p>
       Le cœur n'a pas changé d'une ligne pour y arriver — c'est ce que la
-      règle des deux couches garantissait. Un seul obstacle : le
-      <code>shapely</code> du navigateur ne sait pas trianguler un polygone
-      à trous ; un découpage en oreilles en Python pur, vérifié contre la
-      triangulation en C du bureau, prend le relais. Pas de multicœur ni
-      d'étiquettes imprimées dans cette version : pour ces deux-là, le bureau.
+      règle des deux couches garantissait. Pas de multicœur ni d'étiquettes
+      imprimées dans cette version : pour ces deux-là, le bureau.
     </p>
+
+    <div class="callout note">
+      <span class="ci">Une étoile qui plantait le calcul, sans le moindre message</span>
+      <p>
+        Une pièce à pointes très aiguës — une étoile importée d'un SVG —
+        plantait le calcul sur la page web, en silence : une exception C++
+        de GEOS, la bibliothèque géométrique sous <code>shapely</code>, ne
+        traverse pas proprement la frontière WebAssembly. Le bureau, sur le
+        GEOS du système, calculait le même dossier sans broncher — confirmé
+        en comparant les deux directement. La page est passée à la version
+        de Pyodide qui embarque un GEOS à jour. Au passage, son
+        <code>shapely</code> sait désormais trianguler un polygone à trous
+        comme le fait celui du bureau : le découpage en oreilles en Python
+        pur qui servait de relais n'est plus sollicité, sans qu'une ligne
+        n'ait eu à changer pour ça non plus.
+      </p>
+    </div>
 
     <p>
       La page s'<b>installe</b> et fonctionne <b>hors-ligne</b> après une
@@ -666,13 +687,13 @@
       tous. Les étiquettes imprimées restent au bureau elles aussi.</li>
     </ul>
 
-    <!-- LE SOUTIEN SE POSE ICI, EN BAS, ET PAS DANS LE HÉROS. Sur l'accueil,
-         un bouton Ko-fi en tête disputait la première vue aux liens qui
-         mènent au contenu, et il en est descendu : une demande de soutien se
-         lit après ce qu'elle soutient. Christophe l'a voulu plus présent sur
-         cette fiche (15/09/2026) — d'où un panneau à part entière, à égalité
-         avec le code, plutôt qu'un lien de plus dans le pied de page.
-         L'ancre #soutenir permet d'y renvoyer directement. -->
+    <!-- LE SOUTIEN EST EN TÊTE ET ICI. Sur l'accueil, un bouton Ko-fi en
+         tête disputait la première vue aux liens du contenu, et il en est
+         descendu. Sur cette fiche, Christophe l'a voulu plus présent le
+         15/09/2026 : d'abord ce panneau seul, puis — « ça ne se voit pas
+         assez » — le même bouton, plein et en gras, dans le héros. Le
+         panneau reste : c'est lui qui dit pourquoi soutenir. L'ancre
+         #soutenir permet d'y renvoyer directement. -->
     <div class="cols">
       <div class="panel">
         <h3>Le code est public</h3>

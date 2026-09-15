@@ -29,7 +29,7 @@
      fonds où il se pose — blanc 4,94, --orange-soft 4,51, --bg-2 4,61 —
      à la teinte exacte de la marque (31,8°), qui ne bouge pas. */
   --orange-encre:#ac5b00;
-  /* L'encre du bouton Ko-fi : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
+  /* L'encre d'un LIEN Ko-fi en texte : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
   --kofi-encre:#bf4644;
   --slate:#2f3540; --slate-2:#3c434f;
   --bg:#ffffff; --bg-2:#f6f7f9; --bg-3:#eef0f3;
@@ -108,7 +108,7 @@
      fonds où il se pose — blanc 4,94, --orange-soft 4,51, --bg-2 4,61 —
      à la teinte exacte de la marque (31,8°), qui ne bouge pas. */
   --orange-encre:#ac5b00;
-  /* L'encre du bouton Ko-fi : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
+  /* L'encre d'un LIEN Ko-fi en texte : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
   --kofi-encre:#bf4644;
   --slate:#2f3540; --slate-2:#3c434f;
   --bg:#ffffff; --bg-2:#f6f7f9; --bg-3:#eef0f3;

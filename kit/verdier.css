@@ -44,7 +44,7 @@
      fonds où il se pose — blanc 4,94, --orange-soft 4,51, --bg-2 4,61 —
      à la teinte exacte de la marque (31,8°), qui ne bouge pas. */
   --orange-encre:#ac5b00;
-  /* L'encre du bouton Ko-fi : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
+  /* L'encre d'un LIEN Ko-fi en texte : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
   --kofi-encre:#bf4644;
   --slate:#2f3540; --slate-2:#3c434f;
   --bg:#ffffff; --bg-2:#f6f7f9; --bg-3:#eef0f3;
@@ -120,7 +120,7 @@
      fonds où il se pose — blanc 4,94, --orange-soft 4,51, --bg-2 4,61 —
      à la teinte exacte de la marque (31,8°), qui ne bouge pas. */
   --orange-encre:#ac5b00;
-  /* L'encre du bouton Ko-fi : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
+  /* L'encre d'un LIEN Ko-fi en texte : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
   --kofi-encre:#bf4644;
   --slate:#2f3540; --slate-2:#3c434f;
   --bg:#ffffff; --bg-2:#f6f7f9; --bg-3:#eef0f3;
@@ -324,17 +324,21 @@ header.topbar{
 .btn-primary:hover{background:var(--orange-d); text-decoration:none}
 .btn-ghost{background:var(--card); color:var(--fg); border-color:var(--line-2)}
 .btn-ghost:hover{border-color:var(--orange); text-decoration:none}
-/* LE BOUTON KO-FI S'ÉCRIT À L'ENCRE, PAS AU ROUGE DE LA MARQUE. #ff5e5b
-   sur blanc donne 3,00:1 — mesuré le 15/09/2026, le jour où le bouton est
-   monté en bas de la fiche du chutier pour y être vu. Il en faut 4,5 pour
-   un texte de cette taille. --kofi-encre vaut #bf4644 en thème clair : le
-   plus CLAIR qui tienne 4,5 à la teinte de la marque (1°) sur les trois
-   fonds où un bouton se pose — blanc 5,03, --bg-2 4,69, --note 4,53. En
-   thème sombre, le rouge de la marque se lit tel quel.
-   Au survol, le rouge de la marque revient en FOND, sous l'encre foncée du
-   bouton principal (5,93:1) : le blanc qui s'y posait ne tenait que 3,00. */
-.btn-kofi{background:var(--card); color:var(--kofi-encre); border-color:var(--kofi-encre); font-weight:600}
-.btn-kofi:hover{background:#ff5e5b; color:#20160a; border-color:#ff5e5b; text-decoration:none}
+/* LE BOUTON KO-FI EST PLEIN, ET EN GRAS. En contour rouge sur blanc il
+   s'effaçait entre le bouton principal orange et le bouton GitHub noir :
+   « ça ne se voit pas assez », Christophe, 15/09/2026. Il porte donc le
+   rouge de la marque en FOND, sous l'encre foncée du bouton principal —
+   5,93:1 dans les deux thèmes, puisque ni le fond ni l'encre ne changent.
+   Le blanc qui s'y posait autrefois ne tenait que 3,00.
+   Contre la page, le bouton tient 3,00:1 sur blanc et 5,52 sur la carte
+   sombre : le seuil d'un élément d'interface est 3. Au survol, le même
+   rouge assombri à 92 % garde 5,08 sous l'encre.
+   --kofi-encre ne sert donc plus au bouton : c'est l'encre d'un LIEN Ko-fi
+   en texte courant, où le rouge de la marque ne tient pas sur blanc —
+   #bf4644 en thème clair, le plus CLAIR qui tienne 4,5 à la même teinte
+   (1°) : blanc 5,03, --bg-2 4,69, --note 4,53. */
+.btn-kofi{background:#ff5e5b; color:#20160a; border-color:#ff5e5b; font-weight:800}
+.btn-kofi:hover{background:#eb5654; color:#20160a; border-color:#eb5654; text-decoration:none}
 .btn-kofi svg{width:1.15em; height:1.15em; flex:none}
 /* --- Le dépôt, en évidence --------------------------------------------
    Les liens vers le code étaient noyés : « Dépôt » au bout d'une rangée de
