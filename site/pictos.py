@@ -152,6 +152,15 @@ DESSINS = {
     'corbeille': ('<path d="M4 6.5h16"/><path d="M10 4h4"/>'
                   '<path d="m6 6.5 1 13.5h10l1-13.5"/>'
                   '<path d="M10.4 10.5v5.5"/><path d="M13.6 10.5v5.5"/>'),
+
+    # --- Le soutien (fiche du chutier) ------------------------------------
+    # Une tasse fumante : le café de Ko-fi. Dans le bouton, elle remplace
+    # l'émoji ☕ — dessiné par le système, en couleur, et sourd au thème.
+    'tasse': ('<path d="M4.5 10h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5v-4Z"/>'
+              '<path d="M15.5 11.5h1.2a2.6 2.6 0 0 1 0 5.2h-2"/>'
+              '<path d="M8 3.5c-.9 1 .9 2.2 0 3.5"/>'
+              '<path d="M12 3.5c-.9 1 .9 2.2 0 3.5"/>'
+              '<path d="M3.5 21.5h13"/>'),
 }
 
 

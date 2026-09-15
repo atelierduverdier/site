@@ -29,6 +29,8 @@
      fonds où il se pose — blanc 4,94, --orange-soft 4,51, --bg-2 4,61 —
      à la teinte exacte de la marque (31,8°), qui ne bouge pas. */
   --orange-encre:#ac5b00;
+  /* L'encre du bouton Ko-fi : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
+  --kofi-encre:#bf4644;
   --slate:#2f3540; --slate-2:#3c434f;
   --bg:#ffffff; --bg-2:#f6f7f9; --bg-3:#eef0f3;
   --fg:#23272e; --fg-2:#5a626e; --fg-3:#858d99;
@@ -65,6 +67,8 @@
     --orange:#ff9a1f; --orange-d:#ffab45; --orange-soft:#3a2b12;
   /* Sur fond sombre l'encre n'a jamais manqué : 8,79:1 sur --card. */
   --orange-encre:#ffab45;
+  /* Sur fond sombre le rouge de la marque Ko-fi se lit tel quel : 5,52:1 sur --card. */
+  --kofi-encre:#ff5e5b;
     --slate:#0f1215; --slate-2:#191d23;
     --bg:#14171b; --bg-2:#1a1e23; --bg-3:#22272e;
     --fg:#e6e9ee; --fg-2:#a8b0bc; --fg-3:#7c8592;
@@ -78,6 +82,8 @@
   --orange:#ff9a1f; --orange-d:#ffab45; --orange-soft:#3a2b12;
   /* Sur fond sombre l'encre n'a jamais manqué : 8,79:1 sur --card. */
   --orange-encre:#ffab45;
+  /* Sur fond sombre le rouge de la marque Ko-fi se lit tel quel : 5,52:1 sur --card. */
+  --kofi-encre:#ff5e5b;
   --slate:#0f1215; --slate-2:#191d23;
   --bg:#14171b; --bg-2:#1a1e23; --bg-3:#22272e;
   --fg:#e6e9ee; --fg-2:#a8b0bc; --fg-3:#7c8592;
@@ -102,6 +108,8 @@
      fonds où il se pose — blanc 4,94, --orange-soft 4,51, --bg-2 4,61 —
      à la teinte exacte de la marque (31,8°), qui ne bouge pas. */
   --orange-encre:#ac5b00;
+  /* L'encre du bouton Ko-fi : le rouge de la marque ne tient pas sur blanc (voir .btn-kofi). */
+  --kofi-encre:#bf4644;
   --slate:#2f3540; --slate-2:#3c434f;
   --bg:#ffffff; --bg-2:#f6f7f9; --bg-3:#eef0f3;
   --fg:#23272e; --fg-2:#5a626e; --fg-3:#858d99;
