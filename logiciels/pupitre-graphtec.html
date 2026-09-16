@@ -1,0 +1,797 @@
+<!-- =========================================================================
+     entete.html — haut de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/entete.html
+
+     Marques à remplacer par le générateur — NOMMÉES SANS LEURS ACCOLADES,
+     et ce n'est pas une coquetterie : `remplir` fait un remplacement de
+     texte sur tout le fichier, commentaire compris. Écrites en toutes
+     lettres ici, ces sept marques étaient donc REMPLIES elles aussi, et
+     chaque page servait 1 918 octets de commentaire portant son propre
+     titre, sa description et ses cinq liens de menu — un bloc de
+     documentation qui s'effaçait en expliquant, sur les dix-sept documents
+     des quatre sites. Relevé le 29/08/2026.
+       TITRE        titre de l'onglet
+       DESCRIPTION  méta description (une phrase, pour les moteurs)
+       RACINE       préfixe vers le kit depuis la page : "" ou "../"
+       SOUS_TITRE   « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       NAV          les <a> de navigation
+       LOCAL_CSS    <link> vers la feuille propre au site, ou vide
+
+     IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
+     Le site laser écrivait data-theme="light" : comme
+     :root[data-theme="light"] est plus spécifique que le bloc
+     @media (prefers-color-scheme: dark), un visiteur dont le système est
+     en sombre recevait quand même la page blanche (vérifié le 11/08/2026 :
+     fond rendu rgb(255,255,255) système en sombre). Son thème sombre
+     existait bel et bien — #14171b — mais seul le bouton ◐ y donnait accès.
+     ========================================================================= -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LE CANEVAS AVANT LA FEUILLE DE STYLE. Sans cette ligne, le navigateur
+     peint la page en BLANC jusqu'à ce que verdier.css arrive — une seconde
+     requête, mesurée à 143 ms au premier appel pour 40 Ko. Sur un poste
+     réglé en sombre, ça fait un éclair blanc plein écran à CHAQUE
+     navigation. Le script anti-clignotement plus bas ne suffisait pas : il
+     pose `data-theme`, ce qui ne dit rien au navigateur sur la couleur du
+     fond avant que la feuille ne soit lue. Elle vaut aussi pour l'ascenseur
+     et les widgets natifs, qui restaient en livrée claire le long d'une
+     page sombre. Déclarée AVANT le <link>, sinon elle arrive trop tard. -->
+<meta name="color-scheme" content="light dark">
+<title>Pupitre Graphtec CE6000-60 — piloter un traceur sous Linux</title>
+<meta name="description" content="Piloter le traceur de découpe Graphtec CE6000-60 depuis Linux, sans driver : conversion SVG vers HP-GL, réglage de la machine, et le protocole propriétaire TC relevé au flux USB.">
+<link rel="icon" type="image/svg+xml" href="../chapeau.svg">
+<link rel="canonical" href="https://atelierduverdier.fr/logiciels/pupitre-graphtec.html">
+
+<!-- CE QUE VOIT UN RÉSEAU SOCIAL. Sans ces lignes, Facebook ne trouvait
+     ni image ni description : il affichait le domaine, le titre, et un
+     cadre vide. Vu par Christophe le 23/08/2026 en partageant la fiche de
+     la dust shoe.
+
+     L'image est un JPEG de 1200 x 630 fabriqué par generer.py — PAS le
+     WebP servi à la page. Le robot de Facebook ne lit pas le WebP, et
+     tout le site est en WebP : c'est le piège qu'il fallait éviter.
+     Elle porte l'empreinte de son contenu dans son nom, pour la même
+     raison que les captures : Facebook garde longtemps ce qu'il a vu,
+     et une adresse qui ne change pas lui ferait ressservir l'ancienne. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Atelier du Verdier">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Pupitre Graphtec CE6000-60 — piloter un traceur sous Linux">
+<meta property="og:description" content="Piloter le traceur de découpe Graphtec CE6000-60 depuis Linux, sans driver : conversion SVG vers HP-GL, réglage de la machine, et le protocole propriétaire TC relevé au flux USB.">
+<meta property="og:url" content="https://atelierduverdier.fr/logiciels/pupitre-graphtec.html">
+<meta property="og:image" content="https://atelierduverdier.fr/partage/logiciels-pupitre-graphtec.2bfff935.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="pupitre Graphtec">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Anti-clignotement : pose le thème choisi AVANT que la feuille de style
+     ne peigne. Placé ici et pas dans verdier.js, qui est chargé en fin de
+     page — sinon le visiteur voit le thème clair une fraction de seconde
+     avant la bascule. Volontairement minuscule et en ligne. -->
+<script>
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
+  var v=m?m[1]:localStorage.getItem('verdier-theme');
+  // `colorScheme` en plus de `data-theme` : la balise <meta> ci-dessus
+  // annonce « les deux », donc le navigateur suit l'OS. Quand le visiteur a
+  // choisi le CONTRAIRE de son OS, il faut le lui dire ici — sans quoi le
+  // fond et l'ascenseur partiraient dans le mauvais sens le temps du
+  // chargement, et l'éclair reviendrait pour ceux-là seulement.
+  if(v){var r=document.documentElement;r.setAttribute('data-theme',v);
+        r.style.colorScheme=v;}
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="../verdier.css">
+
+</head>
+<body>
+<a id="top"></a>
+
+<header class="topbar">
+  <div class="wrap">
+    <!-- Le logo est COLLÉ ici, pas chargé en <img> : en ligne, son
+         mot-symbole suit `currentColor`, donc le bouton de thème. En <img>
+         il ne suivrait que le réglage du système. -->
+    <a class="brand" href="https://atelierduverdier.fr/" aria-label="Atelier du Verdier">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      <span class="brand-sub">pupitre Graphtec</span>
+    </a>
+    <button class="nav-btn" type="button" aria-label="Ouvrir le menu"
+            aria-controls="menu-principal">☰</button>
+    <nav class="navlinks" id="menu-principal">
+      <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels" aria-current="true">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/">Projets</a>
+      <a href="../modeles-3d.html">Modèles 3D</a>
+    </nav>
+    <!-- Le contraste, DESSINÉ et non écrit. Le caractère « ◐ » était rendu
+         par la police du système : maigre, minuscule, et lu comme un
+         chevron. Le tracé ci-dessous est le même trait que les pictos des
+         cartes, et le demi-disque plein dit ce que fait le bouton. -->
+    <button class="theme-btn" type="button" title="Thème clair / sombre"
+            aria-label="Basculer entre le thème clair et le thème sombre">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8.6"/>
+        <path d="M12 3.4a8.6 8.6 0 0 1 0 17.2Z" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- Pupitre Graphtec CE6000-60.
+
+     Tous les faits et tous les chiffres viennent du README du projet
+     (~/Projets/logiciels/graphtec-ce6000/README.md). Rien n'est inventé, et aucune
+     courbe de mesure n'est dessinée là où le projet ne donne qu'une
+     tendance : le nuancier est représenté comme un OUTIL, pas un relevé.
+
+     ORDRE DE LA PAGE (repris le 12/08/2026 à la demande de Christophe) :
+     ce que fait le logiciel et comment s'en servir D'ABORD, l'archéologie
+     du protocole ENSUITE et REPLIÉE. Une page qui s'ouvre sur du protocole
+     propriétaire décourage avant d'avoir dit à quoi sert le programme. Le
+     détail n'est pas retiré — il est derrière un panneau à dérouler.
+
+     Les captures sont engendrées par site/outils/capturer_pupitre.py, qui
+     lance l'application hors écran et refuse de tourner si le traceur est
+     branché.
+
+     Bases de police : 9,9 px pour le héros (échelle 1,21), 12 px pour un
+     viewBox de 640 (échelle 1), 10,1 px pour 540 (échelle 1,19). Mesuré. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">Graphtec <b>CE6000-60</b></span>
+          <span class="badge">HP-GL</span>
+          <span class="badge">GPL-3.0</span>
+        </div>
+        <h1>Un traceur, sans driver</h1>
+        <p class="lede">
+          Le Graphtec CE6000-60 n'est pas une imprimante à pilote propriétaire : c'est un
+          traceur qui lit des commandes texte. Le driver Windows ne fait que traduire des
+          courbes en HP-GL et pousser le résultat sur le port.
+        </p>
+        <div class="cta">
+          <a class="btn btn-github" href="https://github.com/atelierduverdier/graphtec-ce6000"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            Le code sur GitHub
+          </a>
+          <a class="btn btn-primary" href="#emploi">Le mode d'emploi</a>
+          <a class="btn btn-ghost" href="#capot">Sous le capot</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="La chaîne : un SVG converti en HP-GL, poussé sur le périphérique USB, jusqu'au traceur">
+          <g class="figure">
+            <rect x="90" y="10" width="160" height="30" rx="8" fill="var(--card)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="29" text-anchor="middle" class="fort">un SVG</text>
+
+            <line x1="170" y1="40" x2="170" y2="58" class="cote"/>
+            <polygon points="170,62 166,54 174,54" fill="var(--fg-2)"/>
+
+            <rect x="90" y="62" width="160" height="30" rx="8" fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.8"/>
+            <text x="170" y="81" text-anchor="middle" class="orange">svg2hpgl</text>
+
+            <line x1="170" y1="92" x2="170" y2="110" class="cote"/>
+            <polygon points="170,114 166,106 174,106" fill="var(--fg-2)"/>
+
+            <rect x="90" y="114" width="160" height="30" rx="8" fill="var(--card)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="133" text-anchor="middle" class="fort">HP-GL, du texte</text>
+
+            <line x1="170" y1="144" x2="170" y2="162" class="cote"/>
+            <polygon points="170,166 166,158 174,158" fill="var(--fg-2)"/>
+
+            <rect x="90" y="166" width="160" height="30" rx="8" fill="var(--card)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="185" text-anchor="middle" class="petit">/dev/usb/lp0</text>
+
+            <line x1="170" y1="196" x2="170" y2="212" class="cote"/>
+            <polygon points="170,216 166,208 174,208" fill="var(--fg-2)"/>
+
+            <rect x="70" y="216" width="200" height="28" rx="8" fill="var(--slate)" stroke="var(--fg)" stroke-width="1.5"/>
+            <text x="170" y="234" text-anchor="middle" fill="#e6e9ee" class="gros">CE6000-60</text>
+
+            <g opacity="0.55">
+              <rect x="4" y="108" width="72" height="42" rx="8" fill="none"
+                    stroke="var(--warn-b)" stroke-width="1.3" stroke-dasharray="4 3"/>
+              <text x="40" y="126" text-anchor="middle" class="petit" fill="var(--warn-b)">driver</text>
+              <text x="40" y="140" text-anchor="middle" class="petit" fill="var(--warn-b)">Windows</text>
+              <line x1="10" y1="146" x2="70" y2="112" stroke="var(--warn-b)" stroke-width="1.6"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="emploi">
+  <div class="wrap">
+    <div class="sec-tag">Mode d'emploi</div>
+    <h2>Ouvrir, placer, régler, envoyer</h2>
+    <p class="sec-lede">
+      Une seule application à lancer, trois onglets, et quatre gestes. Le reste du dépôt
+      est ce qu'il a fallu comprendre pour l'écrire — c'est plus bas, et replié.
+    </p>
+
+    <div class="pipe">
+      <div class="step"><div class="n">1</div><h4>Ouvrir</h4><p>Un SVG, n'importe lequel. Les avertissements de lecture s'affichent sous le nom.</p></div>
+      <div class="step"><div class="n">2</div><h4>Placer</h4><p>Origine, rotation, miroirs, échelle — ou « ajuster au média » d'un bouton.</p></div>
+      <div class="step"><div class="n">3</div><h4>Régler</h4><p>Le carnet d'établi pose tout d'un coup : lame, vitesse, force, passages.</p></div>
+      <div class="step"><div class="n">4</div><h4>Envoyer</h4><p>Chaque réglage est relu ; si l'un n'a pas été retenu, l'envoi est annulé.</p></div>
+    </div>
+
+    <h3>① Dessin — poser le tracé sur le média</h3>
+    <figure class="capture">
+      <img src="../logiciels/captures/pupitre-dessin.fc526498.webp"
+           alt="Onglet Dessin du pupitre : réglages de média, placement, mosaïque et perforation à gauche, aperçu du tracé à droite"
+           data-agrandir>
+      <figcaption>
+        L'aperçu montre le <b>média</b>, la <b>zone utile</b> en pointillé, le tracé et les
+        tuiles numérotées. Molette pour zoomer, glisser pour déplacer, double-clic pour
+        recadrer. En bas, le compte des tracés et l'emprise réelle en millimètres — et un
+        avertissement en rouge si le dessin déborde. <b>La machine n'est pas branchée sur
+        cette capture</b> : d'où le « traceur muet » en haut à droite.
+      </figcaption>
+    </figure>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Découper en panneaux</h3>
+        <p>
+          Quand le dessin dépasse la feuille, la <b>mosaïque</b> le coupe en tuiles avec
+          recouvrement, numérotées et raccordées aux croix. Un bouton pose le panneau à la
+          taille du média.
+        </p>
+      </div>
+      <div class="panel">
+        <h3>Perforer plutôt que couper</h3>
+        <p>
+          Le mode <b>pointillé</b> alterne coupé et laissé — 8,0 mm coupés, 0,30 mm laissés
+          par défaut — pour un gabarit qui se détache à la main sans tomber tout seul.
+        </p>
+      </div>
+    </div>
+
+    <h3>② Outil — le carnet d'établi</h3>
+    <figure class="capture">
+      <img src="../logiciels/captures/pupitre-outil.185d00e3.webp"
+           alt="Onglet Outil : matériau, condition, type de lame avec son icône, vitesse, force, accélération, nuancier et copies matricielles"
+           data-agrandir>
+      <figcaption>
+        Choisir un <b>matériau</b> pose d'un coup le type de lame, la vitesse, la force,
+        l'accélération et les passages. En dessous, le <b>nuancier de force</b> — une
+        grille de carrés à lever pour trouver le réglage sur un papier neuf — et les
+        <b>copies matricielles</b>, rangées × colonnes avec leurs écarts.
+      </figcaption>
+    </figure>
+
+    <div class="callout warn">
+      <span class="ci">L'icône d'outil n'est pas décorative</span>
+      <p>
+        La largeur de la pointe suit le diamètre de la lame, son angle suit celui de la
+        lame. Le type déclaré doit correspondre à l'outil <b>réellement monté</b> : un
+        « Stylo feutre » oublié a arrondi tous les angles d'une découpe.
+      </p>
+    </div>
+
+    <h3>③ Machine — les huit réglages du menu</h3>
+    <figure class="capture">
+      <img src="../logiciels/captures/pupitre-machine.408e4526.webp"
+           alt="Onglet Machine : passe-pas, force et angle d'offset, vitesse de l'outil relevé, priorité, lame initiale, déplacement relevé, tri des chemins"
+           data-agrandir>
+      <figcaption>
+        Passe-pas, force et angle d'offset, tri des chemins, vitesse de l'outil relevé,
+        priorité de condition, position de lame initiale, déplacement relevé. Lus à la
+        demande, écrits un par un — <b>et relus derrière</b>.
+      </figcaption>
+    </figure>
+
+    <div class="callout tip">
+      <span class="ci">La règle qui gouverne tout l'envoi</span>
+      <p>
+        Tout ce qui est écrit dans la machine est <b>relu</b>, et l'envoi est annulé si un
+        réglage n'a pas été retenu. Tracer avec des réglages qu'on croit posés et qui ne le
+        sont pas gâche le média — et on ne s'en aperçoit qu'à la fin.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="capot">
+  <div class="wrap">
+    <div class="sec-tag">Sous le capot</div>
+    <h2>Ce qu'il a fallu comprendre</h2>
+    <p class="sec-lede">
+      La partie technique, repliée : à dérouler seulement si le sujet intéresse. Deux
+      journées entières se cachent dans les deux premiers panneaux.
+    </p>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">La machine écrivait le fichier, à la plume, sur le papier</span>
+        <span class="s">une journée perdue</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Avec <code>COMMANDE</code> réglée sur <code>AUTO</code>, le traceur devine le
+          langage d'après ce qu'il reçoit. Quand il ne reconnaît ni HP-GL ni GP-GL, il
+          <b>écrit les octets reçus en toutes lettres</b> — <code>U572,2620;</code> tracé
+          au stylo. Puis la ligne court vers la droite et le panneau affiche « hors
+          surface » : une conséquence, pas la cause, et qui envoie chercher du côté des
+          cotes alors que le dessin tenait très bien.
+        </p>
+
+        <figure class="figure">
+          <svg style="font-size:12px" viewBox="0 0 640 280" role="img"
+               aria-label="En AUTO, la machine écrit les octets en toutes lettres et sort de la feuille ; en HP-GL, elle trace le dessin">
+            <text x="150" y="24" text-anchor="middle" class="petit" fill="var(--warn-b)">COMMANDE = AUTO</text>
+            <rect x="30" y="34" width="240" height="150" rx="4" fill="var(--bg-2)" stroke="var(--warn-b)" stroke-width="1.5"/>
+            <text x="44" y="70" class="petit" fill="var(--warn-b)">U572,2620;IN;SP1;PU0,0;</text>
+            <text x="44" y="94" class="petit" fill="var(--warn-b)">PD1200,0;PD1200,800;PD0,8</text>
+            <text x="44" y="118" class="petit" fill="var(--warn-b)">00;PD0,0;PU;SP0;</text>
+            <line x1="44" y1="136" x2="300" y2="136" stroke="var(--warn-b)" stroke-width="1.6"/>
+            <text x="286" y="152" class="petit" fill="var(--warn-b)">→ « hors surface »</text>
+            <text x="150" y="204" text-anchor="middle" class="petit">le texte du fichier, à la plume</text>
+            <text x="150" y="219" text-anchor="middle" class="petit">la sortie de feuille est une</text>
+            <text x="150" y="234" text-anchor="middle" class="petit">conséquence, pas la cause</text>
+
+            <text x="490" y="24" text-anchor="middle" class="orange">COMMANDE = HP-GL</text>
+            <rect x="370" y="34" width="240" height="150" rx="4" fill="var(--bg-2)" stroke="var(--orange)" stroke-width="1.5"/>
+            <rect x="430" y="66" width="120" height="86" rx="3" fill="none" stroke="var(--fg)" stroke-width="2"/>
+            <path d="M 460 96 L 460 130 M 460 96 L 500 96 M 460 112 L 490 112"
+                  fill="none" stroke="var(--fg)" stroke-width="2.4" stroke-linecap="round"/>
+            <text x="490" y="204" text-anchor="middle" class="petit">le dessin, tracé</text>
+
+            <rect x="120" y="248" width="400" height="26" rx="6" fill="var(--warn)" stroke="var(--warn-b)" stroke-width="1.2"/>
+            <text x="320" y="265" text-anchor="middle" class="petit" fill="var(--warn-b)">journal de la machine : W06001 DANGER COMMANDE = AUTO</text>
+          </svg>
+          <figcaption>
+            <b>La machine le disait elle-même</b>, dans son propre journal, depuis le début
+            — lu trois fois sans être compris.
+          </figcaption>
+        </figure>
+
+        <div class="callout warn">
+          <span class="ci">Ce que le README affirmait pendant ce temps</span>
+          <p>
+            Qu'<code>AUTO</code> allait très bien « puisque la machine reconnaît les deux à
+            la volée ». Une commodité <b>jamais vérifiée</b>, contredite par un
+            avertissement que la machine répétait dans ses logs. La mesure qui a tranché :
+            le même fichier de 163 Ko, envoyé plume levée, ajoute une entrée au journal en
+            <code>AUTO</code> et <b>aucune</b> en <code>HP-GL</code>.
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Un seul descripteur, sinon la machine se tait</span>
+        <span class="s">44 secondes de mutisme</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Fermer et rouvrir <code>/dev/usb/lp0</code> entre deux étapes rend la machine
+          <b>muette</b>, pour des dizaines de secondes. C'est à quoi se réduit toute une
+          journée de chasse aux « pannes intermittentes ».
+        </p>
+
+        <figure class="figure">
+          <svg style="font-size:12px" viewBox="0 0 640 230" role="img"
+               aria-label="Sur un même descripteur la machine répond du premier coup ; si on referme entre deux, elle se tait plus de 44 secondes">
+            <line x1="120" y1="196" x2="600" y2="196" class="cote"/>
+            <g class="trait-fin">
+              <line x1="120" y1="190" x2="120" y2="202"/>
+              <line x1="240" y1="190" x2="240" y2="202"/>
+              <line x1="360" y1="190" x2="360" y2="202"/>
+              <line x1="480" y1="190" x2="480" y2="202"/>
+              <line x1="600" y1="190" x2="600" y2="202"/>
+            </g>
+            <text x="120" y="214" text-anchor="middle" class="petit">0 s</text>
+            <text x="240" y="214" text-anchor="middle" class="petit">15</text>
+            <text x="360" y="214" text-anchor="middle" class="petit">30</text>
+            <text x="480" y="214" text-anchor="middle" class="petit">45</text>
+            <text x="600" y="214" text-anchor="middle" class="petit">60</text>
+
+            <text x="110" y="66" text-anchor="end" class="fort">même descripteur</text>
+            <text x="110" y="82" text-anchor="end" class="petit">journal, puis OH;</text>
+            <rect x="120" y="50" width="14" height="26" rx="3" fill="var(--tip-b)"/>
+            <text x="144" y="68" class="petit" fill="var(--tip-b)">répond du premier coup</text>
+
+            <text x="110" y="140" text-anchor="end" class="fort">fermé puis rouvert</text>
+            <text x="110" y="156" text-anchor="end" class="petit">entre les deux</text>
+            <rect x="120" y="124" width="352" height="26" rx="3" fill="var(--warn-b)" opacity="0.30"/>
+            <rect x="120" y="124" width="352" height="26" rx="3" fill="none" stroke="var(--warn-b)" stroke-width="1.4"/>
+            <text x="296" y="142" text-anchor="middle" class="petit" fill="var(--warn-b)">muette</text>
+            <line x1="472" y1="118" x2="472" y2="172" class="accent"/>
+            <text x="482" y="168" class="orange">plus de 44 s</text>
+
+            <text x="360" y="26" text-anchor="middle" class="petit">le symptôme est identique à une panne de liaison</text>
+          </svg>
+          <figcaption>
+            Chaque programme n'ouvre donc le périphérique <b>qu'une fois</b> et passe son
+            descripteur. Corollaire d'usage : ne pas lancer la lecture d'état juste avant
+            un envoi.
+          </figcaption>
+        </figure>
+
+        <div class="cols">
+          <div class="panel">
+            <h3>Huit octets, et pas un de plus</h3>
+            <p>
+              L'endpoint d'envoi fait <b>8 octets</b> et refuse les données quand la machine
+              sature (<code>EAGAIN</code> en <code>O_NONBLOCK</code>). Écrire sans attendre
+              <b>tronque les gros fichiers en silence</b>. C'est le contrôle de flux du port
+              série sous une autre forme : l'USB ne l'a pas supprimé.
+            </p>
+          </div>
+          <div class="panel">
+            <h3>La première réponse est décalée</h3>
+            <p>
+              Les réponses se terminent par <code>\r</code> et s'accumulent. La toute
+              première interrogation après ouverture revient <b>décalée</b> : le code en
+              jette une pour rien, sans quoi trois relevés identiques n'en donnent que
+              <b>sept paramètres sur onze</b>, l'accélération lue à l'index d'un autre.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout note">
+          <span class="ci">Quand la feuille est simplement trop étroite</span>
+          <p>
+            Les capteurs de média sont sur la table : une feuille qui ne les couvre pas
+            n'est <b>jamais</b> détectée. Le levier descend, tout a l'air normal, et la
+            machine réclame indéfiniment. Même symptôme si un galet presseur pince dans le
+            vide plutôt que sur une bande d'entraînement.
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">Le protocole propriétaire, relevé au flux USB</span>
+        <span class="s">vitesse, force, outil</span>
+      </summary>
+      <div class="corps">
+        <p>
+          Vitesse, force, accélération et type d'outil ne passent pas par HP-GL. Ils passent
+          par <code>TC</code>, une commande Graphtec sans documentation publique — relevée
+          en capturant ce que son propre logiciel envoie.
+        </p>
+
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Paramètre</th><th>Commande</th><th>Plage</th></tr></thead>
+            <tbody>
+              <tr><td>vitesse</td><td><code>TC1002,3,&lt;cond&gt;,&lt;cm/s × 10&gt;</code></td><td>1 à 640, soit 64 cm/s</td></tr>
+              <tr><td>force</td><td><code>TC1002,4,&lt;cond&gt;,&lt;n&gt;</code></td><td>1 à 38</td></tr>
+              <tr><td>accélération</td><td><code>TC1002,5,&lt;cond&gt;,&lt;n&gt;</code></td><td><b>1 à 3 seulement</b></td></tr>
+              <tr><td>type d'outil + offset</td><td><code>TC1002,2,&lt;cond&gt;,&lt;code&gt;,&lt;offset&gt;</code></td><td>offset −5 à +5</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Les codes d'outil ont été relevés en parcourant la liste du logiciel Graphtec
+          <b>deux fois de haut en bas</b> — la même suite les deux fois. Une mesure
+          reproduite, pas une déduction sur un seul passage.
+        </p>
+
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Outil</th><th class="num">Code</th><th>Outil</th><th class="num">Code</th></tr></thead>
+            <tbody>
+              <tr><td>CB09U</td><td class="num">1</td><td>CB15UB</td><td class="num">3</td></tr>
+              <tr><td>CB09U-K60</td><td class="num">10</td><td>Autre</td><td class="num">6</td></tr>
+              <tr><td>CB15U</td><td class="num">2</td><td>Stylo feutre</td><td class="num">9</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <figure class="figure">
+          <svg style="font-size:10.1px" viewBox="0 0 540 260" role="img"
+               aria-label="Vitesse et force se règlent soit par TC, durable et relisible, soit par HP-GL, le temps du travail">
+            <rect x="140" y="20" width="180" height="34" rx="8" fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.8"/>
+            <text x="230" y="36" text-anchor="middle" class="orange">TC — la voie sûre</text>
+            <text x="230" y="49" text-anchor="middle" class="petit">s'applique toujours, se relit</text>
+
+            <rect x="336" y="20" width="180" height="34" rx="8" fill="var(--bg-3)" stroke="var(--fg-3)" stroke-width="1.3"/>
+            <text x="426" y="36" text-anchor="middle" class="fort">HP-GL</text>
+            <text x="426" y="49" text-anchor="middle" class="petit">ne touche pas aux conditions</text>
+
+            <text x="128" y="90" text-anchor="end" class="fort">vitesse</text>
+            <rect x="140" y="66" width="180" height="46" rx="8" fill="var(--card)" stroke="var(--orange)" stroke-width="1.4"/>
+            <text x="230" y="84" text-anchor="middle" class="orange">TC1002,3</text>
+            <text x="230" y="100" text-anchor="middle" class="petit">durable</text>
+
+            <rect x="336" y="66" width="180" height="46" rx="8" fill="var(--card)" stroke="var(--line-2)" stroke-width="1.2"/>
+            <text x="426" y="82" text-anchor="middle" class="petit">VS — le temps du travail</text>
+            <text x="426" y="97" text-anchor="middle" class="petit" fill="var(--warn-b)">muet si PRIORITE ≠ PROGRAMME</text>
+
+            <text x="128" y="152" text-anchor="end" class="fort">force</text>
+            <rect x="140" y="128" width="180" height="46" rx="8" fill="var(--card)" stroke="var(--orange)" stroke-width="1.4"/>
+            <text x="230" y="146" text-anchor="middle" class="orange">TC1002,4</text>
+            <text x="230" y="162" text-anchor="middle" class="petit">durable</text>
+
+            <rect x="336" y="128" width="180" height="46" rx="8" fill="var(--card)" stroke="var(--line-2)" stroke-width="1.2"/>
+            <text x="426" y="146" text-anchor="middle" class="petit">FS — le temps du travail</text>
+            <text x="426" y="161" text-anchor="middle" class="petit">marche même sous MANUEL</text>
+
+            <text x="270" y="204" text-anchor="middle" class="petit">Les scripts prennent TC par défaut : il se relit (TC2002), et VS dépend</text>
+            <text x="270" y="219" text-anchor="middle" class="petit">d'un réglage de panneau qui, mal placé, le rend muet sans le moindre signe.</text>
+            <text x="270" y="244" text-anchor="middle" class="fort">un réglage qu'on ne peut pas relire n'est pas un réglage posé</text>
+          </svg>
+          <figcaption>
+            <code>TC</code> modifie <b>durablement</b> la condition enregistrée dans la
+            machine, exactement comme le fait le logiciel d'origine — d'où la case « régler
+            la machine à l'envoi », qu'on peut décocher.
+          </figcaption>
+        </figure>
+
+        <div class="callout tip">
+          <span class="ci">Le piège de raisonnement, et le seul instrument qui a tranché</span>
+          <p>
+            Deux méthodes ont échoué avant : <code>OA;</code> rend la position
+            <b>logique</b>, pas celle du chariot — il ne mesure donc aucun mouvement ; et le
+            contrôle de flux ne mord pas, 15 ko partent en 3,8 s quelle que soit la vitesse.
+            La seule mesure qui a tranché est un <b>chronomètre à la main</b>.
+          </p>
+          <p>
+            Et surtout : la première version du verdict regardait l'<b>étendue</b> des
+            durées, pas leur ordre. N'importe quel bruit la satisfaisait, et elle a annoncé
+            un résultat faux avec aplomb. Un verdict doit exiger la <b>croissance</b>, et se
+            taire quand les mesures ne sont ni constantes ni croissantes.
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <details class="pliable">
+      <summary>
+        <span class="t">La force : le nombre qu'aucun calcul ne donne</span>
+        <span class="s">1 à 38</span>
+      </summary>
+      <div class="corps">
+        <p>
+          La force de coupe se trouve sur une chute du vrai matériau, en montant jusqu'à ce
+          que le film se détache sans entamer le support. <b>Aucun calcul ne donne ce
+          nombre.</b> D'où le nuancier : une grille de carrés à lever, pour trouver le
+          réglage sur un papier neuf.
+        </p>
+
+        <figure class="figure">
+          <svg style="font-size:10.1px" viewBox="0 0 540 210" role="img"
+               aria-label="Le nuancier de force : une grille de carrés découpés à force croissante, qu'on essaie de lever">
+            <g>
+              <rect x="30" y="46" width="52" height="52" rx="2" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.2"/>
+              <text x="56" y="118" text-anchor="middle" class="petit">2</text>
+              <rect x="94" y="46" width="52" height="52" rx="2" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.2"/>
+              <text x="120" y="118" text-anchor="middle" class="petit">6</text>
+              <rect x="158" y="46" width="52" height="52" rx="2" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.4"/>
+              <text x="184" y="118" text-anchor="middle" class="petit">10</text>
+              <rect x="222" y="46" width="52" height="52" rx="2" fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="2"/>
+              <text x="248" y="118" text-anchor="middle" class="orange">14</text>
+              <rect x="286" y="46" width="52" height="52" rx="2" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.4"/>
+              <text x="312" y="118" text-anchor="middle" class="petit">18</text>
+              <rect x="350" y="46" width="52" height="52" rx="2" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.4"/>
+              <text x="376" y="118" text-anchor="middle" class="petit">22</text>
+              <rect x="414" y="46" width="52" height="52" rx="2" fill="var(--bg-3)" stroke="var(--fg)" stroke-width="1.4"/>
+              <text x="440" y="118" text-anchor="middle" class="petit">26</text>
+              <rect x="478" y="46" width="32" height="52" rx="2" fill="var(--bg-3)" stroke="var(--fg-3)" stroke-width="1.2" stroke-dasharray="4 3"/>
+              <text x="494" y="118" text-anchor="middle" class="petit">…38</text>
+            </g>
+            <text x="30" y="34" class="petit">force croissante →</text>
+            <line x1="248" y1="126" x2="248" y2="146" class="accent"/>
+            <text x="248" y="162" text-anchor="middle" class="orange">le premier carré qui se lève proprement</text>
+            <text x="248" y="178" text-anchor="middle" class="petit">sans entamer le support</text>
+            <text x="270" y="200" text-anchor="middle" class="petit">La valeur retenue dépend du matériau : ce schéma montre l'outil, pas un relevé.</text>
+          </svg>
+          <figcaption>
+            La plage utile va de <b>1 à 38</b>. Au stylo, la progression ne se voit que
+            jusqu'à une dizaine puis sature — un stylo dépose son encre dès qu'il touche. La
+            force n'est vraiment un réglage continu qu'<b>à la lame</b>, où elle fixe la
+            profondeur de coupe.
+          </figcaption>
+        </figure>
+
+        <div class="callout note">
+          <span class="ci">Ce qui n'est délibérément pas recalculé</span>
+          <p>
+            <b>La compensation d'offset de lame.</b> Le firmware s'en charge : on lui envoie
+            la polyligne nominale, il place la lame. La refaire côté PC serait la faire deux
+            fois.
+          </p>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-tag">Honnêteté</div>
+    <h2>Ce qui marche, et ce qui reste ouvert</h2>
+
+    <div class="cols">
+      <div class="panel">
+        <h3>Éprouvé sur du papier</h3>
+        <ul class="clean">
+          <li>Tracé au stylo d'une planche TechDraw</li>
+          <li>Mosaïque sur deux feuilles, raccordées aux croix</li>
+          <li>Découpe au nuancier sur 80 g et 300 g</li>
+          <li>Perforation d'un carré de 60 mm qui se détache à la main</li>
+          <li>Réglage complet de la machine depuis le PC</li>
+          <li>Lecture de sa configuration entière, en clair</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Ouvert, et dit plutôt que caché</h3>
+        <ul class="clean">
+          <li><code>TC2004,1</code> accepte une écriture — 0 devient 1, relu 1 — sans
+          qu'aucune ligne du vidage en clair ne bouge. Un réglage réel que la machine
+          n'expose nulle part. <b>Sondé deux fois, sans résultat.</b></li>
+          <li>Une <code>HP-GL ERREUR 1</code> naît par intermittence d'une salve
+          <code>TC</code>. Sans effet sur le tracé, et évitable.</li>
+          <li>L'ARMS — détection des marques de repérage, <i>print &amp; cut</i> — reste
+          hors de portée : commandes mal documentées hors SDK Graphtec.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Le code est public</span>
+      <p>
+        Sous <b>GPL-3.0</b>, sur
+        <a href="https://github.com/atelierduverdier/graphtec-ce6000">github.com/atelierduverdier/graphtec-ce6000</a> —
+        y compris les huit sondes de l'enquête, et les trois suites de tests dont une
+        qui vérifie que les deux autres savent échouer.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     pied.html — bas de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/pied.html
+
+     Marques à remplacer par le générateur :
+       ../     préfixe vers le kit depuis la page : "" ou "../"
+       pupitre Graphtec nom du site dans la marque du pied
+       Pilotage du traceur de découpe Graphtec CE6000-60 sous Linux, sans driver constructeur. Code public, GPL-3.0.     une ou deux phrases sur ce qu'est ce site-là
+       <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>      les <a> du pied
+       2026      année du copyright
+          <script> propre au site, ou vide
+     ========================================================================= -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+        <span class="brand-sub">pupitre Graphtec</span>
+      </div>
+      <p class="muted" style="margin:.2em 0 0">
+        Pilotage du traceur de découpe Graphtec CE6000-60 sous Linux, sans driver constructeur. Code public, GPL-3.0.<br>
+        © 2026 Atelier du Verdier.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>
+      <a href="#top">Haut de page ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Visionneuse : présente sur toutes les pages, verdier.js ne s'y accroche
+     que s'il trouve des images à agrandir. -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Fermer">×</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-hint">Cliquer n'importe où, ou Échap, pour fermer</div>
+</div>
+
+<script src="../verdier.js"></script>
+
+
+<!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
+     tous les sous-domaines remontent au même endroit. Pas de cookie, pas
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+<script>
+  window.goatcounter = {
+    path: function (p) { return '/portail' + p }
+  };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>
