@@ -1,0 +1,684 @@
+<!-- =========================================================================
+     entete.html — haut de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/entete.html
+
+     Marques à remplacer par le générateur — NOMMÉES SANS LEURS ACCOLADES,
+     et ce n'est pas une coquetterie : `remplir` fait un remplacement de
+     texte sur tout le fichier, commentaire compris. Écrites en toutes
+     lettres ici, ces sept marques étaient donc REMPLIES elles aussi, et
+     chaque page servait 1 918 octets de commentaire portant son propre
+     titre, sa description et ses cinq liens de menu — un bloc de
+     documentation qui s'effaçait en expliquant, sur les dix-sept documents
+     des quatre sites. Relevé le 29/08/2026.
+       TITRE        titre de l'onglet
+       DESCRIPTION  méta description (une phrase, pour les moteurs)
+       RACINE       préfixe vers le kit depuis la page : "" ou "../"
+       SOUS_TITRE   « Atelier Laser », « Journal PrintNC »… vide pour le portail
+       NAV          les <a> de navigation
+       LOCAL_CSS    <link> vers la feuille propre au site, ou vide
+
+     IMPORTANT — la balise <html> ne porte PAS de data-theme en dur.
+     Le site laser écrivait data-theme="light" : comme
+     :root[data-theme="light"] est plus spécifique que le bloc
+     @media (prefers-color-scheme: dark), un visiteur dont le système est
+     en sombre recevait quand même la page blanche (vérifié le 11/08/2026 :
+     fond rendu rgb(255,255,255) système en sombre). Son thème sombre
+     existait bel et bien — #14171b — mais seul le bouton ◐ y donnait accès.
+     ========================================================================= -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- LE CANEVAS AVANT LA FEUILLE DE STYLE. Sans cette ligne, le navigateur
+     peint la page en BLANC jusqu'à ce que verdier.css arrive — une seconde
+     requête, mesurée à 143 ms au premier appel pour 40 Ko. Sur un poste
+     réglé en sombre, ça fait un éclair blanc plein écran à CHAQUE
+     navigation. Le script anti-clignotement plus bas ne suffisait pas : il
+     pose `data-theme`, ce qui ne dit rien au navigateur sur la couleur du
+     fond avant que la feuille ne soit lue. Elle vaut aussi pour l'ascenseur
+     et les widgets natifs, qui restaient en livrée claire le long d'une
+     page sombre. Déclarée AVANT le <link>, sinon elle arrive trop tard. -->
+<meta name="color-scheme" content="light dark">
+<title>Dust shoe PrintNC — le laser et le tuyau se relaient</title>
+<meta name="description" content="Aspiration pour broche Ø80 sur PrintNC : trois pièces imprimées dont deux se retirent, et un adaptateur qui prend la place du laser sur sa glissière. Jamais imprimé ni essayé — le modèle et ses contrôles seulement.">
+<link rel="icon" type="image/svg+xml" href="../chapeau.svg">
+<link rel="canonical" href="https://atelierduverdier.fr/projets/dust-shoe.html">
+
+<!-- CE QUE VOIT UN RÉSEAU SOCIAL. Sans ces lignes, Facebook ne trouvait
+     ni image ni description : il affichait le domaine, le titre, et un
+     cadre vide. Vu par Christophe le 23/08/2026 en partageant la fiche de
+     la dust shoe.
+
+     L'image est un JPEG de 1200 x 630 fabriqué par generer.py — PAS le
+     WebP servi à la page. Le robot de Facebook ne lit pas le WebP, et
+     tout le site est en WebP : c'est le piège qu'il fallait éviter.
+     Elle porte l'empreinte de son contenu dans son nom, pour la même
+     raison que les captures : Facebook garde longtemps ce qu'il a vu,
+     et une adresse qui ne change pas lui ferait ressservir l'ancienne. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Atelier du Verdier">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Dust shoe PrintNC — le laser et le tuyau se relaient">
+<meta property="og:description" content="Aspiration pour broche Ø80 sur PrintNC : trois pièces imprimées dont deux se retirent, et un adaptateur qui prend la place du laser sur sa glissière. Jamais imprimé ni essayé — le modèle et ses contrôles seulement.">
+<meta property="og:url" content="https://atelierduverdier.fr/projets/dust-shoe.html">
+<meta property="og:image" content="https://atelierduverdier.fr/partage/projets-dust-shoe.307839d6.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="dust shoe">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Anti-clignotement : pose le thème choisi AVANT que la feuille de style
+     ne peigne. Placé ici et pas dans verdier.js, qui est chargé en fin de
+     page — sinon le visiteur voit le thème clair une fraction de seconde
+     avant la bascule. Volontairement minuscule et en ligne. -->
+<script>
+(function(){try{
+  var m=document.cookie.match(/(?:^|;\s*)verdier-theme=(light|dark)/);
+  var v=m?m[1]:localStorage.getItem('verdier-theme');
+  // `colorScheme` en plus de `data-theme` : la balise <meta> ci-dessus
+  // annonce « les deux », donc le navigateur suit l'OS. Quand le visiteur a
+  // choisi le CONTRAIRE de son OS, il faut le lui dire ici — sans quoi le
+  // fond et l'ascenseur partiraient dans le mauvais sens le temps du
+  // chargement, et l'éclair reviendrait pour ceux-là seulement.
+  if(v){var r=document.documentElement;r.setAttribute('data-theme',v);
+        r.style.colorScheme=v;}
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="../verdier.css">
+
+</head>
+<body>
+<a id="top"></a>
+
+<header class="topbar">
+  <div class="wrap">
+    <!-- Le logo est COLLÉ ici, pas chargé en <img> : en ligne, son
+         mot-symbole suit `currentColor`, donc le bouton de thème. En <img>
+         il ne suivrait que le réglage du système. -->
+    <a class="brand" href="https://atelierduverdier.fr/" aria-label="Atelier du Verdier">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+      <span class="brand-sub">dust shoe</span>
+    </a>
+    <button class="nav-btn" type="button" aria-label="Ouvrir le menu"
+            aria-controls="menu-principal">☰</button>
+    <nav class="navlinks" id="menu-principal">
+      <a href="../index.html">Accueil</a>
+      <a href="../index.html#logiciels">Logiciels</a>
+      <a href="../index.html#atelier">L'atelier</a>
+      <a href="../projets/" aria-current="true">Projets</a>
+      <a href="../modeles-3d.html">Modèles 3D</a>
+    </nav>
+    <!-- Le contraste, DESSINÉ et non écrit. Le caractère « ◐ » était rendu
+         par la police du système : maigre, minuscule, et lu comme un
+         chevron. Le tracé ci-dessous est le même trait que les pictos des
+         cartes, et le demi-disque plein dit ce que fait le bouton. -->
+    <button class="theme-btn" type="button" title="Thème clair / sombre"
+            aria-label="Basculer entre le thème clair et le thème sombre">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8.6"/>
+        <path d="M12 3.4a8.6 8.6 0 0 1 0 17.2Z" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- Dust shoe PrintNC.
+
+     LES COTES SONT LUES PAR ALIAS, jamais recopiées : `dustshoe` est le
+     tableur v2 (`ParametresV2.FCStd`), `dustshoe1` celui de la v1, qui
+     sert encore — le quai lui appartient, et c'est lui qui porte le Ø du
+     tuyau d'aspirateur. Le tableur v2 ne connaît que le Ø de l'EMBOÎTURE
+     (99), qui découle du tuyau de 100 mais ne le dit pas : la première
+     version de cette page a écrit « tuyau Ø99 » pour cette raison.
+
+     La règle appliquée ici : tout ce qui est une COTE en mm vient d'un
+     tableur ; un COMPTE de perçages ou d'aimants s'écrit en toutes
+     lettres, parce qu'un compte faux se voit sur la planche alors qu'un
+     millimètre faux, non.
+
+     Un projet jamais fabriqué ne se présente pas comme une réalisation :
+     l'état « jamais imprimé ni essayé » est dit dans le héros, répété en
+     encart, et la page ne montre que ce qui existe — un modèle, des
+     contrôles, des planches. -->
+
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="badges">
+          <span class="badge">3 pièces imprimées</span>
+          <span class="badge">tuyau Ø100</span>
+          <span class="badge">jamais essayé</span>
+        </div>
+        <h1>Le laser et le tuyau se relaient</h1>
+        <p class="lede">
+          Une jupe d'aspiration pour une broche Ø80, sur une machine où la place manque.
+          Le principe tient en une phrase : <b>l'adaptateur de tuyau prend la place du
+          laser</b> sur sa glissière. Les deux ne sont jamais montés ensemble, donc ils
+          n'ont plus rien à se disputer.
+        </p>
+        <div class="cta">
+      <a class="btn btn-ghost" href="../modeles-3d.html">Le tourner en 3D</a>
+          <a class="btn btn-github" href="https://github.com/atelierduverdier/dust-shoe"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            Le modèle et les plans sur GitHub
+          </a>
+    </div>
+      </div>
+      <div class="hero-art">
+        <svg style="font-size:9.9px" viewBox="0 0 340 250" role="img"
+             aria-label="La glissière du porte-broche, occupée tour à tour par le laser qui se retire et par l'adaptateur de tuyau qui se pose">
+          <g class="figure">
+            <!-- la glissière en T, le passage partagé -->
+            <rect x="156" y="24" width="20" height="120" rx="2"
+                  fill="var(--card)" stroke="var(--fg)" stroke-width="1.8"/>
+            <!-- l'étiquette est POSÉE DANS le rail, à la verticale : à
+                 l'horizontale au-dessus, elle butait contre « on le
+                 remonte » (vu au rendu, pas au code). -->
+            <text x="166" y="84" text-anchor="middle" class="petit"
+                  transform="rotate(-90 166 84)">glissière</text>
+
+            <!-- le laser : il monte et s'en va -->
+            <rect x="98" y="52" width="44" height="76" rx="4"
+                  fill="var(--bg-3)" stroke="var(--fg-3)" stroke-width="1.6"/>
+            <text x="120" y="94" text-anchor="middle" class="petit">laser</text>
+            <line x1="120" y1="48" x2="120" y2="28" class="cote"/>
+            <polygon points="120,22 116,32 124,32" fill="var(--fg-2)"/>
+            <text x="120" y="16" text-anchor="middle" class="petit">on le remonte</text>
+
+            <!-- l'adaptateur : il descend et prend la place -->
+            <rect x="190" y="30" width="58" height="118" rx="4"
+                  fill="var(--orange-soft)" stroke="var(--orange)" stroke-width="1.8"/>
+            <ellipse cx="219" cy="30" rx="29" ry="7"
+                     fill="var(--card)" stroke="var(--orange)" stroke-width="1.8"/>
+            <text x="219" y="96" text-anchor="middle" class="orange">tuyau</text>
+            <line x1="266" y1="30" x2="266" y2="120" class="cote"/>
+            <polygon points="266,126 262,116 270,116" fill="var(--fg-2)"/>
+            <text x="292" y="80" text-anchor="middle" class="petit">il prend</text>
+            <text x="292" y="92" text-anchor="middle" class="petit">sa place</text>
+
+            <!-- la semelle, serrée à demeure sur la broche -->
+            <rect x="72" y="152" width="196" height="14" rx="7"
+                  fill="var(--card)" stroke="var(--fg)" stroke-width="1.8"/>
+            <text x="52" y="163" text-anchor="end" class="petit">semelle</text>
+
+            <!-- la brosse, seule pièce qui se dépose -->
+            <path d="M84,166 h172 v22 h-172 z" fill="var(--bg-3)"
+                  stroke="var(--fg)" stroke-width="1.6"/>
+            <g stroke="var(--fg-3)" stroke-width="1.2">
+              <line x1="94" y1="188" x2="94" y2="212"/>
+              <line x1="112" y1="188" x2="112" y2="212"/>
+              <line x1="130" y1="188" x2="130" y2="212"/>
+              <line x1="148" y1="188" x2="148" y2="212"/>
+              <line x1="166" y1="188" x2="166" y2="212"/>
+              <line x1="184" y1="188" x2="184" y2="212"/>
+              <line x1="202" y1="188" x2="202" y2="212"/>
+              <line x1="220" y1="188" x2="220" y2="212"/>
+              <line x1="238" y1="188" x2="238" y2="212"/>
+            </g>
+            <text x="52" y="182" text-anchor="end" class="petit">brosse</text>
+            <text x="170" y="234" text-anchor="middle" class="petit">
+              elle seule se dépose, et va se parquer
+            </text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="montage">
+  <div class="wrap">
+    <div class="sec-tag">L'ouvrage</div>
+    <h2>Deux états, et c'est tout le projet</h2>
+    <p class="sec-lede">
+      Il n'y a que deux configurations à tenir : la machine fraise, ou la brosse est
+      parquée pour laisser passer autre chose. Rien entre les deux.
+    </p>
+
+    <figure class="capture">
+      <img src="../logiciels/captures/vue3d-dust-shoe-fraisage.d2aaf5d6.webp"
+           alt="Rendu 3D de l'aspiration montée : la broche en gris, la semelle bleue serrée sur sa collerette, la brosse dessous, et l'adaptateur orange qui monte vers le tuyau"
+           data-agrandir>
+      <figcaption>
+        <b>En fraisage.</b> La semelle (bleu) est serrée à demeure sur la collerette
+        Ø69,0 de la broche ; la brosse pend dessous par ses
+        aimants ; l'adaptateur (orange) descend par la glissière du porte-broche, là où
+        le laser se monte d'habitude. Le manchon du tuyau de
+        Ø100 vient coiffer son emboîture
+        Ø99.
+      </figcaption>
+    </figure>
+
+    <figure class="capture">
+      <img src="../logiciels/captures/vue3d-dust-shoe-parque.cd3ce6cc.webp"
+           alt="Rendu 3D du parcage : la brosse est restée dans son quai vert au bout de la table, la semelle et l'adaptateur sont repartis avec la broche"
+           data-agrandir>
+      <figcaption>
+        <b>Au parcage.</b> La machine se gare broche au centre du berceau, recule, et
+        <b>seule la brosse reste</b> dans le quai (vert). La semelle repart avec la
+        broche, l'adaptateur reste au tuyau. Un seul maillon magnétique dans toute la
+        chaîne — sinon c'est le hasard qui choisit lequel cède.
+      </figcaption>
+    </figure>
+
+    <h3>Le geste, en quatre temps</h3>
+    <p>
+      Deux prises du même parcage, quatorze secondes chacune, sans son. La machine
+      descend le sabot dans le quai ; la broche remonte et <b>la brosse reste</b> dans
+      la fourche ; l'adaptateur s'en va par le haut avec le tuyau ; et le laser
+      redescend prendre sa place dans la glissière — c'est là qu'on voit que les deux
+      ne se disputent rien.
+    </p>
+
+    <div class="figure-row serree">
+      <figure class="capture">
+        <video src="../logiciels/captures/video-dust-shoe-parcage-1.c9165277.mp4"
+               controls muted loop playsinline preload="metadata"
+               aria-label="Animation du parcage, prise large : le sabot descend dans le quai, la broche remonte en laissant la brosse, l'adaptateur part par le haut, le laser redescend">
+        </video>
+        <figcaption>Prise large — on voit le quai et le dégagement autour.</figcaption>
+      </figure>
+      <figure class="capture">
+        <video src="../logiciels/captures/video-dust-shoe-parcage-2.af2105ad.mp4"
+               controls muted loop playsinline preload="metadata"
+               aria-label="Le même parcage, cadré serré sur la broche, la semelle et la brosse">
+        </video>
+        <figcaption>Cadré serré — on suit ce qui se détache et ce qui reste.</figcaption>
+      </figure>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Ce sont des images de synthèse, et elles ne prouvent rien</span>
+      <p>
+        Le film est monté depuis le <b>même modèle</b> que les planches — les pièces y
+        bougent aux positions que le modèle calcule, pas à celles qu'on aimerait. Mais
+        une animation ne rencontre pas plus la machine qu'un dessin : elle montre une
+        intention, elle ne la valide pas.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="pieces">
+  <div class="wrap">
+    <div class="sec-tag">Le principe</div>
+    <h2>Trois pièces, dont une seule se dépose</h2>
+    <p class="sec-lede">
+      La seule zone cylindrique libre sous le porte-broche est la collerette
+      Ø69,0. Tout part de là.
+    </p>
+
+    <div class="chiffres">
+      <div class="chiffre"><span class="v">69,0</span><span class="l">collerette,<br>Ø en mm</span></div>
+      <div class="chiffre"><span class="v">100</span><span class="l">tuyau,<br>Ø en mm</span></div>
+      <div class="chiffre"><span class="v">8,3</span><span class="l">poche d'aimant,<br>Ø en mm</span></div>
+      <div class="chiffre"><span class="v">10</span><span class="l">rainure de brosse,<br>profondeur</span></div>
+    </div>
+
+    <div class="cartes">
+      <div class="carte">
+        <div class="head">
+          <span class="ci"><svg class="picto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="4.5" r="2"/><path d="M12 6.5V21"/><path d="M8 10h8"/><path d="M4 13.5a8 8 0 0 0 16 0"/></svg></span>
+          <h3>La semelle-collier</h3>
+          <span class="etat prive">à demeure</span>
+        </div>
+        <p>
+          Une bague fendue serrée par une vis M4 sur la collerette, prolongée en plaque
+          de 5 mm. Elle ne se dépose <b>jamais</b>. Une fente en
+          T et son couloir la traversent, pour que le laser puisse descendre
+          <b>semelle en place</b> : le corps par le couloir, la plaque par la fente.
+        </p>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci"><svg class="picto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5.5" width="18" height="5" rx="1.5"/><path d="M6 10.5V18"/><path d="M9 10.5V18"/><path d="M12 10.5V18"/><path d="M15 10.5V18"/><path d="M18 10.5V18"/></svg></span>
+          <h3>La brosse</h3>
+          <span class="etat chantier">amovible</span>
+        </div>
+        <p>
+          La jupe à poils, parois de 6 mm, avec une rainure
+          périphérique de 10 mm qui reçoit le dos de la
+          bande brosse du commerce. Elle pend sous la semelle par huit aimants et deux
+          goupilles acier chassées dans la flasque, guidées par des entonnoirs
+          creusés sous la semelle (bouche Ø10,
+          siège Ø4,4) : la reprise au quai tolère
+          0,8&nbsp;mm de décalage, l'entonnoir en rattrape 3. C'est <b>la seule
+          pièce qui se parque</b>.
+        </p>
+      </div>
+
+      <div class="carte">
+        <div class="head">
+          <span class="ci"><svg class="picto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9.8 4.5v8"/><path d="M14.2 4.5v8"/><path d="M9.8 7h4.4"/><path d="M9.8 9.7h4.4"/><path d="M9.2 12.5h5.6l3.2 6.6H6l3.2-6.6Z"/><path d="M3.5 20.8h17"/></svg></span>
+          <h3>L'adaptateur</h3>
+          <span class="etat prive">sur la glissière</span>
+        </div>
+        <p>
+          Un tenon copié sur la plaque du laser (4,7 mm
+          d'épaisseur), un conduit aplati en D, un pied à joint, et l'emboîture
+          Ø99 du tuyau. Son tenon monte 35 mm au-dessus
+          de la pince : de quoi suivre la broche quand elle redescend dans son
+          collier, en gardant le joint écrasé.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Pourquoi le conduit est en D</span>
+      <p>
+        L'axe du tuyau passe à 31,8 mm de la face arrière de la pince : un rond de
+        Ø93 la traverserait de près de 15 mm. Le conduit
+        est donc <b>aplati d'un côté</b> sur toute la bande que la pince peut balayer
+        pendant la pose, puis il redevient rond par une rampe à 45°. La section utile du
+        D vaut encore <b>84 % de l'intérieur du tuyau</b> — contre 40 % qu'imposait le
+        port Ø63 de la version précédente.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="plans">
+  <div class="wrap">
+    <div class="sec-tag">Les plans</div>
+    <h2>Cinq planches, et quarante-huit cotes relues</h2>
+    <p class="sec-lede">
+      Les planches ne sont pas dessinées : elles sont <b>projetées</b> depuis les
+      volumes dont sortent les fichiers d'impression. Ce qu'on regarde est donc ce
+      qu'on imprimerait. Les voici toutes les cinq, dans l'ordre du dossier —
+      cliquer pour agrandir.
+    </p>
+
+    <figure class="plan">
+      <img src="../logiciels/captures/plan-dust-shoe-semelle.bf5d8968.webp"
+           alt="Planche 1 : la semelle-collier, vue de face au-dessus de la vue de dessus, avec ses diamètres concentriques, la fente en T et son couloir, et une perspective"
+           data-agrandir>
+      <figcaption>
+        <b>1 — Semelle-collier</b> (DS-V2-01). Les diamètres concentriques de la bague,
+        le passage de l'écrou, l'ouverture du conduit ; la fente en T et le couloir par
+        lesquels le laser descend, semelle en place.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="../logiciels/captures/plan-dust-shoe-brosse.561fec81.webp"
+           alt="Planche 2 : la brosse, sa flasque à aimants vue de dessus, la rainure de la bande brosse et la gorge du quai en vue de face"
+           data-agrandir>
+      <figcaption>
+        <b>2 — Brosse</b> (DS-V2-02). La flasque et ses huit bossages d'aimant, le cul
+        rogné au cercle de la broche, la rainure qui reçoit la bande brosse et la gorge
+        où s'engage la languette du quai.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="../logiciels/captures/plan-dust-shoe-adaptateur.3e564c0e.webp"
+           alt="Planche 3 : l'adaptateur en dessin de définition — vue de droite, face, dessus et perspective, avec le tenon, le conduit en D, la gorge du joint et l'emboîture"
+           data-agrandir>
+      <figcaption>
+        <b>3 — Adaptateur</b> (DS-V2-03). Le tenon en T qui coulisse dans la glissière,
+        le conduit aplati, la gorge du joint sous le pied, l'emboîture du tuyau. Vues
+        disposées en <b>premier dièdre</b>, comme l'annonce le symbole du cartouche.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="../logiciels/captures/plan-dust-shoe-quai.470eb966.webp"
+           alt="Planche 4 : le quai de parcage — vue de droite, face, dessus et perspective, avec le berceau, la languette de retenue et les trois vis M6"
+           data-agrandir>
+      <figcaption>
+        <b>4 — Quai de parcage</b> (DS-V2-04). Le berceau où la broche se gare, la
+        languette qui retient la brosse par ses deux lobes latéraux, et les trois vis M6
+        qui traversent le lit pour se tarauder dans un tube du bâti.
+      </figcaption>
+    </figure>
+
+    <figure class="plan">
+      <img src="../logiciels/captures/plan-dust-shoe-ensemble.e4b34668.webp"
+           alt="Planche 5 : le plan d'ensemble — le montage de fraisage en élévation et de côté, l'état parqué, une perspective et la nomenclature des dix repères"
+           data-agrandir>
+      <figcaption>
+        <b>5 — Les deux montages</b> (DS-V2-05). Le fraisage et le parcage côte à côte,
+        une perspective, et la nomenclature des dix repères — visserie, aimants, cordon
+        et bande brosse compris.
+      </figcaption>
+    </figure>
+
+    <div class="liens">
+      <a href="../projets/plans/dust-shoe-plans.pdf" target="_blank" rel="noopener">
+        Les cinq planches en un PDF, prêtes à imprimer (A3)
+      </a>
+    </div>
+
+    <div class="callout note">
+      <span class="ci">Une cote fausse doit se voir toute seule</span>
+      <p>
+        Aucune cote n'est posée à la main. Chaque arête est retrouvée <b>par la
+        mesure</b> — sa longueur, son rayon, sa position — puis la cote posée dessus
+        est <b>relue</b> et comparée à la valeur qu'elle devrait avoir. Une cote
+        accrochée au mauvais endroit donne un nombre faux, donc se voit, et la
+        génération s'arrête en erreur.
+      </p>
+      <p>
+        Et il y a deux modèles derrière : le trait vient de l'un, la valeur attendue
+        de l'autre. <b>Une planche juste prouve donc au passage que les deux disent
+        la même chose.</b>
+      </p>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">Ce que quatre contrôles verts ne prouvaient pas</span>
+      <p>
+        Étendue des vues, tenue dans le cadre A3, disposition, poids du fichier exporté :
+        les quatre passaient au vert pendant qu'un pavé de texte s'imprimait
+        <b>par-dessus</b> la vue de dessus, que les vues étaient rangées à l'américaine
+        sous un symbole de premier dièdre, et qu'aucune vue ne portait son nom. Il a fallu
+        rendre les planches en image et les ouvrir. C'est la même règle que partout dans
+        cet atelier : <b>c'est la pièce qui juge, pas le rapport</b>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="etat">
+  <div class="wrap">
+    <div class="sec-tag">L'état</div>
+    <h2>Rien n'a été imprimé, et ça change tout</h2>
+
+    <div class="callout warn">
+      <span class="ci">Aucune de ces pièces n'existe</span>
+      <p>
+        Le modèle passe ses contrôles — recouvrement des deux modèles, sondes de points,
+        assemblages à vraies liaisons, interférences, étanchéité du conduit, retenue au
+        quai. Aucun de ces contrôles n'a rencontré la machine. Tous les jeux sont des
+        valeurs d'atelier. <b>La seule chose mesurée au pied à coulisse</b>, ce sont les
+        dépassements d'outil sous l'écrou — de 7 à 60 mm — et c'est ce relevé qui commande
+        la profondeur de la jupe.
+      </p>
+    </div>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>À confirmer devant la machine</th><th>pourquoi</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>La hauteur des poils de la bande brosse</td>
+            <td>C'est elle qui décide de ce qui touche vraiment la pièce.</td>
+          </tr>
+          <tr>
+            <td>Le dégagement arrière</td>
+            <td>La poutre de l'axe X est relevée à +60 ; on garde 2 mm. Cette cote
+                commande aussi le secteur où la languette du quai ne retient rien.</td>
+          </tr>
+          <tr>
+            <td>Le passage du magasin ATC sous la semelle</td>
+            <td>Au changement d'outil, la semelle reste sur la broche : le magasin doit
+                passer dessous.</td>
+          </tr>
+          <tr>
+            <td>L'hypothèse du chariot&nbsp;Z</td>
+            <td>Rien du chariot ne descendrait sous z&nbsp;=&nbsp;−25 à l'arrière. L'arc du
+                quai monte à −30&nbsp;: si l'hypothèse est fausse, c'est là que ça se touche.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout tip">
+      <span class="ci">Ce que la version précédente a coûté</span>
+      <p>
+        La forme a porté pendant douze jours une échancrure ouverte « du côté du laser »,
+        sur une prémisse fausse : le laser pend <b>du même côté que le conduit</b>, pas à
+        l'opposé. Le contrôle de collision validait sereinement la mauvaise orientation —
+        <b>un contrôle qui juge une orientation supposée valide la supposition, pas la
+        pièce.</b> C'est en regardant la machine que ça s'est réglé, pas en relisant du
+        code.
+      </p>
+    </div>
+
+    <div class="liens">
+      <a href="https://github.com/atelierduverdier/dust-shoe" target="_blank" rel="noopener">
+        Le dépôt, modèle et planches
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================================
+     pied.html — bas de page commun de l'Atelier du Verdier
+     =========================================================================
+     GABARIT DU KIT, recopié dans chaque site par outils/diffuser_kit.py.
+     Ne pas l'éditer dans une copie : elle sera écrasée.
+     Source : atelierduverdier/site — kit/pied.html
+
+     Marques à remplacer par le générateur :
+       ../     préfixe vers le kit depuis la page : "" ou "../"
+       dust shoe nom du site dans la marque du pied
+       Jupe d'aspiration paramétrique pour la broche G-PENNY Ø80 : semelle à demeure, brosse amovible, adaptateur de tuyau Ø100.     une ou deux phrases sur ce qu'est ce site-là
+       <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>      les <a> du pied
+       2026      année du copyright
+          <script> propre au site, ou vide
+     ========================================================================= -->
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336.2 54.0"
+     width="336" height="54" class="logo"
+     role="img" aria-label="Atelier du Verdier">
+  <title>Atelier du Verdier</title>
+  <g transform="translate(4.0 4.0) scale(1.02222) translate(-32.000 -1.000)">
+    <g
+         transform="matrix(0.80893458,-0.17233457,0.19166986,0.8996939,-22.831279,-36.579103)"
+         style="display:inline">
+        <path
+           d="m 105.96886,69.549308 c 3.76397,3.406838 6.08389,8.147021 6.36422,13.005442 0.0556,0.962295 -0.48114,1.810879 -1.00977,2.045076 -0.62117,0.275174 -1.08388,0.322466 -1.45675,0.149058 -0.7338,-0.341389 -1.0916,-1.570413 -1.58659,-3.271932 -0.76989,-2.644275 -1.93354,-6.640764 -5.49967,-10.698629 -0.51103,-0.581501 -1.02662,-1.927445 -0.23536,-2.327146 1.33219,-0.673884 3.00682,0.720135 3.42392,1.098131 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.271374" />
+        <path
+           d="m 99.588923,34.084463 c 0.227255,4.868244 -4.486163,9.26724 -15.793349,9.21804 -8.272645,0.02536 -16.109126,-2.753168 -23.624913,-5.929869 -7.065059,-2.484206 -18.435134,-9.125989 -25.867672,-6.831624 -0.428823,0.191694 -0.8758,0.280252 -1.292429,0.126603 1.085163,-1.042897 1.973843,-1.887351 3.022039,-1.989027 11.00202,-0.192041 22.282383,7.8669 36.377624,11.578617 15.775112,4.061076 24.924262,-0.319147 25.727115,-5.143351 1.083323,-6.509652 -8.90413,-10.393474 -8.922453,-10.443806 -0.08066,-0.221507 -0.04349,-0.66211 0.03463,-0.857829 0,0 9.597665,2.457356 10.339414,10.272246 0.741751,7.81489 -5e-6,0 -6e-6,0 z"
+           style="display:inline;fill:#ffffff;stroke-width:0.230783"
+           transform="matrix(1.2017348,0.11949472,-0.13290159,1.0805062,13.488768,50.02759)" />
+        <path
+           style="display:inline;fill:#ff6600;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.59546;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+           d="m 96.369023,100.57206 c -0.354914,-0.0235 -1.538227,-0.12818 -2.629586,-0.23272 l -1.984284,-0.19008 -2.119337,-0.954731 C 88.470182,98.669428 83.624695,96.567176 79.21068,94.335867 74.796665,92.104561 70.346005,90.01793 69.314843,89.543624 c -2.321754,-1.06794 -5.567577,-2.272963 -7.063102,-2.777262 -1.401427,-0.472571 -1.010175,-0.741343 -0.903854,-1.170876 0.04757,-0.192172 0.161646,-0.327062 0.276864,-0.327373 0.246673,-6.64e-4 4.279809,0.927936 8.49992,2.173327 9.47837,2.79715 18.139979,5.084287 21.949007,5.795737 2.689213,0.502288 4.926334,0.692644 8.072192,0.686852 3.09655,-0.0056 4.68831,-0.135402 7.46597,-0.608348 3.03822,-0.517316 6.54753,-1.53359 8.58491,-2.486138 0.42581,-0.199082 0.81322,-0.362073 0.86093,-0.362202 0.0873,-2.35e-4 0.0429,2.52629 -0.093,5.285514 l -0.0734,1.489976 -0.96501,0.459654 c -2.67995,1.276517 -5.82554,2.18893 -10.03264,2.679415 -1.55391,0.18116 -8.007043,0.29046 -9.524647,0.19016 z" />
+        <path
+           style="display:inline;fill:#000000;stroke:#ffffff;stroke-width:1.7;stroke-linejoin:round;paint-order:stroke fill"
+           d="m 95.380114,61.717074 c -6.850348,-1.090241 -13.954172,-0.69309 -19.944998,1.210123 -4.99216,1.585648 -8.795992,4.612278 -11.305572,8.995101 C 62.056014,75.54365 60.7957,80.122217 60.27843,85.917386 57.2217,85.077599 54.677411,84.48055 52.158051,84.9822 c -0.787018,0.154951 -4.621384,2.109134 -3.888272,5.108206 0.63447,2.596886 3.642861,4.947531 5.576171,5.787054 9.41361,4.088342 18.031881,7.14033 26.348267,9.33108 6.878637,1.81187 15.120829,3.73228 24.092583,4.23763 1.53405,0.0865 3.14708,0.14816 4.79252,0.14816 6.42303,0 13.35001,-0.93985 18.10722,-5.01972 2.58948,-2.22091 3.5135,-5.514578 2.41125,-8.595386 -0.83582,-2.335212 -2.54592,-4.567076 -4.94516,-6.455672 -2.08307,-1.639094 -4.6357,-2.975167 -7.19211,-3.764948 -0.10477,-5.342731 -1.45465,-10.158708 -3.90522,-13.929285 -2.65192,-4.080669 -6.50772,-6.949187 -11.45992,-8.526633 -2.176394,-0.693142 -4.431816,-1.222199 -6.715266,-1.585612 z m 10.556696,7.958664 c 3.66977,3.32158 5.93163,7.943137 6.20495,12.679972 0.0542,0.938213 -0.4691,1.765561 -0.9845,1.993897 -0.60563,0.268287 -1.05676,0.314395 -1.4203,0.145327 -0.71543,-0.332846 -1.06428,-1.531112 -1.54688,-3.190049 -0.75062,-2.5781 -1.88515,-6.474574 -5.36204,-10.430889 -0.49824,-0.566948 -1.00093,-1.879209 -0.22947,-2.268907 1.29885,-0.65702 2.93157,0.702113 3.33824,1.070649 z m 11.68999,16.800808 c 6.49034,2.639227 11.01979,7.572484 10.83805,12.177007 -0.18592,4.698217 -6.62281,9.477237 -20.20451,8.072927 -9.944895,-0.96114 -18.992997,-4.89977 -27.602791,-9.230312 -8.160173,-3.528438 -20.941284,-12.06359 -30.178148,-10.472663 -0.540808,0.155885 -0.897594,0.271524 -1.377851,0.05572 1.44268,-0.997186 2.611879,-1.714091 3.885045,-1.698699 13.247033,1.107182 25.491278,11.075624 41.936727,16.770464 18.417778,6.27306 30.239878,2.68498 31.845838,-2.431666 2.16701,-6.904268 -9.26172,-12.351807 -9.27705,-12.408381 -0.0675,-0.248979 0.0148,-0.632261 0.13469,-0.834402 z m -0.96433,4.196212 -0.18272,6.631929 c -6.02959,3.381113 -16.791497,3.826373 -24.798847,2.766713 -3.912659,-1.617402 -8.149695,-3.747755 -12.247561,-5.807801 -5.783525,-2.907771 -11.764199,-5.914097 -17.179959,-7.68072 -0.04948,-0.0164 -0.100522,-0.0323 -0.151822,-0.04844 -0.36962,-0.115622 -0.751212,-0.235219 -0.771812,-0.4916 -0.01588,-0.197644 0.09258,-0.661224 0.215883,-0.743244 0.0172,-0.0121 0.02877,-0.01008 0.04257,-0.0037 l 3.909512,1.035892 c 5.869771,1.690633 14.995366,4.430513 24.750295,6.69437 11.108321,2.46564 21.039981,0.227329 26.414461,-2.353417 z" />
+      </g>
+  </g>
+  <g fill="currentColor" transform="translate(89.85 -111.19)">
+    <path d="M 12,145.35 H 5.49 L 4.32,150 h -4.59 l 6.39,-20.76 h 5.37 L 17.85,150 h -4.68 z m -0.84,-3.27 -2.43,-9.57 -2.4,9.57 z m 18.230014,7.17 q -0.87,0.6 -1.98,0.9 -1.08,0.33 -2.16,0.33 -2.46,-0.03 -3.72,-1.41 -1.26,-1.38 -1.26,-4.05 v -7.92 h -2.37 v -3 h 2.37 v -3.48 l 4.26,-0.51 v 3.99 h 3.66 l -0.42,3 h -3.24 v 7.83 q 0,1.14 0.39,1.65 0.39,0.51 1.2,0.51 0.81,0 1.8,-0.54 z m 15.019968,-7.56 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 11.42,9.99 q -1.95,0 -3.03,-1.11 -1.08,-1.14 -1.08,-3.21 v -18.39 l 4.26,-0.48 v 18.75 q 0,0.54 0.21,0.81 0.21,0.24 0.66,0.24 0.48,0 0.84,-0.18 l 0.87,3.03 q -1.23,0.54 -2.73,0.54 z m 7.340011,-24.57 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80998,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.710003,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 25.059984,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 24.59001,2.7 h -3.69 l -0.21,-2.13 q -0.87,1.32 -2.07,1.98 -1.17,0.63 -2.76,0.63 -2.16,0 -3.3,-1.29 -1.14,-1.32 -1.14,-3.66 V 134.1 h 4.26 v 10.89 q 0,1.26 0.42,1.8 0.42,0.51 1.32,0.51 1.71,0 2.91,-2.07 V 134.1 h 4.26 z m 21.06998,0 h -5.37 l -6.18,-20.76 h 4.71 l 4.23,17.1 4.08,-17.1 h 4.5 z m 20.71999,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.70999,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z m 16.94,-5.88 V 150 h -3.75 l -0.24,-1.95 q -1.68,2.43 -4.56,2.43 -2.94,0 -4.5,-2.25 -1.53,-2.28 -1.53,-6.18 0,-2.46 0.78,-4.35 0.81,-1.92 2.28,-3 1.47,-1.08 3.39,-1.08 2.22,0 3.87,1.59 v -7.92 z m -7.29,19.53 q 0.93,0 1.65,-0.45 0.72,-0.48 1.38,-1.47 v -7.11 q -0.63,-0.75 -1.29,-1.11 -0.63,-0.39 -1.47,-0.39 -1.47,0 -2.31,1.29 -0.81,1.29 -0.81,3.99 0,2.85 0.72,4.05 0.75,1.2 2.13,1.2 z m 13.73001,-21.39 q 1.14,0 1.86,0.72 0.75,0.69 0.75,1.77 0,1.08 -0.75,1.8 -0.72,0.69 -1.86,0.69 -1.14,0 -1.86,-0.69 -0.72,-0.72 -0.72,-1.8 0,-1.08 0.72,-1.77 0.72,-0.72 1.86,-0.72 z m 2.13,24.09 h -4.26 v -15.9 h 4.26 z m 17.80997,-8.31 q 0,0.3 -0.09,1.65 h -9.93 q 0.21,2.16 1.17,3.06 0.96,0.9 2.61,0.9 1.02,0 1.92,-0.33 0.9,-0.33 1.95,-1.05 l 1.77,2.4 q -2.67,2.16 -6.03,2.16 -3.75,0 -5.76,-2.25 -2.01,-2.25 -2.01,-6.09 0,-2.43 0.84,-4.35 0.87,-1.95 2.49,-3.06 1.65,-1.11 3.9,-1.11 3.39,0 5.28,2.13 1.89,2.13 1.89,5.94 z m -4.23,-1.2 q 0,-3.96 -2.85,-3.96 -1.32,0 -2.07,0.99 -0.72,0.96 -0.87,3.15 h 5.79 z m 15.71001,-6.84 q 0.78,0 1.59,0.24 l -0.69,4.11 q -0.9,-0.21 -1.44,-0.21 -1.41,0 -2.22,1.02 -0.78,1.02 -1.2,3.06 V 150 h -4.26 v -15.9 h 3.72 l 0.36,3.09 q 0.57,-1.65 1.65,-2.58 1.11,-0.96 2.49,-0.96 z"/>
+  </g>
+</svg>
+        <span class="brand-sub">dust shoe</span>
+      </div>
+      <p class="muted" style="margin:.2em 0 0">
+        Jupe d'aspiration paramétrique pour la broche G-PENNY Ø80 : semelle à demeure, brosse amovible, adaptateur de tuyau Ø100.<br>
+        © 2026 Atelier du Verdier.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://ko-fi.com/atelierduverdier" target="_blank" rel="noopener">☕ Soutenir sur Ko-fi</a>
+      <a href="https://github.com/atelierduverdier" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://laser.atelierduverdier.fr" target="_blank" rel="noopener">Atelier Laser</a>
+      <a href="https://printnc.atelierduverdier.fr" target="_blank" rel="noopener">Journal PrintNC</a>
+      <a href="https://liens.atelierduverdier.fr" target="_blank" rel="noopener">Mes liens</a>
+      <a href="#top">Haut de page ↑</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Visionneuse : présente sur toutes les pages, verdier.js ne s'y accroche
+     que s'il trouve des images à agrandir. -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image agrandie">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Fermer">×</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-hint">Cliquer n'importe où, ou Échap, pour fermer</div>
+</div>
+
+<script src="../verdier.js"></script>
+
+
+<!-- Fréquentation : GoatCounter, compte unique pour tout le domaine, donc
+     tous les sous-domaines remontent au même endroit. Pas de cookie, pas
+     de tiers publicitaire, rien à demander au visiteur.
+
+     LE PRÉFIXE N'EST PAS UN ORNEMENT. Vérifié dans count.js le 12/08/2026 :
+     la charge utile envoyée est p (chemin), r, t, e, s, b, q — le NOM D'HÔTE
+     n'en fait pas partie. Sans préfixe, le « / » de ce site et le « / » du
+     journal PrintNC tomberaient dans le même seau, et les deux courbes
+     seraient indémêlables.
+
+     C'est le nouveau venu qui se préfixe, jamais le journal : lui a des
+     mois d'historique sur « / », et le couper en deux séries serait perdre
+     la continuité qu'on cherche justement à préserver. -->
+<script>
+  window.goatcounter = {
+    path: function (p) { return '/portail' + p }
+  };
+</script>
+<script data-goatcounter="https://atelierduverdier.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>

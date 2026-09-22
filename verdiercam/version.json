@@ -1,0 +1,8 @@
+{
+  "version": "0.37.0",
+  "page": "https://github.com/atelierduverdier/verdiercam-archives/releases/tag/v0.37.0",
+  "archive": "https://github.com/atelierduverdier/verdiercam-archives/releases/download/v0.37.0/VerdierCAM-0.37.0-x86_64.AppImage",
+  "sha256": "ed86ca5eb59e755d07857cdb30c5c02826f881c9f9035bb7f60b29506d1e9fc1",
+  "commit": "7fad74f",
+  "quoi": "L'archive s'ouvre sous Debian et Ubuntu : de GLIBC_2.44 à GLIBC_2.27."
+}
