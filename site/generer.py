@@ -241,6 +241,18 @@ def injecter_chutier(corps: str, nom: str) -> str:
     return corps
 
 
+# LE MANIFESTE DE VERDIERCAM, servi TEL QUEL sur /verdiercam/. Trois lignes de JSON qui disent
+# quelle version du logiciel est la bonne — et c'est tout. VerdierCAM le lit une fois par jour et
+# colore sa case de version : verte si c'est la vôtre, rouge s'il en existe une plus récente.
+#
+# CE FICHIER EST L'INTERRUPTEUR DE LA DIFFUSION. Tant qu'on ne le touche pas, aucun utilisateur ne
+# voit de nouvelle version, quel que soit le nombre de commits faits dans le dépôt du logiciel.
+# Il est écrit par `outils/publier-version.sh` du dépôt verdiercam-cpp, jamais à la main.
+#
+# Il vit ICI, sur le site, et non dans le dépôt d'archives : ce dépôt est PRIVÉ, donc illisible
+# par le logiciel. Le site est la seule adresse publique et durable de la maison.
+MANIFESTE_VERDIERCAM = SITE / 'verdiercam'
+
 # L'appli « vitesses de coupe », servie TELLE QUELLE sur /coupe/.
 APPLI_COUPE = SITE / 'appli' / 'coupe'
 
@@ -1704,6 +1716,22 @@ def convertir_captures() -> dict:
 
     return empreintes
 
+def copier_manifeste_verdiercam() -> None:
+    """Le manifeste de version de VerdierCAM, recopié tel quel sur /verdiercam/.
+
+    Absent, on ne s'arrête PAS : le site doit pouvoir se publier avant la
+    première version du logiciel. On le dit, et l'on continue — un site qui
+    refuse de sortir pour un fichier qui n'existe pas encore serait pire.
+    """
+    if not MANIFESTE_VERDIERCAM.is_dir():
+        print("  · pas de manifeste VerdierCAM (site/verdiercam/) — rien à servir")
+        return
+    shutil.copytree(MANIFESTE_VERDIERCAM, PUBLIC / 'verdiercam')
+    version = (MANIFESTE_VERDIERCAM / 'version.json')
+    if version.is_file():
+        print(f"  · manifeste VerdierCAM servi ({version.stat().st_size} octets)")
+
+
 def main() -> None:
     if PUBLIC.exists():
         shutil.rmtree(PUBLIC)
@@ -1719,6 +1747,7 @@ def main() -> None:
     pages_3d = _pages_avec_modele()
     copier_appli_coupe()
     partage_appli_coupe()
+    copier_manifeste_verdiercam()
     cartes = images_partage(PAGES)
     # Les pages dont le héros a effectivement reçu sa case photo : une
     # entrée de PHOTOS_HEROS que personne ne pose est une photo qu'on croit
