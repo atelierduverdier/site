@@ -241,6 +241,100 @@ def injecter_chutier(corps: str, nom: str) -> str:
     return corps
 
 
+# --- VerdierCAM ----------------------------------------------------------
+# La fiche ne recopie NI la version NI la liste des opérations. La version se
+# lit dans le `project(... VERSION x.y.z)` du CMakeLists — c'est celle que le
+# binaire affiche ; les familles d'opérations, leur nom et leur phrase se
+# lisent dans `FamilyLabel` / `FamilyTip` du noyau (src/cam/Operation.h), là
+# où la palette du logiciel les lit elle-même. Seules les familles que
+# `FamilyIsImplemented` déclare faites sont montrées.
+#
+# LE RANGEMENT EN GROUPES est la seule chose écrite ici. Une famille nouvelle
+# que ce tableau ne range nulle part ARRÊTE la génération : sinon elle
+# manquerait à la fiche sans que personne ne le voie.
+VERDIERCAM_GROUPES = [
+    ('Découper et évider', ['Profile', 'Pocket', 'Facing', 'Slot', 'Finish']),
+    ('Percer et fileter', ['Drill', 'Helical', 'ThreadMill']),
+    ('Graver', ['Engrave', 'VCarve', 'Deburr', 'PhotoV', 'Texture']),
+    ('Volumes et reliefs', ['Roughing3D', 'Moulding', 'Revolution']),
+    ('Usiner les deux faces', ['Dowels', 'Fence']),
+]
+
+
+def faits_verdiercam() -> dict:
+    """Version et familles d'opérations, lues dans le dépôt de VerdierCAM."""
+    cmake = chemins.VERDIERCAM_CMAKE
+    op = chemins.VERDIERCAM_OPERATION
+    for f in (cmake, op):
+        if not f.is_file():
+            sys.exit(f"generer : {f} introuvable — corriger chemins.py, ou "
+                     f"retirer la fiche VerdierCAM.")
+    m = re.search(r'project\(\s*\w+\s+VERSION\s+([\d.]+)', cmake.read_text(encoding='utf-8'))
+    if not m:
+        sys.exit(f"generer : pas de VERSION dans {cmake}")
+    version = m.group(1)
+
+    texte = op.read_text(encoding='utf-8')
+
+    def corps_fonction(nom):
+        debut = texte.index(nom)
+        return texte[debut:texte.index('\n}\n', debut)]
+
+    noms = dict(re.findall(r'case OperationFamily::(\w+):\s*return "([^"]+)";',
+                           corps_fonction('FamilyLabel(')))
+    phrases = dict(re.findall(r'case OperationFamily::(\w+):\s*return "([^"]+)";',
+                              corps_fonction('FamilyTip(')))
+    faites = re.findall(r'OperationFamily::(\w+)', corps_fonction('FamilyIsImplemented('))
+    if not noms or not faites:
+        sys.exit(f"generer : familles illisibles dans {op} — le format a changé ?")
+
+    rangees = {f for _, fam in VERDIERCAM_GROUPES for f in fam}
+    oubliees = sorted(set(faites) - rangees)
+    if oubliees:
+        sys.exit(f"generer : famille(s) VerdierCAM sans groupe : {', '.join(oubliees)} "
+                 f"— les ranger dans VERDIERCAM_GROUPES.")
+
+    # Trois phrases commencent par le nom de leur famille (« Moulure : deux
+    # formes… ») : en liste, derrière ce même nom en gras, il se lirait deux fois.
+    for f, nom_f in noms.items():
+        if f in phrases and phrases[f].startswith(nom_f):
+            phrases[f] = phrases[f][len(nom_f):].lstrip(' :')
+
+    blocs = []
+    for titre, familles in VERDIERCAM_GROUPES:
+        lignes = [f'<li><b>{html.escape(noms[f], quote=False)}</b> — {html.escape(phrases[f], quote=False)}.</li>'
+                  for f in familles if f in faites]
+        if lignes:
+            blocs.append(f'<div class="panel famille">\n  <h3>{html.escape(titre)}</h3>\n'
+                         f'  <ul>\n    ' + '\n    '.join(lignes) + '\n  </ul>\n</div>')
+    return {
+        'version': version,
+        'familles': str(len(set(faites))),
+        'liste_familles': '\n'.join(blocs),
+    }
+
+
+def injecter_verdiercam(corps: str, nom: str) -> str:
+    """Remplace les {{verdiercam.xxx}}. Une clé inconnue arrête la génération."""
+    if '{{verdiercam' not in corps:
+        return corps
+    connues = faits_verdiercam()
+    manquantes = []
+
+    def remplacer(m):
+        cle = m.group(1)
+        if cle not in connues:
+            manquantes.append(cle)
+            return m.group(0)
+        return connues[cle]
+
+    corps = re.sub(r'\{\{verdiercam\.(\w+)\}\}', remplacer, corps)
+    if manquantes:
+        sys.exit(f"{nom} : clé(s) verdiercam inconnue(s) : "
+                 f"{', '.join(sorted(set(manquantes)))}")
+    return corps
+
+
 # LE MANIFESTE DE VERDIERCAM, servi TEL QUEL sur /verdiercam/. Trois lignes de JSON qui disent
 # quelle version du logiciel est la bonne — et c'est tout. VerdierCAM le lit une fois par jour et
 # colore sa case de version : verte si c'est la vôtre, rouge s'il en existe une plus récente.
@@ -581,6 +675,31 @@ PAGES = [
         'sous_titre': 'chutier',
         'resume': "Feuille de débit et stock de chutes : les restes passent avant les "
                   "planches neuves. Code public, LGPL-2.1.",
+    },
+    {
+        'contenu': 'verdiercam.html',
+        'sortie': 'logiciels/verdiercam.html',
+        'partage': CONTENU / 'captures' / 'verdiercam-assiette.png',
+        'titre': "VerdierCAM — du croquis au copeau, sans changer de logiciel",
+        'description': "Logiciel de CAO/FAO pour la défonceuse CNC : croquis "
+                       "contraint, dix-huit familles d'opérations, simulation de "
+                       "la matière et pilotage de la machine dans une seule "
+                       "fenêtre. Linux et Windows. Sortie prochaine.",
+        'sous_titre': 'VerdierCAM',
+        'resume': "CAO/FAO pour défonceuse CNC : dessiner, usiner, simuler, "
+                  "piloter. Sortie prochaine.",
+        # Quatre établis côte à côte au large, deux sur tablette, un sur
+        # téléphone ; les familles d'opérations en grille souple, pour que cinq
+        # groupes ne laissent pas un panneau orphelin sur une colonne de deux.
+        'entete_sup': '<style>\n'
+                      '.cols-4{grid-template-columns:repeat(4,1fr)}\n'
+                      '@media(max-width:980px){.cols-4{grid-template-columns:1fr 1fr}}\n'
+                      '@media(max-width:560px){.cols-4{grid-template-columns:1fr}}\n'
+                      '.cols.familles{grid-template-columns:repeat(auto-fit,'
+                      'minmax(min(320px,100%),1fr));margin:26px 0}\n'
+                      '.panel ul{margin:.4em 0 0;padding-left:1.1em}\n'
+                      '.panel li{margin:.3em 0}\n'
+                      '</style>',
     },
     {
         'contenu': 'pupitre-graphtec.html',
@@ -1770,6 +1889,7 @@ def main() -> None:
         corps = injecter_valeurs_atc(corps, page['contenu'])
         corps = injecter_laser(corps, page['contenu'])
         corps = injecter_chutier(corps, page['contenu'])
+        corps = injecter_verdiercam(corps, page['contenu'])
         corps = injecter_fcstd(corps, page['contenu'])
         corps = injecter_coupe(corps, page['contenu'])
         corps = injecter_modeles(corps, page['contenu'], modeles)

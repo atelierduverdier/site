@@ -75,6 +75,14 @@ PAQUERETTE = (PROJETS / 'archives' / 'Conception' / 'FreeCAD' / 'Penderie'
 PRINTNC_CONFIG = PROJETS / 'machine' / 'printnc-config'
 PENDANTE_HAL = PRINTNC_CONFIG / 'pendant-whb04b6.hal'
 
+# VerdierCAM : la version se lit dans le CMakeLists, les familles d'opérations
+# dans le noyau — la fiche ne recopie ni l'une ni les autres. Les captures et
+# les clips viennent de la présentation, qui les refait par scénarios.
+VERDIERCAM = PROJETS / 'logiciels' / 'verdiercam-imgui'
+VERDIERCAM_CMAKE = VERDIERCAM / 'CMakeLists.txt'
+VERDIERCAM_OPERATION = VERDIERCAM / 'src' / 'cam' / 'Operation.h'
+VERDIERCAM_PRESENTATION = PROJETS / 'realisations' / 'presentation-verdiercam'
+
 TOUT = {
     'dépôt config PrintNC': PRINTNC_CONFIG,
     'câblage HAL de la pendante': PENDANTE_HAL,
@@ -101,6 +109,9 @@ TOUT = {
     'valeurs de l\'attache': ATTACHE_VALEURS,
     'planche de l\'attache': ATTACHE_RENDU,
     'STL de l\'attache': ATTACHE_STL,
+    'CMakeLists VerdierCAM (version)': VERDIERCAM_CMAKE,
+    'Operation.h VerdierCAM (familles)': VERDIERCAM_OPERATION,
+    'présentation VerdierCAM (captures)': VERDIERCAM_PRESENTATION,
 }
 
 

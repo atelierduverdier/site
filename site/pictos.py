@@ -53,6 +53,10 @@ DESSINS = {
     # Un parcours d'outil : segments orthogonaux, départ et arrivée marqués.
     'parcours': ('<path d="M4 19h4v-8h6V6h6"/>'
                  '<circle cx="4" cy="19" r="1.5"/><circle cx="20" cy="6" r="1.5"/>'),
+    # Une fraise droite vue de profil : la queue, puis la partie coupante
+    # aux deux hélices. Pour VerdierCAM, qui la mène du croquis au G-code.
+    'fraise': ('<path d="M9.5 3h5v7h-5z"/><path d="M9.5 10h5v8.5l-2.5 2.5-2.5-2.5z"/>'
+               '<path d="M9.5 12.5l5 2.5"/><path d="M9.5 16l5 2.5"/>'),
     # Un panneau débité en coupes guillotine.
     'debit': ('<rect x="3" y="4" width="18" height="16" rx="2"/>'
               '<path d="M3 12h18"/><path d="M12 4v8"/><path d="M16 12v8"/>'),
