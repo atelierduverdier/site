@@ -97,6 +97,15 @@ JETONS_ET_ENTETE = {**JETONS_SEULS,
                     'verdier-entete.css': 'verdier-entete.css'}
 
 # nom lisible -> dossier où poser la charte, chez le satellite.
+# Un site qui se construit comme le portail : la charte ENTIÈRE, et les
+# gabarits d'en-tête et de pied avec le logo en ligne, que son générateur
+# remplit comme le nôtre. Le site de VerdierCAM, sur verdiercam.fr, est le
+# premier (06/10/2026).
+CHARTE_ET_GABARITS = {**FICHIERS,
+                      'entete.html': 'entete.html',
+                      'pied.html': 'pied.html',
+                      'logo-inline.svg': 'logo-inline.svg'}
+
 SATELLITES = {
     'site laser': ((Path.home() / '.local' / 'share' / 'FreeCAD' / 'v1-1'
                     / 'Mod' / 'LaserAtelier' / 'docs' / 'assets'), FICHIERS),
@@ -112,6 +121,8 @@ SATELLITES = {
     # GitHub Pages : ce qui est posé ici part en ligne au prochain push.
     'page de liens': ((Path.home() / 'Projets' / 'site' / 'Site_Liens'),
                       JETONS_ET_ENTETE),
+    'site VerdierCAM': ((Path.home() / 'Projets' / 'site' / 'Site_VerdierCAM'
+                         / 'kit'), CHARTE_ET_GABARITS),
 }
 
 BANDEAU = {
