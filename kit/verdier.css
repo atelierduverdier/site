@@ -621,12 +621,31 @@ footer{padding:44px 0 60px; color:var(--fg-2)}
 
 /* ---------- 13. Visionneuse (clic sur une image pour l'agrandir) -------- */
 
-.lightbox{position:fixed; inset:0; z-index:200; display:none;
+/* L'ouverture est animee : le fond se fonce, l'image grandit de 96 a 100 %.
+   Reprise de transitions.dev (« Modal open / close »), courbe remplacee
+   par notre --sortie. Fermer (150 ms) va plus vite qu'ouvrir (250 ms) :
+   c'est ce qui donne l'impression que le clic repond tout de suite.
+
+   PAS DE `display:none` : un navigateur n'anime jamais `display`, c'est
+   ce qui rendait l'ouverture seche. `visibility` s'anime, elle, et retire
+   quand meme la visionneuse du clic et du clavier une fois fermee — son
+   delai de 150 ms la garde visible le temps du fondu de sortie.
+   verdier.js attend la fin de ce fondu avant de vider l'image. */
+.lightbox{position:fixed; inset:0; z-index:200; display:flex;
   align-items:center; justify-content:center; padding:24px;
-  background:rgba(10,12,15,.92); cursor:zoom-out}
-.lightbox.open{display:flex}
+  background:rgba(10,12,15,.92); cursor:zoom-out;
+  opacity:0; visibility:hidden;
+  transition:opacity .15s var(--sortie), visibility 0s linear .15s}
+.lightbox.open{opacity:1; visibility:visible;
+  transition:opacity .25s var(--sortie), visibility 0s}
 .lightbox img{max-width:96vw; max-height:92vh; width:auto; height:auto;
-  border-radius:10px; box-shadow:0 12px 48px rgba(0,0,0,.6); background:#fff}
+  border-radius:10px; box-shadow:0 12px 48px rgba(0,0,0,.6); background:#fff;
+  transform:scale(.96); transition:transform .15s var(--sortie)}
+.lightbox.open img{transform:none; transition:transform .25s var(--sortie)}
+@media (prefers-reduced-motion:reduce){
+  .lightbox,.lightbox.open,.lightbox img,.lightbox.open img{transition:none}
+  .lightbox img{transform:none}
+}
 .lightbox .lb-close{position:absolute; top:14px; right:18px; width:42px; height:42px;
   border-radius:50%; border:none; cursor:pointer; font-size:1.6rem; line-height:1;
   background:rgba(255,255,255,.14); color:#fff}

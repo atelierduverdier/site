@@ -111,14 +111,22 @@
   var close = document.getElementById('lbClose');
   if (!img) return;
 
+  /* L'image n'est vidée qu'APRÈS le fondu de sortie (150 ms, voir la
+     section 13 de verdier.css) : vidée tout de suite, elle disparaîtrait
+     avant le fond. Une réouverture pendant ce délai annule le vidage. */
+  var vidage = null;
+
   function ouvrir(src, alt){
+    clearTimeout(vidage);
     img.src = src; img.alt = alt || '';
     lb.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
   function fermer(){
-    lb.classList.remove('open'); img.src = '';
+    if (!lb.classList.contains('open')) return;
+    lb.classList.remove('open');
     document.body.style.overflow = '';
+    vidage = setTimeout(function(){ img.src = ''; }, 200);
   }
 
   var cibles = document.querySelectorAll('[data-agrandir], .mode .shot img, .diagram img');
