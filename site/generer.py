@@ -260,6 +260,13 @@ VERDIERCAM_GROUPES = [
     ('Usiner les deux faces', ['Dowels', 'Fence']),
 ]
 
+# LES FAMILLES TAIRES : faites dans le logiciel, mais pas encore annoncees sur
+# la fiche, qui est une page de vente. Le laser y est depuis le 16/10/2026 :
+# le code de VerdierCAM le dit lui-meme « chantier experimental ». Le jour ou
+# il est pret, retirer ses familles d'ici et les ranger dans un groupe.
+# Elles ne comptent pas non plus dans le nombre de familles affiche.
+VERDIERCAM_TAIRES = ['Laser', 'LaserCut', 'LaserFill', 'LaserTest']
+
 
 def faits_verdiercam() -> dict:
     """Version et familles d'opérations, lues dans le dépôt de VerdierCAM."""
@@ -289,6 +296,10 @@ def faits_verdiercam() -> dict:
         sys.exit(f"generer : familles illisibles dans {op} — le format a changé ?")
 
     rangees = {f for _, fam in VERDIERCAM_GROUPES for f in fam}
+    if rangees & set(VERDIERCAM_TAIRES):
+        sys.exit(f"generer : famille(s) a la fois rangee(s) et tue(s) : "
+                 f"{', '.join(sorted(rangees & set(VERDIERCAM_TAIRES)))}")
+    faites = [f for f in faites if f not in VERDIERCAM_TAIRES]
     oubliees = sorted(set(faites) - rangees)
     if oubliees:
         sys.exit(f"generer : famille(s) VerdierCAM sans groupe : {', '.join(oubliees)} "
