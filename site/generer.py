@@ -261,11 +261,13 @@ VERDIERCAM_GROUPES = [
 ]
 
 # LES FAMILLES TAIRES : faites dans le logiciel, mais pas encore annoncees sur
-# la fiche, qui est une page de vente. Le laser y est depuis le 16/10/2026 :
-# le code de VerdierCAM le dit lui-meme « chantier experimental ». Le jour ou
-# il est pret, retirer ses familles d'ici et les ranger dans un groupe.
-# Elles ne comptent pas non plus dans le nombre de familles affiche.
-VERDIERCAM_TAIRES = ['Laser', 'LaserCut', 'LaserFill', 'LaserTest']
+# la fiche, qui est une page de vente. Ce sont celles du laser (16/10/2026,
+# Christophe : « les cacher ») — le code de VerdierCAM les dit lui-meme
+# « chantier experimental ». Elles ne se recopient pas ici : elles se LISENT
+# dans le corps de `EstLaser` (src/cam/Operation.h), comme le fait deja le
+# site de VerdierCAM. Une famille laser ajoutee au logiciel est donc tue
+# d'office. Elles ne comptent pas dans le nombre de familles affiche.
+# Le jour ou le laser est pret, retirer ce filtre et ranger ses familles.
 
 
 def faits_verdiercam() -> dict:
@@ -295,11 +297,16 @@ def faits_verdiercam() -> dict:
     if not noms or not faites:
         sys.exit(f"generer : familles illisibles dans {op} — le format a changé ?")
 
+    m = re.search(r'bool\s+EstLaser\s*\([^)]*\)\s*\{(.*?)\}', texte, re.S)
+    taires = set(re.findall(r'OperationFamily::(\w+)', m.group(1))) if m else set()
+    if not taires:
+        sys.exit(f"generer : EstLaser illisible dans {op} — les familles laser "
+                 f"seraient annoncees sur la fiche.")
     rangees = {f for _, fam in VERDIERCAM_GROUPES for f in fam}
-    if rangees & set(VERDIERCAM_TAIRES):
+    if rangees & taires:
         sys.exit(f"generer : famille(s) a la fois rangee(s) et tue(s) : "
-                 f"{', '.join(sorted(rangees & set(VERDIERCAM_TAIRES)))}")
-    faites = [f for f in faites if f not in VERDIERCAM_TAIRES]
+                 f"{', '.join(sorted(rangees & taires))}")
+    faites = [f for f in faites if f not in taires]
     oubliees = sorted(set(faites) - rangees)
     if oubliees:
         sys.exit(f"generer : famille(s) VerdierCAM sans groupe : {', '.join(oubliees)} "
